@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import Footer from './Footer';
 import { Calendar, Shield, AlertCircle, CheckCircle } from 'lucide-react';
 import './SubscribeForm.css';
 
@@ -235,7 +234,7 @@ interface FormData {
           </div>
         </div>
       </div>
-      <Footer />
+     
     </div>
   );
 };

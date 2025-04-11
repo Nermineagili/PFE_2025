@@ -20,6 +20,5 @@ router.post(
 );
 
 // GET route to fetch all contracts for a user
-router.get('/contracts/:userId', getUserContracts);
-
+router.get('/:userId', getUserContracts ,authenticateToken, validateObjectId);  // Ensure this is not `/contracts/:userId`
 module.exports = router;

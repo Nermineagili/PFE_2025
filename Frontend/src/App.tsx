@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import SignUp from './pages/SignUp';
@@ -33,26 +33,25 @@ function App() {
 }
 
 function AppContent() {
-  const location = useLocation();
   const { isLoggedIn, user } = useAuth();
-
-  // Define routes where Layout (Navbar+Footer) should be hidden
-  const excludedRoutes = ['/signin', '/signup', '/adminhome', '/settings', '/admin/edit-user/:id'];
 
   return (
     <Routes>
-<Route 
-  path="/" 
-  element={
-    !isLoggedIn ? (
-      <HomePage />
-    ) : (
-      user?.role === 'admin' ? 
-        <Navigate to="/adminhome" replace /> : 
-        <Navigate to="/clienthome" replace />
-    )
-  } 
-/>
+      {/* Homepage */}
+      <Route 
+        path="/" 
+        element={
+          !isLoggedIn ? (
+            <HomePage />
+          ) : user?.role === 'admin' ? (
+            <Navigate to="/adminhome" replace />
+          ) : (
+            <Navigate to="/clienthome" replace />
+          )
+        } 
+      />
+
+      {/* Auth */}
       <Route path="/signup" element={!isLoggedIn ? <SignUp /> : <Navigate to="/" replace />} />
       <Route path="/signin" element={!isLoggedIn ? <SignIn /> : <Navigate to="/" replace />} />
       
@@ -67,16 +66,21 @@ function AppContent() {
         <Route path="/mes-declarations" element={<MesDeclarations />} />
         <Route path="/guide" element={<UserGuide />} />
       </Route>
-      
+
       {/* Routes without Layout */}
       <Route 
         path="/adminhome" 
         element={isLoggedIn && user?.role === 'admin' ? <AdminHome /> : <Navigate to="/" replace />} 
       />
       <Route path="/settings" element={<Settings />} />
-      <Route path="/admin/edit-user/:id" element={<EditUser id={''} onClose={() => {}} />} />
+      <Route path="/admin/edit-user/:id" element={<EditUserWrapper />} />
     </Routes>
   );
+}
+
+function EditUserWrapper() {
+  const { id } = useParams<{ id: string }>();
+  return <EditUser id={id || ''} onClose={() => {}} />;
 }
 
 export default App;

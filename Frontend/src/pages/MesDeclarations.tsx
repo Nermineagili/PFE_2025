@@ -6,7 +6,6 @@ import { Badge, Table, Spinner, Container, Card, Button } from "react-bootstrap"
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { FiX } from "react-icons/fi";
 import "./MesDeclarations.css";
-import Footer from "../components/Footer";
 interface Claim {
   _id: string;
   incidentDescription: string;
@@ -170,7 +169,7 @@ const MesDeclarations = () => {
           </Card.Body>
         </Card>
       </Container>
-    <Footer/>
+    
     </section>
   );
 };
