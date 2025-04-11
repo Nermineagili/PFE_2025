@@ -1,0 +1,137 @@
+/* Main Container */
+.manage-users-container {
+  padding: 2rem 0;
+}
+
+.manage-users-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: none;
+}
+
+.manage-users-title {
+  color: #153a64;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+/* Table Styles */
+.manage-users-table {
+  margin-top: 1rem;
+}
+
+.manage-users-table thead th {
+  background-color: #153a64;
+  color: white;
+  border-bottom: 2px solid #c19048;
+}
+
+.manage-users-table tbody tr:hover {
+  background-color: rgba(193, 144, 72, 0.05);
+}
+
+.actions-cell {
+  white-space: nowrap;
+}
+
+.action-btn {
+  border: none;
+  background: transparent;
+  padding: 0.4rem;
+  margin: 0 0.2rem;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.action-btn:hover {
+  transform: scale(1.1);
+}
+
+.analyze-btn {
+  color: #153a64;
+}
+
+.analyze-btn:hover {
+  background-color: rgba(21, 58, 100, 0.1);
+}
+
+.approve-btn {
+  color: #28a745;
+}
+
+.approve-btn:hover {
+  background-color: rgba(40, 167, 69, 0.1);
+}
+
+.reject-btn {
+  color: #dc3545;
+}
+
+.reject-btn:hover {
+  background-color: rgba(220, 53, 69, 0.1);
+}
+
+.delete-btn {
+  color: #6c757d;
+}
+
+.delete-btn:hover {
+  background-color: rgba(108, 117, 125, 0.1);
+}
+
+/* Status Badges */
+.badge {
+  padding: 0.5em 0.75em;
+  font-weight: 500;
+  border-radius: 8px;
+}
+
+/* User Modal Styles */
+.user-modal {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.modal-header {
+  background-color: #153a64;
+  color: white;
+  border-bottom: 2px solid #c19048;
+}
+
+.modal-header .btn-close {
+  filter: invert(1);
+}
+
+.modal-body {
+  padding: 25px;
+}
+
+.modal-footer {
+  border-top: 1px solid #e5e7eb;
+  padding: 15px 25px;
+}
+
+.close-button {
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .manage-users-container {
+    padding: 1rem;
+  }
+  
+  .manage-users-table {
+    font-size: 0.9rem;
+  }
+  
+  .action-btn {
+    padding: 0.3rem;
+    margin: 0 0.1rem;
+  }
+  
+  .modal-body {
+    padding: 20px;
+  }
+}

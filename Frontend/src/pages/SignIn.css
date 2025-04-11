@@ -1,0 +1,62 @@
+/* Parent container to center the form */
+.signin-background {
+    width: 100%;
+    height: 100vh;
+    background-color: white; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* The form container */
+.signin-form {
+    background-color: #1f618d; 
+    border-radius: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    padding: 30px;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+/* Form heading */
+.signin-form h2 {
+    color: #fff;
+    margin-bottom: 20px;
+}
+
+/* Input fields */
+.signin-form .form-control {
+    background-color: #5499c7; 
+    border: none;
+    color: #fff;
+}
+
+/* Placeholder text color */
+.signin-form .form-control::placeholder {
+    color: #ffffffcc; 
+}
+
+/* Button styling */
+.btn-submit {
+    background-color: #fff !important;
+    color: #3790c7 !important;
+    border: none !important;
+    font-weight: 600;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+/* Existing account text */
+.existing-account {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.existing-account a {
+    color: #fff;
+    text-decoration: underline;
+}
+.existing-account span{
+    color: #fff;
+}

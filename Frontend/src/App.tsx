@@ -1,0 +1,82 @@
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import HomePage from './pages/HomePage';
+import SignUp from './pages/SignUp';
+import SignIn from './pages/SignIn';
+import ClientHome from './pages/ClientHome';
+import AdminHome from './pages/AdminHome';
+import { AuthProvider, useAuth } from "./context/AuthContext"; 
+import { ThemeProvider } from "./context/ThemeContext"; 
+import { Suspense } from 'react';
+import ClaimForm from './pages/ClaimForm';
+import EditUser from './components/EditUser';
+import '@fortawesome/fontawesome-free/css/all.css';
+import MesDeclarations from './pages/MesDeclarations';
+import Settings from './components/Settings'; 
+import './styles/theme.css'; 
+import SubscribeForm from './components/SubscribeForm';
+import UserGuide from './pages/UserGuide';
+import Layout from './pages/Layout';
+
+function App() {
+  return (
+    <AuthProvider>
+      <ThemeProvider>
+        <Router>
+          <Suspense fallback={<div>Loading...</div>}>
+            <AppContent />
+          </Suspense>
+        </Router>
+      </ThemeProvider>
+    </AuthProvider>
+  );
+}
+
+function AppContent() {
+  const location = useLocation();
+  const { isLoggedIn, user } = useAuth();
+
+  // Define routes where Layout (Navbar+Footer) should be hidden
+  const excludedRoutes = ['/signin', '/signup', '/adminhome', '/settings', '/admin/edit-user/:id'];
+
+  return (
+    <Routes>
+<Route 
+  path="/" 
+  element={
+    !isLoggedIn ? (
+      <HomePage />
+    ) : (
+      user?.role === 'admin' ? 
+        <Navigate to="/adminhome" replace /> : 
+        <Navigate to="/clienthome" replace />
+    )
+  } 
+/>
+      <Route path="/signup" element={!isLoggedIn ? <SignUp /> : <Navigate to="/" replace />} />
+      <Route path="/signin" element={!isLoggedIn ? <SignIn /> : <Navigate to="/" replace />} />
+      
+      {/* Routes with Layout */}
+      <Route element={<Layout />}>
+        <Route 
+          path="/clienthome" 
+          element={isLoggedIn && user?.role === 'user' ? <ClientHome /> : <Navigate to="/" replace />} 
+        />
+        <Route path="/claimform" element={<ClaimForm />} />
+        <Route path="/souscription" element={<SubscribeForm />} />
+        <Route path="/mes-declarations" element={<MesDeclarations />} />
+        <Route path="/guide" element={<UserGuide />} />
+      </Route>
+      
+      {/* Routes without Layout */}
+      <Route 
+        path="/adminhome" 
+        element={isLoggedIn && user?.role === 'admin' ? <AdminHome /> : <Navigate to="/" replace />} 
+      />
+      <Route path="/settings" element={<Settings />} />
+      <Route path="/admin/edit-user/:id" element={<EditUser id={''} onClose={() => {}} />} />
+    </Routes>
+  );
+}
+
+export default App;

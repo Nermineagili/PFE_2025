@@ -1,0 +1,103 @@
+/* Edit User Component Styles - Unique Class Names */
+.edit-user-wrapper {
+  padding: 25px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.edit-user-spinner-container {
+  display: flex;
+  justify-content: center;
+  padding: 40px 0;
+}
+
+.edit-user-alert {
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+.edit-user-form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.edit-user-form-group {
+  margin-bottom: 0;
+}
+
+.edit-user-form-label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 600;
+  color: #153a64;
+  font-size: 0.95rem;
+}
+
+.edit-user-form-input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.edit-user-form-input:focus {
+  border-color: #c19048;
+  box-shadow: 0 0 0 0.2rem rgba(193, 144, 72, 0.25);
+  outline: none;
+}
+
+.edit-user-button-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.edit-user-cancel-btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 500;
+  background-color: #6c757d;
+  border: none;
+}
+
+.edit-user-submit-btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 500;
+  background-color: #153a64;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.edit-user-submit-btn:hover {
+  background-color: #0d2a4a;
+  transform: translateY(-1px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .edit-user-wrapper {
+      padding: 20px;
+  }
+  
+  .edit-user-form-input {
+      padding: 10px 12px;
+  }
+  
+  .edit-user-button-group {
+      flex-direction: column;
+      gap: 10px;
+  }
+  
+  .edit-user-cancel-btn,
+  .edit-user-submit-btn {
+      width: 100%;
+      padding: 12px;
+  }
+}

@@ -1,0 +1,48 @@
+.contactus-section {
+    padding: 60px 0;
+    background: #f8f9fa;
+  }
+  
+  .contact-container {
+    max-width: 600px;
+    margin: auto;
+  }
+  
+  .contact-card {
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    background: white;
+  }
+  
+  .contact-title {
+    font-size: 28px;
+    font-weight: bold;
+    color: #1f618d;
+  }
+  
+  .contact-subtitle {
+    font-size: 16px;
+    color: #5d6d7e;
+    margin-bottom: 20px;
+  }
+  
+  .contact-form .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .send-button {
+    background-color: #1f618d !important;
+    border: none;
+    padding: 10px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 8px;
+    transition: 0.3s;
+  }
+  
+  .send-button:hover {
+    background-color: #154360 !important;
+    transform: scale(1.05);
+  }
+  

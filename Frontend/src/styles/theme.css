@@ -1,0 +1,63 @@
+/* src/styles/theme.css */
+/* Light theme */
+body.light-theme {
+    --primary-bg: #ffffff;
+    --secondary-bg: #f8f9fa;
+    --text-color: #212529;
+    --border-color: #dee2e6;
+    --card-bg: #ffffff;
+    --card-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  }
+  
+  /* Dark theme */
+  body.dark-theme {
+    --primary-bg: #1a1a1a;
+    --secondary-bg: #2d2d2d;
+    --text-color: #f8f9fa;
+    --border-color: #495057;
+    --card-bg: #2d2d2d;
+    --card-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.5);
+  }
+  
+  /* Apply these variables to your components */
+  .settings-container {
+    background-color: var(--primary-bg);
+    color: var(--text-color);
+  }
+  
+  .settings-card {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    box-shadow: var(--card-shadow);
+  }
+  
+  /* Theme selector styles */
+  .theme-selector {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+  }
+  
+  .theme-option {
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid var(--border-color);
+    transition: all 0.2s;
+  }
+  
+  .theme-option:hover {
+    background-color: var(--secondary-bg);
+  }
+  
+  .theme-option.active {
+    background-color: var(--secondary-bg);
+    border-color: var(--primary-color);
+  }
+  
+  .theme-icon {
+    font-size: 1.25rem;
+  }

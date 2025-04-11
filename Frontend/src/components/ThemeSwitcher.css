@@ -1,0 +1,17 @@
+/* src/components/ThemeSwitcher.css */
+.theme-switcher-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+  }
+  
+  .theme-switcher-btn:hover {
+    transform: rotate(30deg);
+  }

@@ -1,0 +1,38 @@
+.apropos-section {
+  padding: 80px 20px;
+  background-color: #f9f9f9;
+  text-align: center;
+  color: #333;
+}
+
+.beliefs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.belief {
+  max-width: 280px;
+  padding: 20px;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease;
+}
+
+.belief:hover {
+  transform: translateY(-5px);
+}
+
+.belief span {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 10px;
+}
+
+h2, h3 {
+  color: #1a1a1a;
+  margin-bottom: 20px;
+}

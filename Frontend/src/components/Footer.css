@@ -1,0 +1,65 @@
+/* src/components/Footer.css */
+.footer {
+    background-color: #e2e1e1;
+    color: black;
+    padding: 20px 0;
+    text-align: center;
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.footer-logo {
+    margin-bottom: 15px;
+}
+
+.footer-logo-img {
+    width: 150px; /* Set a width for your logo */
+    height: auto;
+}
+
+.footer-nav {
+    margin-bottom: 10px;
+}
+
+.footer-link {
+    margin: 0 15px;
+    color: black;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+.footer-link:hover {
+    color: rgb(57, 53, 53);
+}
+
+.footer-copy {
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.footer-social {
+    margin-top: 10px;
+}
+
+.footer-social-link {
+    margin: 0 10px;
+    color: black;
+    text-decoration: none;
+}
+
+.footer-social-link:hover {
+    color: rgb(57, 53, 53);
+}
+
+.footer-icon {
+    font-size: 24px; /* Icon size */
+    transition: color 0.3s ease;
+}
+
+.footer-social-link:hover .footer-icon {
+    color: rgb(57, 53, 53);
+}

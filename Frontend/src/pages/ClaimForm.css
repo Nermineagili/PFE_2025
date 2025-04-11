@@ -1,0 +1,65 @@
+.claim-form-section {
+  padding: 60px 0;
+  background: #f8f9fa;
+}
+
+.claim-container {
+  max-width: 800px;
+  margin: auto;
+}
+
+.claim-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  background: white;
+}
+
+.claim-title {
+  font-size: 28px;
+  font-weight: bold;
+  color: #1f618d;
+  margin-bottom: 15px;
+}
+
+.claim-subtitle {
+  font-size: 16px;
+  color: #5d6d7e;
+  margin-bottom: 30px;
+}
+
+.claim-form .form-group {
+  margin-bottom: 20px;
+}
+
+.submit-button {
+  background-color: #1f618d !important;
+  border: none;
+  padding: 10px 30px;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 8px;
+  transition: 0.3s;
+  margin-top: 20px;
+}
+
+.submit-button:hover {
+  background-color: #154360 !important;
+  transform: scale(1.05);
+}
+
+.birth-date-container {
+  display: flex;
+  gap: 10px;
+}
+
+.birth-date-select {
+  flex: 1;
+}
+
+@media (max-width: 576px) {
+  .birth-date-container {
+    flex-direction: column;
+    gap: 10px;
+  }
+}

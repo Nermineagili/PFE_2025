@@ -1,0 +1,12 @@
+/* styles.css */
+.sticky-navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000; /* Ensure the navbar is above other content */
+    background-color: #51565c; /* Match the navbar background color */
+  }
+  
+  .main-content {
+    padding-top: 70px; /* Adjust this value based on your navbar height */
+  }

@@ -1,0 +1,452 @@
+/* Navbar Styling */
+.custom-navbar {
+    position: fixed; /* La navbar reste fixe */
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; /* S'assure qu'elle soit au-dessus des autres éléments */
+    background: #e2e1e1;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 10px 20px;
+    border-bottom: 3px solid #1f618d;
+}
+
+/* Navbar Brand */
+.custom-navbar .navbar-brand {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #1f618d !important;
+}
+
+/* Navbar Links */
+.custom-navbar .nav-link {
+    font-size: 1rem;
+    font-weight: bold;
+    color: black !important;
+    margin-right: 15px;
+}
+
+/* Active Navbar Link */
+.custom-navbar .nav-link.active {
+    color: #1f618d !important;
+}
+
+/* "Se connecter" Link */
+.custom-navbar .nav-link[href="/signin"] {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: bold;
+}
+
+/* "S'inscrire" Button */
+.custom-button {
+    background: #1f618d;
+    border-radius: 20px;
+    width: 120px;
+    height: 35px;
+    color: white;
+    border: none;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+}
+
+.custom-button:hover {
+    background: #154360;
+}
+
+/* Additional styling for the Logout button */
+.logout-button {
+    background: #e74c3c; /* Red background */
+    border-radius: 20px;
+    width: 120px;
+    height: 35px;
+    color: white;
+    border: none;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+    margin-left: 15px;
+}
+
+.logout-button:hover {
+    background: #c0392b; /* Darker red on hover */
+}
+
+/* Navbar Collapse (Ensures Alignment) */
+.navbar-collapse {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Navbar Right Section */
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+.nav-icon {
+    cursor: pointer;
+    color: inherit; /* or a specific color */
+  }
+  /* Profile picture styling */
+.navbar-profile-pic {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  
+  /* Username styling */
+  .navbar-user-name {
+    font-size: 0.9rem;
+    color: inherit; /* or specify a color to match your navbar text */
+  }
+  
+  /* Optional: adjust the logout icon styling */
+  .nav-icon {
+    cursor: pointer;
+    color: inherit;
+    margin-left: 4px;
+  }
+
+
+  .navbar-profile-pic {
+    cursor: pointer;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  
+  .navbar-profile-icon {
+    color: gray;
+    cursor: pointer;
+  }
+  
+  .profile-container {
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
+  }
+  
+  .navbar-user-name {
+    margin: 0 8px;
+    font-weight: bold;
+  }
+  
+  
+  /* Profile picture styling
+.navbar-profile-pic {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    cursor: pointer;
+  }
+  
+  /* Default profile icon styling */
+  /* .navbar-profile-icon {
+    cursor: pointer;
+  } */ */
+  
+  /* Username styling */
+  .navbar-user-name {
+    font-size: 0.9rem;
+    color: inherit;
+  }
+  /* Profile Modal Styles */
+/* Profile Modal Styles */
+.profile-tabs .nav-link {
+  color: #103e58;
+  font-weight: 500;
+  border: none;
+  padding: 12px 20px;
+}
+
+.profile-tabs .nav-link.active {
+  color: #bf8f50;
+  background-color: transparent;
+  border-bottom: 2px solid #bf8f50;
+}
+
+.profile-tabs .nav-link:hover {
+  color: #bf8f50;
+}
+
+.profile-tab-content, .password-tab-content {
+  padding: 20px;
+}
+
+.profile-image-section {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.profile-image-container {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 1rem;
+}
+
+.profile-image-large {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border: 3px solid #f8f9fa;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+}
+
+.profile-initials-large {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #103e58, #bf8f50);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  font-weight: bold;
+  margin: 0 auto;
+  border: 3px solid #f8f9fa;
+}
+
+.profile-form, .password-form {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.profile-info-value {
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  background-color: #f8f9fa;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  border: 1px solid #e9ecef;
+}
+
+/* Buttons */
+.save-btn {
+  background-color: #bf8f50;
+  border-color: #bf8f50;
+}
+
+.save-btn:hover {
+  background-color: #a87d44;
+  border-color: #a87d44;
+}
+
+.edit-btn, .cancel-btn {
+  color: #103e58;
+  border-color: #103e58;
+}
+
+.edit-btn:hover, .cancel-btn:hover {
+  background-color: #f0f0f0;
+  color: #103e58;
+}
+
+.change-password-btn {
+  background-color: #103e58;
+  border-color: #103e58;
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.change-password-btn:hover {
+  background-color: #0a2d42;
+  border-color: #0a2d42;
+}
+
+/* Profile in Navbar */
+.profile-container {
+  position: relative;
+}
+
+.profile-image {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+}
+
+.profile-initials {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #103e58, #bf8f50);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.navbar-user-name {
+  color: #103e58;
+  font-weight: 500;
+}
+
+/* Modal Animation */
+.modal.fade .modal-dialog {
+  transition: transform 0.3s ease-out, opacity 0.3s ease;
+  transform: translateY(-20px);
+  opacity: 0;
+}
+
+.modal.show .modal-dialog {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Form inputs */
+.form-control:focus {
+  border-color: #bf8f50;
+  box-shadow: 0 0 0 0.2rem rgba(191, 143, 80, 0.25);
+}
+  /* Notification Badge Styles */
+/* Modern Notification Badge */
+.notification-badge {
+  position: relative;
+  margin-left: 8px;
+}
+
+.notification-dot {
+  width: 10px;
+  height: 10px;
+  background: linear-gradient(135deg, #c19048 0%, #e0b15f 100%);
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.8);
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(193, 144, 72, 0.7);
+  }
+  70% {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 8px rgba(193, 144, 72, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(193, 144, 72, 0);
+  }
+}
+
+/* Modern Nav Link with Notification */
+.nav-link-with-notification {
+  position: relative;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.nav-link-with-notification:hover {
+  color: #c19048 !important;
+}
+
+/* Additional styles for the dropdown navigation */
+.nav-dropdown-toggle {
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  color: black !important;
+}
+
+.nav-dropdown-toggle::after {
+  margin-left: 6px;
+}
+
+.nav-dropdown-menu {
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 8px 0;
+  min-width: 220px;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  color: #333;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background-color: #f7f7f7;
+  color: #1f618d;
+}
+
+.dropdown-item:active {
+  background-color: #e8f0fe;
+  color: #1f618d;
+}
+
+/* Notification in dropdown */
+.dropdown-item-with-notification {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.dropdown-notification-badge {
+  margin-left: 8px;
+}
+
+/* Add icons to main nav items */
+.nav-link svg, .dropdown-item svg {
+  vertical-align: -0.125em;
+}
+
+/* Animation for dropdown */
+.dropdown-menu {
+  animation: dropdown-fade 0.2s ease;
+  transform-origin: top;
+}
+
+@keyframes dropdown-fade {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 991px) {
+  .nav-dropdown-menu {
+    box-shadow: none;
+    border-left: 3px solid #1f618d;
+    border-radius: 0;
+    margin-left: 15px;
+    padding-left: 0;
+  }
+  
+  .dropdown-item {
+    padding: 8px 16px;
+  }
+  
+  .nav-dropdown-toggle {
+    padding-left: 0;
+  }
+  
+  .navbar-collapse {
+    padding-top: 10px;
+  }
+}

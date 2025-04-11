@@ -1,0 +1,68 @@
+/* AdminSidebar.css */
+.admin-sidebar {
+  width: 250px;
+  height: 100vh;
+  background-color: #343a40;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  left: 0;
+  top: 0;
+  transition: width 0.3s;
+  overflow-y: auto; /* Enable scrolling */
+}
+
+.admin-sidebar.collapsed {
+  width: 70px;
+}
+
+.admin-sidebar-toggle-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 18px;
+  margin: 10px;
+  cursor: pointer;
+}
+
+.admin-sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  padding-top: 20px;
+}
+
+.admin-nav-item {
+  padding: 15px;
+  color: white;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  transition: background 0.3s;
+}
+
+.admin-nav-item .admin-nav-icon {
+  margin-right: 10px;
+  font-size: 18px;
+}
+
+.admin-sidebar.collapsed .admin-nav-item span {
+  display: none;
+}
+
+.admin-nav-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.admin-log-out:hover {
+  background: #c82333;
+}
+
+.content-area {
+  margin-left: 250px; /* Adjusts the content area when sidebar is expanded */
+  transition: margin-left 0.3s;
+}
+
+.admin-sidebar.collapsed + .content-area {
+  margin-left: 70px; /* Adjusts when sidebar is collapsed */
+}
