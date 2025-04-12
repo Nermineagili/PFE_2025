@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Container, Nav, Navbar, Image, Dropdown } from "react-bootstrap";
-import { MdLogout, MdMenu, MdDashboard, MdAssignment, MdInsertDriveFile, MdContactSupport } from "react-icons/md";
+import { MdLogout, MdMenu, MdDashboard, MdAssignment, MdInsertDriveFile, MdContactSupport, MdDescription } from "react-icons/md";
 import { BsInfoCircle, BsShield } from "react-icons/bs";
 import UserProfileModal from "./UserProfileModal";
 import "./navbar.css";
@@ -121,6 +121,10 @@ const CustomNavbar: React.FC<NavbarProps> = ({
     navigate("/mes-declarations");
   };
 
+  const handleNavigateToMesContrats = () => {
+    navigate("/mes-contrats");
+  };
+
   return (
     <>
       <Navbar collapseOnSelect expand="lg" className="custom-navbar">
@@ -161,6 +165,9 @@ const CustomNavbar: React.FC<NavbarProps> = ({
                           <span className="notification-dot"></span>
                         </span>
                       )}
+                    </Dropdown.Item>
+                    <Dropdown.Item onClick={handleNavigateToMesContrats}>
+                      <MdDescription className="me-2" /> Mes Contrats
                     </Dropdown.Item>
                   </Dropdown.Menu>
                 </Dropdown>

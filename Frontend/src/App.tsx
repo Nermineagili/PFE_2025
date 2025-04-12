@@ -17,6 +17,7 @@ import './styles/theme.css';
 import SubscribeForm from './components/SubscribeForm';
 import UserGuide from './pages/UserGuide';
 import Layout from './pages/Layout';
+import MesContrats from './pages/MesContrats';
 
 function App() {
   return (
@@ -65,6 +66,7 @@ function AppContent() {
         <Route path="/souscription" element={<SubscribeForm />} />
         <Route path="/mes-declarations" element={<MesDeclarations />} />
         <Route path="/guide" element={<UserGuide />} />
+        <Route path="/mes-contrats" element={<MesContrats />} />
       </Route>
 
       {/* Routes without Layout */}
