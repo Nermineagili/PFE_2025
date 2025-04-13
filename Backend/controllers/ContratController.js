@@ -31,6 +31,10 @@ exports.createContract = async (req, res) => {
     // Save the contract to the database
     await contract.save();
 
+    // Add the contract reference to the user's contracts array
+    user.contracts.push(contract._id);
+    await user.save();
+
     res.status(201).json({
       message: 'Contract created successfully',
       contract,
@@ -45,13 +49,15 @@ exports.createContract = async (req, res) => {
 exports.getUserContracts = async (req, res) => {
   try {
     const { userId } = req.params;
-    const contracts = await Contract.find({ userId });
 
-    if (!contracts || contracts.length === 0) {
+    // Find the user and populate the contracts
+    const user = await User.findById(userId).populate('contracts');
+
+    if (!user || !user.contracts || user.contracts.length === 0) {
       return res.status(404).json({ message: 'No contracts found' });
     }
 
-    res.status(200).json(contracts);
+    res.status(200).json(user.contracts);
   } catch (error) {
     console.error('Error fetching contracts:', error);
     res.status(500).json({ message: 'Server error' });

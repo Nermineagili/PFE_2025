@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Table, Button, Alert, Spinner, Card, Container, Modal, OverlayTrigger, Tooltip} from "react-bootstrap";
-import { FaRegEdit, FaRegTrashAlt } from 'react-icons/fa';
+import { Table, Button, Alert, Spinner, Card, Container, Modal, OverlayTrigger, Tooltip, Form } from "react-bootstrap";
+import { FaRegEdit, FaRegTrashAlt, FaFilter, FaUserCheck } from 'react-icons/fa';
 import EditUser from "./EditUser";
 import "./ManageUsers.css";
 
@@ -10,10 +10,11 @@ interface User {
   name: string;
   lastname: string;
   email: string;
-  createdAt: string; // Added to match claims structure
+  createdAt: string;
 }
 
 const API_BASE_URL = "http://localhost:5000/api/admin/users";
+const API_BASE_URL2 = "http://localhost:5000/api/admin";
 
 function ManageUsers() {
   const [users, setUsers] = useState<User[]>([]);
@@ -21,6 +22,9 @@ function ManageUsers() {
   const [error, setError] = useState<string | null>(null);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [filterContracts, setFilterContracts] = useState<boolean>(false);
+  const [totalUsers, setTotalUsers] = useState<number>(0);
+  const [filteredCount, setFilteredCount] = useState<number>(0);
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -28,13 +32,30 @@ function ManageUsers() {
       const token = localStorage.getItem("authToken");
       if (!token) throw new Error("No authentication token found.");
 
-      const response = await axios.get<User[]>(`${API_BASE_URL}`, {
+      // First, get total users count for reference
+      if (!totalUsers) {
+        const allUsersResponse = await axios.get<User[]>(`${API_BASE_URL}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        
+        if (Array.isArray(allUsersResponse.data)) {
+          setTotalUsers(allUsersResponse.data.length);
+        }
+      }
+
+      // Then get either filtered or all users based on filter setting
+      const url = filterContracts
+        ? `${API_BASE_URL2}/users-with-contracts-only`
+        : `${API_BASE_URL}`;
+
+      const response = await axios.get<User[]>(url, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       if (!response.data || !Array.isArray(response.data)) throw new Error("Invalid API response format");
-      
+
       setUsers(response.data);
+      setFilteredCount(response.data.length);
     } catch (err) {
       console.error("Error fetching users:", err);
       setError("Failed to fetch users.");
@@ -54,8 +75,6 @@ function ManageUsers() {
     fetchUsers();
   };
 
-
-
   const deleteUser = async (id: string) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
     try {
@@ -72,17 +91,39 @@ function ManageUsers() {
     }
   };
 
-
-
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [filterContracts]); // re-fetch when the filter changes
 
   return (
     <Container className="manage-users-container">
       <Card className="manage-users-card">
         <Card.Body>
           <h2 className="manage-users-title">Manage Users</h2>
+
+          {/* Enhanced Filter Toggle */}
+          <div className="filter-container">
+            <div className="filter-title">
+              <FaFilter className="filter-icon" />
+              {filterContracts ? 'Showing users with contracts' : 'Showing all users'}
+              {!loading && (
+                <span className="filter-count">
+                  {filterContracts ? filteredCount : totalUsers}
+                </span>
+              )}
+            </div>
+            
+            <div className="filter-switch">
+              <Form.Check
+                type="switch"
+                id="filter-contracts-switch"
+                label="Show only users with contracts"
+                checked={filterContracts}
+                onChange={() => setFilterContracts(!filterContracts)}
+                className="custom-switch"
+              />
+            </div>
+          </div>
 
           {loading && (
             <div className="text-center py-4">
@@ -98,7 +139,8 @@ function ManageUsers() {
 
           {!loading && !error && users.length === 0 && (
             <Alert variant="info" className="text-center">
-              No users found
+              <FaUserCheck className="mb-2" size={32} />
+              <p className="mb-0">No users found matching the current filter criteria</p>
             </Alert>
           )}
 
@@ -122,25 +164,13 @@ function ManageUsers() {
                       <td>{user.lastname}</td>
                       <td>{user.email}</td>
                       <td className="actions-cell">
-                        <OverlayTrigger overlay={<Tooltip id={`edit-tooltip-${user._id}`}>Edit User</Tooltip>}>
-                          <Button
-                            size="sm"
-                            className="action-btn analyze-btn"
-                            onClick={() => handleEditUser(user._id)}
-                          >
+                        <OverlayTrigger overlay={<Tooltip>Edit User</Tooltip>}>
+                          <Button size="sm" className="action-btn analyze-btn" onClick={() => handleEditUser(user._id)}>
                             <FaRegEdit />
                           </Button>
                         </OverlayTrigger>
-                        
-                      
-                           
-                         
-                        <OverlayTrigger overlay={<Tooltip id={`delete-tooltip-${user._id}`}>Delete</Tooltip>}>
-                          <Button
-                            size="sm"
-                            className="action-btn delete-btn"
-                            onClick={() => deleteUser(user._id)}
-                          >
+                        <OverlayTrigger overlay={<Tooltip>Delete</Tooltip>}>
+                          <Button size="sm" className="action-btn delete-btn" onClick={() => deleteUser(user._id)}>
                             <FaRegTrashAlt />
                           </Button>
                         </OverlayTrigger>
@@ -154,22 +184,16 @@ function ManageUsers() {
         </Card.Body>
       </Card>
 
-      {/* Edit User Modal */}
+      {/* Edit Modal */}
       <Modal show={showModal} onHide={handleCloseModal} centered className="user-modal">
         <Modal.Header closeButton className="modal-header">
-          <Modal.Title className="modal-title">
-            Edit User
-          </Modal.Title>
+          <Modal.Title className="modal-title">Edit User</Modal.Title>
         </Modal.Header>
         <Modal.Body className="modal-body">
           {selectedUserId && <EditUser id={selectedUserId} onClose={handleCloseModal} />}
         </Modal.Body>
         <Modal.Footer className="modal-footer">
-          <Button 
-            variant="secondary" 
-            onClick={handleCloseModal}
-            className="close-button"
-          >
+          <Button variant="secondary" onClick={handleCloseModal} className="close-button">
             Close
           </Button>
         </Modal.Footer>

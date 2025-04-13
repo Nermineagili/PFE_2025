@@ -15,6 +15,81 @@
   margin-bottom: 1.5rem;
 }
 
+/* Filter Toggle Styles */
+.filter-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding: 0.8rem 1.2rem;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  border-left: 4px solid #153a64;
+}
+
+.filter-title {
+  display: flex;
+  align-items: center;
+  color: #153a64;
+  font-weight: 500;
+  margin: 0;
+  font-size: 1rem;
+}
+
+.filter-icon {
+  margin-right: 10px;
+  color: #c19048;
+}
+
+.filter-switch .form-check-input {
+  height: 1.5rem;
+  width: 3rem;
+  cursor: pointer;
+}
+
+.filter-switch .form-check-input:checked {
+  background-color: #153a64;
+  border-color: #153a64;
+}
+
+.filter-switch .form-check-input:focus {
+  box-shadow: 0 0 0 0.25rem rgba(21, 58, 100, 0.25);
+}
+
+.form-check-input:before {
+  content: '';
+  position: absolute;
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 50%;
+  top: 0.2rem;
+  left: 0.2rem;
+  background-color: white;
+  transition: transform 0.15s ease-in-out;
+}
+
+.form-check-input:checked:before {
+  transform: translateX(1.5rem);
+}
+
+.filter-switch .form-check-label {
+  cursor: pointer;
+  padding-left: 0.5rem;
+  font-weight: 500;
+  color: #495057;
+}
+
+.filter-count {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  margin-left: 10px;
+  background-color: #153a64;
+  color: white;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
 /* Table Styles */
 .manage-users-table {
   margin-top: 1rem;
@@ -120,6 +195,15 @@
 @media (max-width: 768px) {
   .manage-users-container {
     padding: 1rem;
+  }
+  
+  .filter-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .filter-switch {
+    margin-top: 0.5rem;
   }
   
   .manage-users-table {

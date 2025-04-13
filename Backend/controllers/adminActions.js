@@ -1,6 +1,35 @@
 const User = require('../models/user');
 const Claim = require("../models/claim"); // Import the Claim model
+const Contract = require("../models/Contract"); // <- make sure you have this model!
 
+// Fetch all users (without admin) + their contracts
+const getAllUsersWithContracts = async (req, res) => {
+    try {
+      const users = await User.find({ role: { $ne: 'admin' } })
+        .select('-password')
+        .populate('contracts');
+      res.json(users);
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to fetch users with contracts' });
+    }
+  };
+  
+
+// Fetch only users who have at least one contract
+const getUsersWithContractsOnly = async (req, res) => {
+    try {
+      const users = await User.find({
+        role: { $ne: 'admin' },
+        contracts: { $exists: true, $not: { $size: 0 } }
+      })
+        .select('-password')
+        .populate('contracts');
+      res.json(users);
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to fetch users with contracts' });
+    }
+  };
+  
 const getAllUsers = async (req, res) => {
     try {
       // Fetch all users except those with the role "admin"
@@ -122,4 +151,4 @@ const deleteClaim = async (req, res) => {
 
 
 
-module.exports = { getAllUsers, updateUser, deleteUser, getUserById, getAllClaims, getClaimById, deleteClaim, updateClaimStatus};
+module.exports = { getAllUsers, updateUser, deleteUser, getUserById, getAllClaims, getClaimById, deleteClaim, updateClaimStatus,getAllUsersWithContracts,getUsersWithContractsOnly};
