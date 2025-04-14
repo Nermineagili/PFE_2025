@@ -82,25 +82,26 @@ const ClaimForm = forwardRef<HTMLDivElement>((_props, ref) => {
     try {
       const userId = localStorage.getItem('userId');
       if (!userId) {
-        setError("User ID is missing. Please log in again.");
+        setError("L'identifiant utilisateur est manquant. Veuillez vous reconnecter.");
+        setLoading(false);
         return;
       }
 
-      const birthDate = { 
-        ...formData.birthDate, 
-        month: monthMap[formData.birthDate.month] || formData.birthDate.month 
+      const birthDate = {
+        ...formData.birthDate,
+        month: monthMap[formData.birthDate.month] || formData.birthDate.month,
       };
 
       const dataToSubmit = { ...formData, userId, birthDate };
 
       const response = await axios.post(
         'http://localhost:5000/api/claims/submit',
-        dataToSubmit, 
+        dataToSubmit,
         { headers: { 'Content-Type': 'application/json' } }
       );
 
       if (response.data.success) {
-        setSuccess('Claim submitted successfully!');
+        setSuccess('Sinistre soumis avec succès !');
         setFormData({
           firstName: '',
           lastname: '',
@@ -112,19 +113,34 @@ const ClaimForm = forwardRef<HTMLDivElement>((_props, ref) => {
           postalAddress: '',
           city: '',
           postalCode: '',
-          incidentDescription: '',
           stateProvince: '',
+          incidentDescription: '',
         });
       } else {
-        setError('Failed to submit claim. Please try again.');
+        setError('Échec de la soumission du sinistre. Veuillez réessayer.');
       }
-    } catch (error) {
-      console.error('Error submitting claim:', error);
-      setError('An error occurred while submitting the claim.');
+    } catch (error: any) {
+      console.error('Erreur lors de la soumission du sinistre :', error);
+
+      if (axios.isAxiosError(error) && error.response) {
+        switch (error.response.status) {
+          case 403:
+            setError("Vous n'avez pas de contrat actif pour déclarer un sinistre.");
+            break;
+          case 404:
+            setError("Utilisateur introuvable.");
+            break;
+          default:
+            setError(error.response.data?.error || 'Une erreur est survenue lors de l’envoi du formulaire.');
+        }
+      } else {
+        setError('Une erreur inconnue est survenue.');
+      }
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <section ref={ref} id="claim-form-section" className="claim-form-section">

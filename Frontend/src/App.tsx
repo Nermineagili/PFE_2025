@@ -18,6 +18,7 @@ import SubscribeForm from './components/SubscribeForm';
 import UserGuide from './pages/UserGuide';
 import Layout from './pages/Layout';
 import MesContrats from './pages/MesContrats';
+import SupervisorHome from './pages/SupervisorHome';
 
 function App() {
   return (
@@ -46,7 +47,10 @@ function AppContent() {
             <HomePage />
           ) : user?.role === 'admin' ? (
             <Navigate to="/adminhome" replace />
-          ) : (
+          ) : user?.role === 'superviseur' ? (
+            <Navigate to="/supervisorhome" replace />
+          )
+          : (
             <Navigate to="/clienthome" replace />
           )
         } 
@@ -58,10 +62,7 @@ function AppContent() {
       
       {/* Routes with Layout */}
       <Route element={<Layout />}>
-        <Route 
-          path="/clienthome" 
-          element={isLoggedIn && user?.role === 'user' ? <ClientHome /> : <Navigate to="/" replace />} 
-        />
+        
         <Route path="/claimform" element={<ClaimForm />} />
         <Route path="/souscription" element={<SubscribeForm />} />
         <Route path="/mes-declarations" element={<MesDeclarations />} />
@@ -71,8 +72,16 @@ function AppContent() {
 
       {/* Routes without Layout */}
       <Route 
+          path="/clienthome" 
+          element={isLoggedIn && user?.role === 'user' ? <ClientHome /> : <Navigate to="/" replace />} 
+        />
+      <Route 
         path="/adminhome" 
         element={isLoggedIn && user?.role === 'admin' ? <AdminHome /> : <Navigate to="/" replace />} 
+      />
+      <Route 
+        path="/supervisorhome" 
+        element={isLoggedIn && user?.role === 'superviseur' ? <SupervisorHome /> : <Navigate to="/" replace />} 
       />
       <Route path="/settings" element={<Settings />} />
       <Route path="/admin/edit-user/:id" element={<EditUserWrapper />} />

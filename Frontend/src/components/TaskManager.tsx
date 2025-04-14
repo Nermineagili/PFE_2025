@@ -128,7 +128,7 @@ function TaskManager() {
       <Card className="task-manager-card">
         <Card.Body>
           <div className="d-flex justify-content-between align-items-center mb-4">
-            <h2 className="task-manager-title">Task Manager</h2>
+            <h2 className="task-manager-title">Tâches à faire</h2>
             <Button 
               variant="primary" 
               onClick={() => setShowModal(true)}
@@ -162,7 +162,7 @@ function TaskManager() {
               <Table hover className="task-table">
                 <thead>
                   <tr>
-                    <th>Title</th>
+                    <th>Titre</th>
                     <th>Description</th>
                     <th>Actions</th>
                   </tr>

@@ -40,6 +40,22 @@ exports.checkAdmin = async (req, res, next) => {
         res.status(500).json({ error: "Authorization error" });
     }
 };
+// Check if the user is a supervisor
+exports.checkSupervisor = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user._id);
+        if (!user) return res.status(404).json({ error: "User not found" });
+
+        if (user.role !== 'superviseur') {
+            return res.status(403).json({ error: "Supervisor access required" });
+        }
+
+        next();
+    } catch (err) {
+        res.status(500).json({ error: "Authorization error" });
+    }
+};
+
 
 // Validate MongoDB ObjectId
 exports.validateObjectId = (req, res, next) => {

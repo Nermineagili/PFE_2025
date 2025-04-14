@@ -16,7 +16,7 @@ interface Claim {
   createdAt: string;
 }
 
-const API_BASE_URL = "http://localhost:5000/api/admin/claims";
+const API_BASE_URL = "http://localhost:5000/api/supervisor/claims";
 
 const ManageClaims: React.FC = () => {
   const { currentTheme } = useTheme();

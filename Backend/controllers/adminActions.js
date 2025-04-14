@@ -1,6 +1,46 @@
 const User = require('../models/user');
 const Claim = require("../models/claim"); // Import the Claim model
 const Contract = require("../models/Contract"); // <- make sure you have this model!
+const bcrypt = require('bcrypt');
+
+const createUser = async (req, res) => {
+    try {
+        const { name, lastname, email, password, profilePic = '', role = 'user' } = req.body;
+    
+        // Basic validation
+        if (!name || !email || !password) {
+          return res.status(400).json({ error: 'Missing required fields' });
+        }
+    
+        // Check if email already exists
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+          return res.status(400).json({ error: 'Email already registered' });
+        }
+    
+        // Hash the password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+    
+        // Create new user
+        const newUser = new User({
+          name,
+          lastname,
+          email,
+          password: hashedPassword,
+          profilePic,
+          role,
+        });
+    
+        await newUser.save();
+    
+        res.status(201).json({ message: 'User created successfully', user: newUser });
+    
+      } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Internal server error' });
+      }
+    };
 
 // Fetch all users (without admin) + their contracts
 const getAllUsersWithContracts = async (req, res) => {
@@ -93,62 +133,7 @@ const deleteUser = async (req, res) => {
     }
 };
 
-// Get all claims (Admin only)
-const getAllClaims = async (req, res) => {
-    try {
-        const claims = await Claim.find().populate("userId", "name email"); // Get claims with user details
-        res.json(claims);
-    } catch (err) {
-        res.status(500).json({ error: "Failed to fetch claims" });
-    }
-};
-
-// Get claim by ID (Admin only)
-const getClaimById = async (req, res) => {
-    try {
-        const claim = await Claim.findById(req.params.id).populate("userId", "name email");
-        if (!claim) return res.status(404).json({ error: "Claim not found" });
-        
-        res.json(claim);
-    } catch (err) {
-        res.status(500).json({ error: "Failed to fetch claim" });
-    }
-};
-
-// Update claim status (Admin only)
-const updateClaimStatus = async (req, res) => {
-    try {
-        const { status } = req.body;
-        if (!["pending", "approved", "rejected"].includes(status)) {
-            return res.status(400).json({ error: "Invalid status value" });
-        }
-
-        const updatedClaim = await Claim.findByIdAndUpdate(
-            req.params.id,
-            { status },
-            { new: true }
-        );
-
-        if (!updatedClaim) return res.status(404).json({ error: "Claim not found" });
-
-        res.json({ message: "Claim status updated successfully", claim: updatedClaim });
-    } catch (err) {
-        res.status(500).json({ error: "Failed to update claim status" });
-    }
-};
-
-// Delete a claim (Admin only)
-const deleteClaim = async (req, res) => {
-    try {
-        const deletedClaim = await Claim.findByIdAndDelete(req.params.id);
-        if (!deletedClaim) return res.status(404).json({ error: "Claim not found" });
-
-        res.json({ message: "Claim deleted successfully" });
-    } catch (err) {
-        res.status(500).json({ error: "Failed to delete claim" });
-    }
-};
 
 
 
-module.exports = { getAllUsers, updateUser, deleteUser, getUserById, getAllClaims, getClaimById, deleteClaim, updateClaimStatus,getAllUsersWithContracts,getUsersWithContractsOnly};
+module.exports = { createUser,getAllUsers, updateUser, deleteUser, getUserById,getAllUsersWithContracts,getUsersWithContractsOnly};

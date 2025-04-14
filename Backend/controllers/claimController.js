@@ -3,24 +3,46 @@ const User = require('../models/user');
 
 const submitClaim = async (req, res) => {
     try {
-        const { userId, birthDate, sexe, phone, address, postalAddress, city, postalCode, email, stateProvince, incidentDescription } = req.body;
-
-        console.log("Received userId:", userId); // Debugging
+        const {
+            userId,
+            birthDate,
+            sexe,
+            phone,
+            address,
+            postalAddress,
+            city,
+            postalCode,
+            email,
+            stateProvince,
+            incidentDescription
+        } = req.body;
 
         // 1️⃣ Validate if user exists
-        const user = await User.findById(userId);
+        const user = await User.findById(userId).populate('contracts');
         if (!user) {
-            console.log("User not found!");
             return res.status(404).json({ success: false, message: "User not found" });
         }
 
-        console.log("User found:", user); // Debugging
+        // 2️⃣ Check if user has at least one contract
+        if (!user.contracts || user.contracts.length === 0) {
+            return res.status(403).json({ success: false, message: "You need a valid contract to submit a claim." });
+        }
 
-        // 2️⃣ Create the claim
+        // Optional: Check if any contract is still active
+        const now = new Date();
+        const hasActiveContract = user.contracts.some(contract =>
+            new Date(contract.startDate) <= now && new Date(contract.endDate) >= now
+        );
+
+        if (!hasActiveContract) {
+            return res.status(403).json({ success: false, message: "You do not have any active contracts." });
+        }
+
+        // 3️⃣ Create the claim
         const newClaim = new Claim({
             userId,
-            firstName: user.name,  // Retrieved from database
-            lastName: user.lastname,    // Retrieved from database
+            firstName: user.name,
+            lastName: user.lastname,
             birthDate,
             sexe,
             phone,

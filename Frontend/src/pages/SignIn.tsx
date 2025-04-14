@@ -1,30 +1,29 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useAuth } from "../context/AuthContext"; // assuming you have AuthContext for global state
+import { useAuth } from "../context/AuthContext";
 import "./SignIn.css";
 
 const SignIn: React.FC = () => {
   const [credentials, setCredentials] = useState({ email: "", password: "" });
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
-  const { login } = useAuth(); // Assuming login method sets the user state
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // Sending a POST request to the backend for login
       const response = await axios.post("http://localhost:5000/api/auth/login", credentials);
-
-      // Call the login function to set token and user in global context (AuthContext)
       login(response.data.token, response.data.user);
-      // Store userId in localStorage
-      localStorage.setItem('userId', response.data.user._id);
-      console.log('User ID stored:', response.data.user._id); // Log to check
+      localStorage.setItem("userId", response.data.user._id);
+      console.log("User ID stored:", response.data.user._id);
 
-      // Redirect based on user role
-      if (response.data.user.role === "user") {
+      // Role-based redirect
+      const userRole = response.data.user.role;
+      if (userRole === "user") {
         navigate("/clienthome");
+      } else if (userRole === "supervisor") {
+        navigate("/supervisorhome");
       } else {
         navigate("/adminhome");
       }
@@ -57,7 +56,9 @@ const SignIn: React.FC = () => {
             value={credentials.password}
             style={{ marginBottom: "15px", padding: "10px" }}
           />
-          <button className="btn-submit" type="submit" style={{ padding: "10px 15px", marginTop: "10px" }}>Se connecter</button>
+          <button className="btn-submit" type="submit" style={{ padding: "10px 15px", marginTop: "10px" }}>
+            Se connecter
+          </button>
         </form>
         <div className="existing-account" style={{ marginTop: "15px" }}>
           <span>Pas encore de compte ? </span>
