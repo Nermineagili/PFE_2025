@@ -1,38 +1,90 @@
 .services-section {
-    background-color: #f9f9f9;
-    padding: 80px 20px;
-    text-align: center;
-  }
-  
-  .services-section h2 {
-    margin-bottom: 40px;
-    color: #222;
-  }
-  
-  .services-grid {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 30px;
+  background-color: #f9f9f9;
+  padding: 80px 20px;
+  text-align: center;
+}
+
+.services-section h2 {
+  margin-bottom: 40px;
+  color: #222;
+}
+
+.services-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+}
+
+.service-card {
+  background: #ffffff;
+  padding: 25px;
+  border-radius: 10px;
+  width: 280px; /* Fixed width */
+  height: 280px; /* Fixed height - all cards will be the same size */
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+}
+
+.service-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 20px rgba(0,0,0,0.1);
+}
+
+.service-icon {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+  display: block;
+}
+
+.service-card h4 {
+  color: #1f618d;
+  margin-bottom: 12px;
+  font-size: 1.3rem;
+}
+
+.service-card p {
+  color: #555;
+  margin-bottom: 20px;
+  flex-grow: 1;
+  /* Ensure text doesn't overflow but shows ellipsis if too long */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.learn-more-btn {
+  background-color: transparent;
+  color: #1f618d;
+  border: 2px solid #1f618d;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: auto;
+}
+
+.learn-more-btn:hover {
+  background-color: #1f618d;
+  color: white;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .services-section {
+    padding: 60px 15px;
   }
   
   .service-card {
-    background: #ffffff;
-    padding: 25px;
-    border-radius: 10px;
+    width: 100%;
     max-width: 280px;
-    text-align: center;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-    transition: transform 0.3s ease;
+    height: 280px; /* Maintain fixed height on mobile */
   }
-  
-  .service-card:hover {
-    transform: translateY(-5px);
-  }
-  
-  .service-icon {
-    font-size: 2.5rem;
-    margin-bottom: 15px;
-    display: block;
-  }
-  
+}

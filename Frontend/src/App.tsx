@@ -19,6 +19,7 @@ import UserGuide from './pages/UserGuide';
 import Layout from './pages/Layout';
 import MesContrats from './pages/MesContrats';
 import SupervisorHome from './pages/SupervisorHome';
+import PolicyType from './pages/PolicyTypes';
 
 function App() {
   return (
@@ -62,7 +63,7 @@ function AppContent() {
       
       {/* Routes with Layout */}
       <Route element={<Layout />}>
-        
+        <Route path="/policytypes" element={<PolicyType />} />
         <Route path="/claimform" element={<ClaimForm />} />
         <Route path="/souscription" element={<SubscribeForm />} />
         <Route path="/mes-declarations" element={<MesDeclarations />} />

@@ -2,6 +2,7 @@ const Contract = require('../models/Contract');
 const User = require('../models/user');
 const { validationResult } = require('express-validator');
 
+
 // Create a new contract (subscription)
 exports.createContract = async (req, res) => {
   const errors = validationResult(req);
@@ -10,7 +11,15 @@ exports.createContract = async (req, res) => {
   }
 
   try {
-    const { userId, policyType, startDate, endDate, premiumAmount, coverageDetails } = req.body;
+    const {
+      userId,
+      policyType,
+      startDate,
+      endDate,
+      premiumAmount,
+      coverageDetails,
+      policyDetails // 👈 new field from req.body
+    } = req.body;
 
     // Check if the user exists
     const user = await User.findById(userId);
@@ -18,7 +27,7 @@ exports.createContract = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Create a new contract
+    // Create a new contract with policyDetails
     const contract = new Contract({
       userId,
       policyType,
@@ -26,12 +35,12 @@ exports.createContract = async (req, res) => {
       endDate,
       premiumAmount,
       coverageDetails,
+      policyDetails // 👈 include this in the contract
     });
 
-    // Save the contract to the database
     await contract.save();
 
-    // Add the contract reference to the user's contracts array
+    // Add contract to user
     user.contracts.push(contract._id);
     await user.save();
 

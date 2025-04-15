@@ -19,10 +19,10 @@ const app = express();
 // CORS Configuration
 app.use(
   cors({
-    origin: "http://127.0.0.1:5173",
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allow these methods
-    allowedHeaders: ["Content-Type", "Authorization"], // Allow these headers
-    credentials: true, // Allow cookies/session
+    origin: "http://localhost:3000", // ✅ frontend address
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
   })
 );
 

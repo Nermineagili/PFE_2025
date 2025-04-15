@@ -58,10 +58,17 @@ exports.checkSupervisor = async (req, res, next) => {
 
 
 // Validate MongoDB ObjectId
+// Middleware to validate ObjectId, checking both URL parameters and body
 exports.validateObjectId = (req, res, next) => {
-    const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({ error: "Invalid user ID" });
+    // Validate for URL parameter (if applicable)
+    if (req.params.userId && !mongoose.Types.ObjectId.isValid(req.params.userId)) {
+        return res.status(400).json({ error: "Invalid user ID in URL" });
     }
+    
+    // Validate for body (if applicable)
+    if (req.body.userId && !mongoose.Types.ObjectId.isValid(req.body.userId)) {
+        return res.status(400).json({ error: "Invalid user ID in body" });
+    }
+    
     next();
 };

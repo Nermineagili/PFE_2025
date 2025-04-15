@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import "./NosServices.css";
+import PolicyDetails from "../pages/PolicyDetails";
 
 const services = [
   {
@@ -10,7 +11,7 @@ const services = [
   {
     icon: "✈️",
     title: "Assurance Voyage",
-    description: "Protégez vos voyages contre les imprévus : annulation, bagages perdus, urgences médicales à l’étranger."
+    description: "Protégez vos voyages contre les imprévus : annulation, bagages perdus, urgences médicales à l'étranger."
   },
   {
     icon: "🚗",
@@ -25,7 +26,7 @@ const services = [
   {
     icon: "📦",
     title: "Assurance Transport",
-    description: "Assurez vos biens et marchandises pendant leur transit, localement ou à l’international."
+    description: "Assurez vos biens et marchandises pendant leur transit, localement ou à l'international."
   },
   {
     icon: "🧑‍⚖️",
@@ -34,19 +35,41 @@ const services = [
   }
 ];
 
-const NosServices =  React.forwardRef<HTMLDivElement>((_props, ref) => {
+const NosServices = React.forwardRef<HTMLDivElement>((_props, ref) => {
+  const [selectedPolicy, setSelectedPolicy] = useState<string | null>(null);
+
+  const handleCardClick = (policyTitle: string) => {
+    setSelectedPolicy(policyTitle);
+  };
+
+  const closeDetails = () => {
+    setSelectedPolicy(null);
+  };
+
   return (
     <section ref={ref} className="services-section" id="services">
       <h2>Nos Services</h2>
       <div className="services-grid">
         {services.map((service, index) => (
-          <div key={index} className="service-card">
+          <div 
+            key={index} 
+            className="service-card" 
+            onClick={() => handleCardClick(service.title)}
+          >
             <span className="service-icon">{service.icon}</span>
             <h4>{service.title}</h4>
             <p>{service.description}</p>
+            <button className="learn-more-btn">En savoir plus</button>
           </div>
         ))}
       </div>
+
+      {selectedPolicy && (
+        <PolicyDetails 
+          selectedPolicy={selectedPolicy as any} 
+          onClose={closeDetails} 
+        />
+      )}
     </section>
   );
 });

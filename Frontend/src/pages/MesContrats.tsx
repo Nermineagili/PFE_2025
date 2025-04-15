@@ -3,19 +3,40 @@ import axios from 'axios';
 import { Container, Row, Col, Card, Badge, Spinner, Alert, Button, Modal } from 'react-bootstrap';
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from 'react-router-dom';
-import { MdAssignment, MdFileDownload, MdInfo, MdAutorenew } from 'react-icons/md';
+import { MdAssignment, MdFileDownload, MdInfo, MdAutorenew, MdEdit } from 'react-icons/md';
 import CustomNavbar from '../components/navbar';
 import './MesContrats.css';
 
 interface Contract {
   _id: string;
   userId: string;
-  policyType: 'santé' | 'voyage' | 'automobile' | 'responsabilité civile' | 'habitation' | 'professionnelle';
+  policyType: 'santé' | 'voyage' | 'automobile' | 'responsabilité civile' | 'habitation' | 'professionnelle' | 'transport';
   startDate: string;
   endDate: string;
   premiumAmount: number;
   coverageDetails: string;
-  claims: string[];
+  policyDetails: {
+    maladiesPreexistantes?: string;
+    fumeur?: boolean;
+    traitementsActuels?: string;
+    destination?: string;
+    departureDate?: string;
+    returnDate?: string;
+    carModel?: string;
+    registrationNumber?: string;
+    usage?: string;
+    coveredActivities?: string;
+    coverageLimit?: number;
+    homeType?: string;
+    location?: string;
+    alarmSystem?: boolean;
+    profession?: string;
+    annualRevenue?: number;
+    employeeCount?: number;
+    transportType?: string;
+    goodsValue?: number;
+  };
+  claims?: string[];
   status?: 'active' | 'expired' | 'pending';
   policyNumber?: string;
 }
@@ -78,31 +99,42 @@ const MesContrats: React.FC = () => {
       
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:5000/api/contracts/${user._id}`);
+        const token = localStorage.getItem('authToken');
         
-        // Add status based on dates for each contract
+        if (!token) {
+          navigate('/signin');
+          return;
+        }
+    
+        const response = await axios.get(`http://localhost:5000/api/contracts/${user._id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
         const contractsWithStatus = response.data.map((contract: Contract) => {
           const endDate = new Date(contract.endDate);
           const today = new Date();
-          let status = 'pending';
+          let status = 'active';
           
           if (today > endDate) {
             status = 'expired';
-          } else {
-            status = 'active';
           }
           
           return {
             ...contract,
             status,
-            // Generate fake policy number if not provided
             policyNumber: contract.policyNumber || `POL-${Math.floor(100000 + Math.random() * 900000)}`
           };
         });
         
         setContracts(contractsWithStatus);
       } catch (err) {
-        setError('Impossible de récupérer vos contrats. Veuillez réessayer plus tard.');
+        if (axios.isAxiosError(err) && err.response?.status === 401) {
+          navigate('/signin');
+        } else {
+          setError('Impossible de récupérer vos contrats. Veuillez réessayer plus tard.');
+        }
         console.error(err);
       } finally {
         setLoading(false);
@@ -166,6 +198,13 @@ const MesContrats: React.FC = () => {
               <Card.Text>
                 Vous n'avez pas encore souscrit à un contrat d'assurance.
               </Card.Text>
+              <Button 
+              variant="outline-secondary" 
+              className="mt-2 w-100"
+              onClick={() => navigate('/souscription', { state: { contract: contracts } })}
+            >
+              <MdEdit className="me-2" /> Modifier
+            </Button>
               <Button variant="primary" onClick={() => navigate('/souscription')}>
                 Souscrire à un contrat
               </Button>

@@ -1,0 +1,70 @@
+.policy-type-section {
+    padding: 5rem 0 2rem 0; /* Extra top padding to account for navbar */
+    text-align: center;
+  }
+  
+  .policy-type-section h2 {
+    margin-bottom: 2rem;
+    color: #153a64;
+    font-weight: 600;
+    font-size: 2rem;
+  }
+  
+  .policy-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+  
+  .policy-card {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    border: none;
+  }
+  
+  .policy-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    background-color: rgba(193, 144, 72, 0.05);
+  }
+  
+  .policy-icon {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: 1rem;
+  }
+  
+  .policy-card h4 {
+    color: #153a64;
+    margin-bottom: 0.5rem;
+    font-size: 1.25rem;
+    font-weight: 500;
+  }
+  
+  .policy-card p {
+    color: #555;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .policy-type-section {
+      padding: 4rem 1rem 1rem 1rem;
+    }
+    
+    .policy-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .policy-card h4 {
+      font-size: 1.1rem;
+    }
+  }
