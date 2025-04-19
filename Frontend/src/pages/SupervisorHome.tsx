@@ -7,12 +7,14 @@ import Settings from "../components/Settings";
 import Postlogin from "../components/ChatBot/Postlogin";
 import AdsupNavbar from "../components/AdsupNavbar";
 import "./SupervisorHome.css"; // Make sure to create this CSS file
+import UsersWithContracts from "../components/UsersWithContracts";
 
 const SupervisorHome: React.FC = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const manageDashboardRef = useRef<HTMLDivElement>(null);
   const manageClaimsRef = useRef<HTMLDivElement>(null);
   const manageSettingsRef = useRef<HTMLDivElement>(null);
+  const manageContractsRef = useRef<HTMLDivElement>(null);
 
   const scrollToDashboard = () => {
     manageDashboardRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -24,6 +26,10 @@ const SupervisorHome: React.FC = () => {
 
   const scrollToSettings = () => {
     manageSettingsRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const scrollToContracts = () => {
+    manageContractsRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   // Handle sidebar collapse state change
@@ -43,6 +49,7 @@ const SupervisorHome: React.FC = () => {
         onManageClaimsClick={scrollToClaims}
         onManageSettingsClick={scrollToSettings}
         onSidebarToggle={handleSidebarToggle}
+        onManageContractsClick={scrollToContracts}
       />
 
       {/* Main Content Area - This adjusts based on sidebar state */}
@@ -51,7 +58,9 @@ const SupervisorHome: React.FC = () => {
           <div ref={manageDashboardRef}>
             <Dashboard />
           </div>
-          
+          <div ref={manageContractsRef}>
+            <UsersWithContracts/>
+          </div>
           <div ref={manageClaimsRef}>
             <ManageClaims />
           </div>

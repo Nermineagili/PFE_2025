@@ -20,6 +20,7 @@ import Layout from './pages/Layout';
 import MesContrats from './pages/MesContrats';
 import SupervisorHome from './pages/SupervisorHome';
 import PolicyType from './pages/PolicyTypes';
+import SupervisorMessages from './components/SupervisorMessages';
 
 function App() {
   return (
@@ -84,6 +85,10 @@ function AppContent() {
         path="/supervisorhome" 
         element={isLoggedIn && user?.role === 'superviseur' ? <SupervisorHome /> : <Navigate to="/" replace />} 
       />
+<Route 
+  path="/supervisor-messages" 
+  element={isLoggedIn && user?.role === 'superviseur' ? <SupervisorMessages /> : <Navigate to="/" replace />} 
+/>
       <Route path="/settings" element={<Settings />} />
       <Route path="/admin/edit-user/:id" element={<EditUserWrapper />} />
     </Routes>

@@ -51,12 +51,11 @@ app.use('/api/claims', claimRoutes);
 
 app.use('/api/admin', adminRoutes); // Register admin routes
 
-app.use("/api", contactRoutes);
+app.use("/api/contact", contactRoutes);
 
 app.use("/api/tasks", taskRoutes);
 
 app.use('/api/contracts', contratRoutes);  // This line links the routes to /api/contracts
-
 
 app.use('/api/supervisor', supervisorRoutes);
 

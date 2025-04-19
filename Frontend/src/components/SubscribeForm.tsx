@@ -123,7 +123,7 @@ const SubscribeForm: React.FC<SubscribeFormProps> = ({ existingContract }) => {
         const token = localStorage.getItem('authToken') || localStorage.getItem('token');
         
         if (!userId || !token) {
-          navigate('/login');
+          navigate('/signin');
           return;
         }
   
@@ -134,7 +134,7 @@ const SubscribeForm: React.FC<SubscribeFormProps> = ({ existingContract }) => {
   
       } catch (error) {
         console.error('Error checking authentication:', error);
-        navigate('/login');
+        navigate('/signin');
       }
     };
   
@@ -256,7 +256,7 @@ const SubscribeForm: React.FC<SubscribeFormProps> = ({ existingContract }) => {
       );
 
       // Handle success
-      setMessage(response.data.message || 'Contract created successfully!');
+      setMessage(response.data.message || 'Contract created successfully. A confirmation email has been sent to your inbox!');
       
       // Optional: Navigate after successful submission
       // setTimeout(() => navigate('/contracts'), 1500);

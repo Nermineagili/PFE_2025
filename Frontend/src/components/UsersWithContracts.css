@@ -1,0 +1,279 @@
+/* UsersWithContracts.css - All class names are prefixed with 'uwc-' to avoid style conflicts */
+
+.uwc-container {
+    max-width: 1200px;
+    margin: 5rem auto 2rem auto;
+    padding: 2rem;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border: none;
+  }
+  
+  .uwc-title {
+    margin-bottom: 1.5rem;
+    color: #153a64;
+    text-align: center;
+    font-weight: 600;
+  }
+  
+  .uwc-stats-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+  }
+  
+  .uwc-stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+    min-width: 120px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  }
+  
+  .uwc-stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #153a64;
+  }
+  
+  .uwc-stat-label {
+    font-size: 0.85rem;
+    color: #4b5563;
+    text-align: center;
+  }
+  
+  .uwc-filter-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    gap: 1rem;
+  }
+  
+  .uwc-filter-label {
+    font-weight: 500;
+    color: #153a64;
+    margin-right: 0.5rem;
+    white-space: nowrap;
+  }
+  
+  .uwc-filter-select {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    color: #153a64;
+    background-color: white;
+  }
+  
+  .uwc-filter-select:focus {
+    border-color: #c19048;
+    box-shadow: 0 0 0 0.2rem rgba(193, 144, 72, 0.25);
+    outline: none;
+  }
+  
+  .uwc-users-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .uwc-user-card {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+  }
+  
+  .uwc-user-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  }
+  
+  .uwc-user-info {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    background-color: #f8f9fa;
+  }
+  
+  .uwc-user-info h3 {
+    margin-bottom: 0.75rem;
+    color: #153a64;
+    font-weight: 600;
+  }
+  
+  .uwc-user-info p {
+    margin: 0.5rem 0;
+    color: #4b5563;
+  }
+  
+  .uwc-contracts-summary {
+    padding: 1.5rem;
+  }
+  
+  .uwc-contracts-summary h4 {
+    margin-bottom: 1rem;
+    color: #153a64;
+    font-weight: 500;
+    border-bottom: 1px dashed #e5e7eb;
+    padding-bottom: 0.5rem;
+  }
+  
+  .uwc-contracts-preview {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  
+  .uwc-contract-item {
+    margin-bottom: 1.25rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  
+  .uwc-contract-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+  
+  .uwc-contract-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+  
+  .uwc-policy-icon {
+    font-size: 1.5rem;
+    margin-right: 0.75rem;
+  }
+  
+  .uwc-policy-type {
+    font-weight: 500;
+    color: #153a64;
+    text-transform: capitalize;
+  }
+  
+  .uwc-contract-details {
+    padding-left: 2.5rem;
+    color: #4b5563;
+  }
+  
+  .uwc-contract-details p {
+    margin: 0.25rem 0;
+    font-size: 0.95rem;
+  }
+  
+  .uwc-expand-button {
+    display: block;
+    width: 100%;
+    margin-top: 1rem;
+    padding: 0.5rem;
+    background-color: #f8f9fa;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    color: #153a64;
+    font-weight: 500;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .uwc-expand-button:hover {
+    background-color: #e5e7eb;
+  }
+  
+  .uwc-no-results {
+    text-align: center;
+    padding: 2rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    color: #4b5563;
+  }
+  
+  .uwc-loading-spinner {
+    display: block;
+    width: 50px;
+    height: 50px;
+    margin: 2rem auto;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #153a64;
+    border-radius: 50%;
+    animation: uwc-spin 1s linear infinite;
+  }
+  
+  @keyframes uwc-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .uwc-error-message {
+    text-align: center;
+    padding: 2rem;
+    background-color: #ffebee;
+    border-radius: 8px;
+    color: #c62828;
+    margin-bottom: 1.5rem;
+  }
+  
+  .uwc-action-button {
+    background-color: #153a64;
+    color: white;
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 1rem;
+    display: inline-block;
+  }
+  
+  .uwc-action-button:hover {
+    background-color: #0d2a4a;
+    transform: translateY(-2px);
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .uwc-container {
+      margin: 4rem 1rem 1rem 1rem;
+      padding: 1rem;
+    }
+    
+    .uwc-users-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .uwc-filter-container {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .uwc-filter-select {
+      width: 100%;
+    }
+    
+    .uwc-stats-container {
+      gap: 0.5rem;
+    }
+    
+    .uwc-stat-item {
+      min-width: 100px;
+      padding: 0.75rem;
+    }
+  }

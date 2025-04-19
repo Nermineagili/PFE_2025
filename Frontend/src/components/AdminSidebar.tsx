@@ -8,18 +8,22 @@ import {
   faSignOutAlt,
   faBars,
   faClipboardList,
+  faEnvelope,
+  faFileContract // Added contract icon
 } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "@themesberg/react-bootstrap";
 import { useAuth } from "../context/AuthContext";
 import "./AdminSidebar.css";
 
 interface AdminSidebarProps {
-  role: "admin" | "supervisor"; // Pass the role
+  role: "admin" | "supervisor";
   onManageUsersClick?: () => void;
   onManageSettingsClick?: () => void;
   onManageDashboardClick?: () => void;
   onManageClaimsClick?: () => void;
-  onSidebarToggle?: (collapsed: boolean) => void; // New callback prop
+  onSidebarToggle?: (collapsed: boolean) => void;
+  onMessagesClick?: () => void;
+  onManageContractsClick?: () => void; // Fixed typo in property name
 }
 
 const AdminSidebar: React.FC<AdminSidebarProps> = ({
@@ -29,13 +33,14 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
   onManageDashboardClick,
   onManageClaimsClick,
   onSidebarToggle,
+  onMessagesClick,
+  onManageContractsClick
 }) => {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
   const { logout } = useAuth();
 
   useEffect(() => {
-    // Notify parent component when sidebar state changes
     if (onSidebarToggle) {
       onSidebarToggle(collapsed);
     }
@@ -52,6 +57,15 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
     if (onManageDashboardClick) onManageDashboardClick();
   };
 
+  const handleMessagesClick = (event: React.MouseEvent) => {
+    event.preventDefault();
+    if (onMessagesClick) {
+      onMessagesClick();
+    } else {
+      navigate("/supervisor-messages");
+    }
+  };
+
   const handleManageUsersClick = (event: React.MouseEvent) => {
     event.preventDefault();
     if (onManageUsersClick) onManageUsersClick();
@@ -65,6 +79,14 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
   const handleManageClaimsClick = (event: React.MouseEvent) => {
     event.preventDefault();
     if (onManageClaimsClick) onManageClaimsClick();
+  };
+  
+  // Fixed function name to match property name
+  const handleManageContractsClick = (event: React.MouseEvent) => {
+    event.preventDefault();
+    if (onManageContractsClick) 
+      onManageContractsClick();
+  
   };
 
   return (
@@ -94,6 +116,14 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
             <span>Manage Users</span>
           </a>
         )}
+        
+        {/* Supervisor-only: Users with Contracts */}
+        {role === "supervisor" && (
+          <a href="#!" className="admin-nav-item" onClick={handleManageContractsClick}>
+            <FontAwesomeIcon icon={faFileContract} className="admin-nav-icon" />
+            <span>Users Contracts</span>
+          </a>
+        )}
 
         {/* Supervisor-only: Manage Claims */}
         {role === "supervisor" && (
@@ -103,13 +133,21 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
           </a>
         )}
 
+        {/* Supervisor-only: Messages */}
+        {role === "supervisor" && (
+          <a href="#!" className="admin-nav-item" onClick={handleMessagesClick}>
+            <FontAwesomeIcon icon={faEnvelope} className="admin-nav-icon" />
+            <span>Messages</span>
+          </a>
+        )}
+
         {/* Common: Settings */}
         <a href="#!" className="admin-nav-item" onClick={handleSettingsClick}>
           <FontAwesomeIcon icon={faCog} className="admin-nav-icon" />
           <span>Settings</span>
         </a>
 
-        {/* Logout button moved to sidebar since it's already here */}
+        {/* Logout */}
         <NavLink
           to="/logout"
           className="admin-nav-item admin-log-out"

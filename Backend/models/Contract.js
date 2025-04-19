@@ -7,7 +7,7 @@ const ContractSchema = new mongoose.Schema(
       type: String,
       enum: ['santé', 'voyage', 'automobile', 'responsabilité civile', 'habitation', 'professionnelle'],
       required: true
-    },
+    },  
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
     premiumAmount: { type: Number, required: true },

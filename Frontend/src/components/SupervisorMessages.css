@@ -1,0 +1,194 @@
+/* SupervisorMessages.css */
+.supervisor-messages-layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  /* Main content area - adjusts based on sidebar state */
+  .supervisor-messages-content {
+
+    margin-top: 56px; /* Matches the height of your AdsupNavbar */
+    transition: margin-left 0.3s;
+    flex: 1;
+    background-color: #f8f9fa;
+    min-height: calc(100vh - 56px);
+  }
+  
+  .supervisor-messages-content.sidebar-collapsed {
+    margin-left: 58px; /* Matches the width of your collapsed AdminSidebar */
+  }
+  
+  /* Card Styling */
+  .messages-card {
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border: none;
+    margin-bottom: 2rem;
+  }
+  
+  .messages-card-header {
+    background-color: #153a64;
+    color: white;
+    border-top-left-radius: 12px !important;
+    border-top-right-radius: 12px !important;
+    padding: 1rem 1.5rem;
+  }
+  
+  .messages-title {
+    font-weight: 600;
+    margin-bottom: 0;
+    font-size: 1.5rem;
+    color : white ;
+  }
+  
+  /* Alert Styling */
+  .messages-alert {
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Message List Styling */
+  .message-list {
+    border-radius: 8px;
+  }
+  
+  .message-item {
+    padding: 1.25rem;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s;
+  }
+  
+  .message-item:last-child {
+    border-bottom: none;
+  }
+  
+  .message-item:hover {
+    background-color: rgba(193, 144, 72, 0.05);
+  }
+  
+  .message-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+  }
+  
+  .message-name {
+    color: #153a64;
+    font-size: 1.1rem;
+    margin-right: 0.5rem;
+  }
+  
+  .message-email {
+    color: #6c757d;
+    font-size: 0.95rem;
+  }
+  
+  .message-date {
+    color: #6c757d;
+    margin-bottom: 0.75rem;
+    font-size: 0.85rem;
+  }
+  
+  .message-content {
+    color: #343a40;
+    margin-bottom: 1rem;
+    white-space: pre-line;
+  }
+  
+  .message-badge {
+    font-weight: 500;
+    padding: 0.4em 0.6em;
+    border-radius: 6px;
+  }
+  
+  .message-actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .reply-button {
+    background-color: #153a64;
+    border-color: #153a64;
+    transition: all 0.3s ease;
+  }
+  
+  .reply-button:hover {
+    background-color: #0d2340;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Modal Styling */
+  .message-modal .modal-content {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  }
+  
+  .message-modal-header {
+    background-color: #153a64;
+    color: white;
+    border-bottom: 2px solid #c19048;
+    padding: 1rem 1.5rem;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+  }
+  
+  .message-modal-header .btn-close {
+    filter: invert(1);
+  }
+  
+  .message-modal-body {
+    padding: 1.5rem;
+  }
+  
+  .message-modal-footer {
+    border-top: 1px solid #e9ecef;
+    padding: 1rem 1.5rem;
+  }
+  
+  /* Original Message Box */
+  .original-message-content {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border-left: 3px solid #c19048;
+    font-style: italic;
+    color: #495057;
+  }
+  
+  /* Form Elements */
+  .form-control {
+    border-radius: 8px;
+    padding: 0.6rem 0.75rem;
+  }
+  
+  .form-control:focus {
+    border-color: #153a64;
+    box-shadow: 0 0 0 0.25rem rgba(21, 58, 100, 0.25);
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 991.98px) {
+    .supervisor-messages-content {
+      margin-left: 0;
+      padding-top: 20px;
+    }
+    
+    .supervisor-messages-content.sidebar-collapsed {
+      margin-left: 0;
+    }
+    
+    .message-header {
+      flex-direction: column;
+    }
+    
+    .message-badge {
+      margin-top: 0.5rem;
+      align-self: flex-start;
+    }
+  }

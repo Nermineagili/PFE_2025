@@ -1,5 +1,9 @@
 const Claim = require("../models/claim");
 const User = require("../models/user");
+const Contract = require('../models/Contract');
+
+const ContactMessage = require("../models/ContactMessage.js");
+
 const bcrypt = require('bcrypt');
 
 // Get all claims (Superviseur only)
@@ -57,23 +61,57 @@ const deleteClaim = async (req, res) => {
     }
 };
 const getUsersWithContractsOnly = async (req, res) => {
-    try {
-      const users = await User.find({
-        role: { $ne: 'admin' },
-        contracts: { $exists: true, $not: { $size: 0 } }
+  try {
+    const { policyType } = req.query; // e.g., /api/supervisor/users-with-contracts?policyType=santé
+
+    // First, find contracts that match the given policyType
+    const contractFilter = policyType
+      ? { policyType }
+      : {}; // if no filter, match all types
+
+    const matchingContracts = await Contract.find(contractFilter).select('_id');
+
+    // Extract contract IDs
+    const matchingContractIds = matchingContracts.map(c => c._id);
+
+    // Find users who have at least one of the matching contracts
+    const users = await User.find({
+      role: { $ne: 'admin' },
+      contracts: { $in: matchingContractIds }
+    })
+      .select('name email phone contracts')
+      .populate({
+        path: 'contracts',
+        match: contractFilter, // Only populate matching contracts
+        select: 'policyType startDate endDate premiumAmount',
+        options: { sort: { startDate: -1 } }
       })
-        .select('-password')
-        .populate('contracts');
-      res.json(users);
-    } catch (err) {
-      res.status(500).json({ error: 'Failed to fetch users with contracts' });
+      .sort({ name: 1 });
+
+    res.status(200).json(users);
+  } catch (err) {
+    console.error('Error fetching users with contracts:', err);
+    res.status(500).json({ error: 'Failed to fetch users with contracts' });
+  }
+};
+
+//get mail messages
+  const getAllMessages = async (req, res) => {
+    try {
+      const messages = await ContactMessage.find().sort({ createdAt: -1 });
+      res.status(200).json(messages);
+    } catch (error) {
+      console.error('Erreur:', error);
+      res.status(500).json({ error: "Erreur lors de la récupération des messages." });
     }
   };
+  
 
 module.exports = {
     getAllClaims,
     getClaimById,
     updateClaimStatus,
     deleteClaim,
-    getUsersWithContractsOnly
+    getUsersWithContractsOnly,
+    getAllMessages
 };

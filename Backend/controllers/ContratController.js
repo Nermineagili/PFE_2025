@@ -1,6 +1,7 @@
 const Contract = require('../models/Contract');
 const User = require('../models/user');
 const { validationResult } = require('express-validator');
+const sendEmail = require('../utils/sendEmail');
 
 
 // Create a new contract (subscription)
@@ -18,7 +19,7 @@ exports.createContract = async (req, res) => {
       endDate,
       premiumAmount,
       coverageDetails,
-      policyDetails // 👈 new field from req.body
+      policyDetails
     } = req.body;
 
     // Check if the user exists
@@ -27,7 +28,7 @@ exports.createContract = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Create a new contract with policyDetails
+    // Create a new contract
     const contract = new Contract({
       userId,
       policyType,
@@ -35,7 +36,7 @@ exports.createContract = async (req, res) => {
       endDate,
       premiumAmount,
       coverageDetails,
-      policyDetails // 👈 include this in the contract
+      policyDetails
     });
 
     await contract.save();
@@ -44,10 +45,36 @@ exports.createContract = async (req, res) => {
     user.contracts.push(contract._id);
     await user.save();
 
+    // ✅ Send confirmation email
+    const htmlContent = `
+      <h2>Bonjour ${user.name || user.username},</h2>
+      <p>Merci pour votre souscription au contrat <strong>${policyType}</strong>.</p>
+      <p>Votre demande a été enregistrée avec succès et est en cours de traitement.</p>
+      <p><strong>Détails du contrat :</strong></p>
+      <ul>
+        <li>Date de début : ${new Date(startDate).toLocaleDateString()}</li>
+        <li>Date de fin : ${new Date(endDate).toLocaleDateString()}</li>
+        <li>Montant de la prime : ${premiumAmount} €</li>
+      </ul>
+      <br/>
+      <p>Nous vous remercions pour votre confiance.</p>
+    `;
+
+    await sendEmail(
+      user.email,
+      'Confirmation de souscription à un contrat',
+      `
+        <h3>Bonjour ${user.name || user.username},</h3>
+        <p>Votre contrat <strong>${policyType}</strong> est en cours de traitement.</p>
+        <p>Merci de votre confiance !</p>
+      `
+    );
+    
     res.status(201).json({
-      message: 'Contract created successfully',
+      message: 'Contract created successfully and confirmation email sent',
       contract,
     });
+
   } catch (error) {
     console.error('Error creating contract:', error);
     res.status(500).json({ message: 'Server error' });
