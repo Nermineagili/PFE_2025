@@ -1,27 +1,36 @@
 const express = require('express');
 const { body } = require('express-validator');
-const { createContract, getUserContracts } = require('../controllers/ContratController');
+const { createContract, confirmContractPayment, getUserContracts } = require('../controllers/ContratController');
 const { authenticateToken, validateObjectId } = require('../middleware/authMiddleware');
 
+// This middleware is needed to get the raw body for webhook signature verification
+const stripeWebhookMiddleware = express.raw({type: 'application/json'});
 const router = express.Router();
 
-// POST route to subscribe to a new contract
+// POST route to subscribe to a new contract (payment initiation)
+// Update the policyType validation to include 'transport'
 router.post(
   '/subscribe',
   [
     body('userId').notEmpty().withMessage('User ID is required'),
     body('policyType')
-      .isIn(['santé', 'voyage', 'automobile', 'responsabilité civile', 'habitation', 'professionnelle'])
+      .isIn(['santé', 'voyage', 'automobile', 'responsabilité civile', 'habitation', 'professionnelle', 'transport'])
       .withMessage('Invalid policy type'),
-    body('startDate').isISO8601().toDate().withMessage('Start date is required and must be a valid date'),
-    body('endDate').isISO8601().toDate().withMessage('End date is required and must be a valid date'),
-    body('premiumAmount').isNumeric().withMessage('Premium amount must be a number'),
-    body('coverageDetails').notEmpty().withMessage('Coverage details are required'),
-    // policyDetails is optional and flexible (you can add custom validation later if needed)
-    authenticateToken,
-    validateObjectId
+    // ... rest of the validations
   ],
   createContract
+);
+
+// Similarly update the confirm-payment route
+router.post(
+  '/confirm-payment',
+  [
+    body('policyType')
+      .isIn(['santé', 'voyage', 'automobile', 'responsabilité civile', 'habitation', 'professionnelle', 'transport'])
+      .withMessage('Invalid policy type'),
+    // ... rest of the validations
+  ],
+  confirmContractPayment
 );
 
 // GET route to fetch all contracts for a user
@@ -31,5 +40,10 @@ router.get(
   validateObjectId,
   getUserContracts
 );
+// Add to your routes file
+
+
+// Add this route - no auth needed as it's called by Stripe
+// router.post('/webhook', stripeWebhookMiddleware, handleStripeWebhook);
 
 module.exports = router;

@@ -1,51 +1,61 @@
 import React, { useState, ChangeEvent, FormEvent, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import PolicyType from '../pages/PolicyTypes'; // Import as component
+import PolicyType from '../pages/PolicyTypes';
 import './SubscribeForm.css';
+import { useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
 
+// Policy type interfaces
 interface SanteDetails {
-  maladiesPreexistantes?: string;
-  fumeur?: boolean;
-  traitementsActuels?: string;
+  maladiesPreexistantes: string;
+  fumeur: boolean;
+  traitementsActuels: string;
+  groupeSanguin: string;
 }
 
 interface VoyageDetails {
-  destination?: string;
-  departureDate?: string;
-  returnDate?: string;
+  destination: string;
+  dureeEnJours: number;
+  activitesAHautRisque: boolean;
+  nombreDeVoyageurs: number;
 }
 
 interface AutomobileDetails {
-  carModel?: string;
-  registrationNumber?: string;
-  usage?: string;
+  marqueModele: string;
+  annee: number;
+  numeroDImmatriculation: string;
+  usageProfessionnel: boolean;
 }
 
 interface ResponsabiliteCivileDetails {
-  coveredActivities?: string;
-  coverageLimit?: number;
+  activitesCouvertes: string;
+  limiteDeCouverture: number;
+  nombreDePersonnes: number;
 }
 
 interface HabitationDetails {
-  homeType?: string;
-  location?: string;
-  alarmSystem?: boolean;
+  typeLogement: string;
+  adresse: string;
+  systemeAlarme: boolean;
+  valeurContenu: number;
 }
 
 interface ProfessionnelleDetails {
-  profession?: string;
-  annualRevenue?: number;
-  employeeCount?: number;
+  profession: string;
+  chiffreAffaires: number;
+  nombreEmployes: number;
+  secteurActivite: string;
 }
 
+// New interface for Transport policy
 interface TransportDetails {
-  transportType?: string;
-  goodsValue?: number;
-  destination?: string;
+  typeMarchandise: string;
+  valeurDeclaree: number;
+  destination: string;
+  modeDExpedition: string;
+  securiteSupplementaire: boolean;
 }
 
-// Define it as a type
 type PolicyTypeValue =
   | 'santé'
   | 'voyage'
@@ -63,7 +73,63 @@ type PolicyDetails =
   | HabitationDetails
   | ProfessionnelleDetails
   | TransportDetails
-  | Record<string, any>; // fallback for any unexpected policy types
+  | Record<string, any>;
+
+const POLICY_PREMIUMS: Record<PolicyTypeValue, number> = {
+  'santé': 2000,
+  'voyage': 500,
+  'automobile': 1000,
+  'responsabilité civile': 800,
+  'habitation': 1200,
+  'professionnelle': 1500,
+  'transport': 1300,
+};
+
+// Default values for each policy type
+const DEFAULT_POLICY_DETAILS: Record<PolicyTypeValue, PolicyDetails> = {
+  'santé': {
+    maladiesPreexistantes: '',
+    fumeur: false,
+    traitementsActuels: '',
+    groupeSanguin: ''
+  },
+  'voyage': {
+    destination: '',
+    dureeEnJours: 7,
+    activitesAHautRisque: false,
+    nombreDeVoyageurs: 1
+  },
+  'automobile': {
+    marqueModele: '',
+    annee: new Date().getFullYear(),
+    numeroDImmatriculation: '',
+    usageProfessionnel: false
+  },
+  'responsabilité civile': {
+    activitesCouvertes: '',
+    limiteDeCouverture: 100000,
+    nombreDePersonnes: 1
+  },
+  'habitation': {
+    typeLogement: '',
+    adresse: '',
+    systemeAlarme: false,
+    valeurContenu: 0
+  },
+  'professionnelle': {
+    profession: '',
+    chiffreAffaires: 0,
+    nombreEmployes: 0,
+    secteurActivite: ''
+  },
+  'transport': {
+    typeMarchandise: '',
+    valeurDeclaree: 0,
+    destination: '',
+    modeDExpedition: 'routier',
+    securiteSupplementaire: false
+  }
+};
 
 interface ContractFormData {
   userId?: string;
@@ -78,30 +144,18 @@ interface ContractFormData {
 interface ValidationErrors {
   [key: string]: string;
 }
+
 interface SubscribeFormProps {
   existingContract?: ContractFormData;
 }
 
-
 const SubscribeForm: React.FC<SubscribeFormProps> = ({ existingContract }) => {
-  useEffect(() => {
-    if (existingContract) {
-      setFormData({
-        policyType: existingContract.policyType,
-        startDate: existingContract.startDate.split('T')[0], // Format date if needed
-        endDate: existingContract.endDate.split('T')[0],
-        premiumAmount: existingContract.premiumAmount.toString(),
-        coverageDetails: existingContract.coverageDetails,
-        policyDetails: existingContract.policyDetails,
-        userId: existingContract.userId
-      });
-      setShowPolicySelection(false);
-    }
-  }, [existingContract]);
+  const stripe = useStripe();
+  const elements = useElements();
   const location = useLocation();
   const navigate = useNavigate();
-  const [showPolicySelection, setShowPolicySelection] = useState(true);
 
+  const [showPolicySelection, setShowPolicySelection] = useState(true);
   const [formData, setFormData] = useState<ContractFormData>({
     policyType: '',
     startDate: '',
@@ -113,185 +167,105 @@ const SubscribeForm: React.FC<SubscribeFormProps> = ({ existingContract }) => {
 
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState<'success' | 'error' | ''>('');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [paymentIntentId, setPaymentIntentId] = useState('');
+
+  useEffect(() => {
+    if (existingContract) {
+      setFormData({
+        ...existingContract,
+        startDate: existingContract.startDate.split('T')[0],
+        endDate: existingContract.endDate.split('T')[0],
+        premiumAmount: existingContract.premiumAmount.toString(),
+      });
+      setShowPolicySelection(false);
+    }
+  }, [existingContract]);
 
   useEffect(() => {
     const fetchUserId = () => {
       try {
-        // Check for both 'user' object and direct 'userId'
-        const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
-        const userId = currentUser?.id || localStorage.getItem('userId');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const userId = user?.id || localStorage.getItem('userId');
         const token = localStorage.getItem('authToken') || localStorage.getItem('token');
-        
+
         if (!userId || !token) {
           navigate('/signin');
           return;
         }
-  
-        setFormData((prev) => ({
+
+        setFormData(prev => ({
           ...prev,
-          userId: userId.toString(), // Ensure it's a string
+          userId: userId.toString(),
         }));
-  
+
+        const state = location.state as { policyType?: PolicyTypeValue };
+        if (state?.policyType) {
+          handlePolicyTypeSelect(state.policyType);
+        }
       } catch (error) {
-        console.error('Error checking authentication:', error);
+        console.error('Auth error:', error);
         navigate('/signin');
       }
     };
-  
+
     fetchUserId();
-  
-    if (location.state?.policyType) {
-      setFormData((prev) => ({
-        ...prev,
-        policyType: location.state.policyType,
-      }));
-      setShowPolicySelection(false);
-    }
   }, [location.state, navigate]);
-  
-  const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [name]: value,
     }));
   };
 
-  const handlePolicyDetailsChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, type, value, checked } = e.target as HTMLInputElement;
-    setFormData((prev) => ({
+  const handlePolicyDetailsChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target as HTMLInputElement;
+    const checked = (e.target as HTMLInputElement).checked;
+    
+    setFormData(prev => ({
       ...prev,
       policyDetails: {
         ...prev.policyDetails,
-        [name]: type === 'checkbox' ? checked : value,
+        [name]: type === 'checkbox' 
+          ? checked 
+          : type === 'number' 
+            ? parseFloat(value) || 0 
+            : value,
       },
     }));
   };
 
   const handlePolicyTypeSelect = (type: PolicyTypeValue) => {
-    let emptyPolicyDetails: PolicyDetails = {};
-    switch (type) {
-      case 'santé':
-        emptyPolicyDetails = {} as SanteDetails;
-        break;
-      case 'voyage':
-        emptyPolicyDetails = {} as VoyageDetails;
-        break;
-      case 'automobile':
-        emptyPolicyDetails = {} as AutomobileDetails;
-        break;
-      case 'responsabilité civile':
-        emptyPolicyDetails = {} as ResponsabiliteCivileDetails;
-        break;
-      case 'habitation':
-        emptyPolicyDetails = {} as HabitationDetails;
-        break;
-      case 'professionnelle':
-        emptyPolicyDetails = {} as ProfessionnelleDetails;
-        break;
-      case 'transport':
-        emptyPolicyDetails = {} as TransportDetails;
-        break;
-    }
-  
-    setFormData((prev) => ({
+    // Set the default end date to 1 year from start date
+    const startDate = new Date().toISOString().split('T')[0];
+    const endDate = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    
+    setFormData(prev => ({
       ...prev,
       policyType: type,
-      policyDetails: emptyPolicyDetails,
+      premiumAmount: POLICY_PREMIUMS[type].toString(),
+      startDate: startDate,
+      endDate: endDate,
+      policyDetails: DEFAULT_POLICY_DETAILS[type],
     }));
+    
     setShowPolicySelection(false);
-  };
-  
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    const validationErrors: ValidationErrors = {};
-
-    // Validate user ID
-    if (!formData.userId) validationErrors.userId = 'User ID is required. Please log in.';
-    if (!formData.policyType) validationErrors.policyType = 'Policy type is required';
-    if (!formData.startDate) validationErrors.startDate = 'Start date is required';
-    if (!formData.endDate) validationErrors.endDate = 'End date is required';
-    if (!formData.premiumAmount || isNaN(Number(formData.premiumAmount))) {
-      validationErrors.premiumAmount = 'Premium amount must be a number';
-    }
-    if (!formData.coverageDetails) validationErrors.coverageDetails = 'Coverage details are required';
-
-    setErrors(validationErrors);
-    if (Object.keys(validationErrors).length > 0) {
-      // Focus on the first field with an error
-      const firstErrorField = Object.keys(validationErrors)[0];
-      const element = document.querySelector(`[name="${firstErrorField}"]`);
-      if (element) {
-        (element as HTMLElement).focus();
-      }
-      return;
-    }
-
-    try {
-      // Get authentication token (rename to match what's in your localStorage)
-      const token = localStorage.getItem('authToken') ;
-      
-      if (!token) {
-        setMessage('Authentication error: No token found. Please log in again.');
-        return;
-      }
-      
-      // Set up complete payload and config
-      const config = {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-      };
-
-      // Make the API request
-      const response = await axios.post(
-        'http://localhost:5000/api/contracts/subscribe',
-        formData, // formData already includes userId from useEffect
-        config
-      );
-
-      // Handle success
-      setMessage(response.data.message || 'Contract created successfully. A confirmation email has been sent to your inbox!');
-      
-      // Optional: Navigate after successful submission
-      // setTimeout(() => navigate('/contracts'), 1500);
-      
-    } catch (error: any) {
-      console.error('Error creating contract:', error);
-      
-      // Better error handling with more specific messages
-      if (error.response) {
-        if (error.response.status === 401) {
-          setMessage('Authentication error: Your session may have expired. Please log in again.');
-          // Optionally redirect to login
-          // setTimeout(() => navigate('/login'), 2000);
-        } else if (error.response.data?.message) {
-          setMessage(`Error: ${error.response.data.message}`);
-        } else {
-          setMessage(`Error: Server responded with status code ${error.response.status}`);
-        }
-      } else if (error.request) {
-        setMessage('Network error: No response received from server. Please check your connection.');
-      } else {
-        setMessage(`Error: ${error.message}`);
-      }
-    }
   };
 
   const renderPolicyDetailsFields = () => {
-    switch (formData.policyType) {
+    if (!formData.policyType) return null;
+
+    switch(formData.policyType) {
       case 'santé':
         return (
           <div className="policy-details-fields">
+            <h3>Détails de santé</h3>
             <div className="form-group">
               <label>Maladies préexistantes</label>
-              <input 
-                type="text" 
+              <textarea 
                 name="maladiesPreexistantes" 
                 value={(formData.policyDetails as SanteDetails).maladiesPreexistantes || ''} 
                 onChange={handlePolicyDetailsChange} 
@@ -310,19 +284,37 @@ const SubscribeForm: React.FC<SubscribeFormProps> = ({ existingContract }) => {
             </div>
             <div className="form-group">
               <label>Traitements actuels</label>
-              <input 
-                type="text" 
+              <textarea 
                 name="traitementsActuels" 
                 value={(formData.policyDetails as SanteDetails).traitementsActuels || ''} 
                 onChange={handlePolicyDetailsChange} 
               />
             </div>
+            <div className="form-group">
+              <label>Groupe sanguin</label>
+              <select 
+                name="groupeSanguin" 
+                value={(formData.policyDetails as SanteDetails).groupeSanguin || ''} 
+                onChange={handlePolicyDetailsChange}
+              >
+                <option value="">Sélectionner</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+              </select>
+            </div>
           </div>
         );
-
+      
       case 'voyage':
         return (
           <div className="policy-details-fields">
+            <h3>Détails du voyage</h3>
             <div className="form-group">
               <label>Destination</label>
               <input 
@@ -333,101 +325,11 @@ const SubscribeForm: React.FC<SubscribeFormProps> = ({ existingContract }) => {
               />
             </div>
             <div className="form-group">
-              <label>Date de départ</label>
-              <input 
-                type="date" 
-                name="departureDate" 
-                value={(formData.policyDetails as VoyageDetails).departureDate || ''} 
-                onChange={handlePolicyDetailsChange} 
-              />
-            </div>
-            <div className="form-group">
-              <label>Date de retour</label>
-              <input 
-                type="date" 
-                name="returnDate" 
-                value={(formData.policyDetails as VoyageDetails).returnDate || ''} 
-                onChange={handlePolicyDetailsChange} 
-              />
-            </div>
-          </div>
-        );
-
-      case 'automobile':
-        return (
-          <div className="policy-details-fields">
-            <div className="form-group">
-              <label>Modèle de voiture</label>
-              <input 
-                type="text" 
-                name="carModel" 
-                value={(formData.policyDetails as AutomobileDetails).carModel || ''} 
-                onChange={handlePolicyDetailsChange} 
-              />
-            </div>
-            <div className="form-group">
-              <label>Numéro d'immatriculation</label>
-              <input 
-                type="text" 
-                name="registrationNumber" 
-                value={(formData.policyDetails as AutomobileDetails).registrationNumber || ''} 
-                onChange={handlePolicyDetailsChange} 
-              />
-            </div>
-            <div className="form-group">
-              <label>Usage</label>
-              <input 
-                type="text" 
-                name="usage" 
-                value={(formData.policyDetails as AutomobileDetails).usage || ''} 
-                onChange={handlePolicyDetailsChange} 
-              />
-            </div>
-          </div>
-        );
-
-      case 'responsabilité civile':
-        return (
-          <div className="policy-details-fields">
-            <div className="form-group">
-              <label>Activités couvertes</label>
-              <input 
-                type="text" 
-                name="coveredActivities" 
-                value={(formData.policyDetails as ResponsabiliteCivileDetails).coveredActivities || ''} 
-                onChange={handlePolicyDetailsChange} 
-              />
-            </div>
-            <div className="form-group">
-              <label>Limite de couverture</label>
+              <label>Durée en jours</label>
               <input 
                 type="number" 
-                name="coverageLimit" 
-                value={(formData.policyDetails as ResponsabiliteCivileDetails).coverageLimit || ''} 
-                onChange={handlePolicyDetailsChange} 
-              />
-            </div>
-          </div>
-        );
-
-      case 'habitation':
-        return (
-          <div className="policy-details-fields">
-            <div className="form-group">
-              <label>Type de logement</label>
-              <input 
-                type="text" 
-                name="homeType" 
-                value={(formData.policyDetails as HabitationDetails).homeType || ''} 
-                onChange={handlePolicyDetailsChange} 
-              />
-            </div>
-            <div className="form-group">
-              <label>Localisation</label>
-              <input 
-                type="text" 
-                name="location" 
-                value={(formData.policyDetails as HabitationDetails).location || ''} 
+                name="dureeEnJours" 
+                value={(formData.policyDetails as VoyageDetails).dureeEnJours || 0} 
                 onChange={handlePolicyDetailsChange} 
               />
             </div>
@@ -435,19 +337,156 @@ const SubscribeForm: React.FC<SubscribeFormProps> = ({ existingContract }) => {
               <label>
                 <input 
                   type="checkbox" 
-                  name="alarmSystem" 
-                  checked={(formData.policyDetails as HabitationDetails).alarmSystem || false} 
+                  name="activitesAHautRisque" 
+                  checked={(formData.policyDetails as VoyageDetails).activitesAHautRisque || false} 
                   onChange={handlePolicyDetailsChange} 
                 />
-                Système d'alarme installé ?
+                Activités à haut risque
+              </label>
+            </div>
+            <div className="form-group">
+              <label>Nombre de voyageurs</label>
+              <input 
+                type="number" 
+                name="nombreDeVoyageurs" 
+                value={(formData.policyDetails as VoyageDetails).nombreDeVoyageurs || 1} 
+                onChange={handlePolicyDetailsChange} 
+              />
+            </div>
+          </div>
+        );
+      
+      case 'automobile':
+        return (
+          <div className="policy-details-fields">
+            <h3>Détails du véhicule</h3>
+            <div className="form-group">
+              <label>Marque et modèle</label>
+              <input 
+                type="text" 
+                name="marqueModele" 
+                value={(formData.policyDetails as AutomobileDetails).marqueModele || ''} 
+                onChange={handlePolicyDetailsChange} 
+              />
+            </div>
+            <div className="form-group">
+              <label>Année</label>
+              <input 
+                type="number" 
+                name="annee" 
+                value={(formData.policyDetails as AutomobileDetails).annee || new Date().getFullYear()} 
+                onChange={handlePolicyDetailsChange} 
+              />
+            </div>
+            <div className="form-group">
+              <label>Numéro d'immatriculation</label>
+              <input 
+                type="text" 
+                name="numeroDImmatriculation" 
+                value={(formData.policyDetails as AutomobileDetails).numeroDImmatriculation || ''} 
+                onChange={handlePolicyDetailsChange} 
+              />
+            </div>
+            <div className="form-group checkbox-group">
+              <label>
+                <input 
+                  type="checkbox" 
+                  name="usageProfessionnel" 
+                  checked={(formData.policyDetails as AutomobileDetails).usageProfessionnel || false} 
+                  onChange={handlePolicyDetailsChange} 
+                />
+                Usage professionnel
               </label>
             </div>
           </div>
         );
-
+      
+      case 'responsabilité civile':
+        return (
+          <div className="policy-details-fields">
+            <h3>Détails de responsabilité civile</h3>
+            <div className="form-group">
+              <label>Activités couvertes</label>
+              <textarea 
+                name="activitesCouvertes" 
+                value={(formData.policyDetails as ResponsabiliteCivileDetails).activitesCouvertes || ''} 
+                onChange={handlePolicyDetailsChange} 
+              />
+            </div>
+            <div className="form-group">
+              <label>Limite de couverture (€)</label>
+              <input 
+                type="number" 
+                name="limiteDeCouverture" 
+                value={(formData.policyDetails as ResponsabiliteCivileDetails).limiteDeCouverture || 100000} 
+                onChange={handlePolicyDetailsChange} 
+              />
+            </div>
+            <div className="form-group">
+              <label>Nombre de personnes couvertes</label>
+              <input 
+                type="number" 
+                name="nombreDePersonnes" 
+                value={(formData.policyDetails as ResponsabiliteCivileDetails).nombreDePersonnes || 1} 
+                onChange={handlePolicyDetailsChange} 
+              />
+            </div>
+          </div>
+        );
+      
+      case 'habitation':
+        return (
+          <div className="policy-details-fields">
+            <h3>Détails du logement</h3>
+            <div className="form-group">
+              <label>Type de logement</label>
+              <select 
+                name="typeLogement" 
+                value={(formData.policyDetails as HabitationDetails).typeLogement || ''} 
+                onChange={handlePolicyDetailsChange}
+              >
+                <option value="">Sélectionner</option>
+                <option value="appartement">Appartement</option>
+                <option value="maison">Maison</option>
+                <option value="studio">Studio</option>
+                <option value="loft">Loft</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Adresse</label>
+              <textarea 
+                name="adresse" 
+                value={(formData.policyDetails as HabitationDetails).adresse || ''} 
+                onChange={handlePolicyDetailsChange} 
+              />
+            </div>
+            <div className="form-group checkbox-group">
+              <label>
+                <input 
+                  type="checkbox" 
+                  name="systemeAlarme" 
+                  checked={(formData.policyDetails as HabitationDetails).systemeAlarme || false} 
+                  onChange={handlePolicyDetailsChange} 
+                />
+                Système d'alarme
+              </label>
+            </div>
+            <div className="form-group">
+              <label>Valeur du contenu (€)</label>
+              <input 
+                type="number" 
+                name="valeurContenu" 
+                value={(formData.policyDetails as HabitationDetails).valeurContenu || 0} 
+                onChange={handlePolicyDetailsChange} 
+              />
+            </div>
+          </div>
+        );
+      
       case 'professionnelle':
         return (
           <div className="policy-details-fields">
+            <h3>Détails professionnels</h3>
             <div className="form-group">
               <label>Profession</label>
               <input 
@@ -458,11 +497,11 @@ const SubscribeForm: React.FC<SubscribeFormProps> = ({ existingContract }) => {
               />
             </div>
             <div className="form-group">
-              <label>Revenu annuel</label>
+              <label>Chiffre d'affaires annuel (€)</label>
               <input 
                 type="number" 
-                name="annualRevenue" 
-                value={(formData.policyDetails as ProfessionnelleDetails).annualRevenue || ''} 
+                name="chiffreAffaires" 
+                value={(formData.policyDetails as ProfessionnelleDetails).chiffreAffaires || 0} 
                 onChange={handlePolicyDetailsChange} 
               />
             </div>
@@ -470,32 +509,42 @@ const SubscribeForm: React.FC<SubscribeFormProps> = ({ existingContract }) => {
               <label>Nombre d'employés</label>
               <input 
                 type="number" 
-                name="employeeCount" 
-                value={(formData.policyDetails as ProfessionnelleDetails).employeeCount || ''} 
+                name="nombreEmployes" 
+                value={(formData.policyDetails as ProfessionnelleDetails).nombreEmployes || 0} 
+                onChange={handlePolicyDetailsChange} 
+              />
+            </div>
+            <div className="form-group">
+              <label>Secteur d'activité</label>
+              <input 
+                type="text" 
+                name="secteurActivite" 
+                value={(formData.policyDetails as ProfessionnelleDetails).secteurActivite || ''} 
                 onChange={handlePolicyDetailsChange} 
               />
             </div>
           </div>
         );
-
+      
       case 'transport':
         return (
           <div className="policy-details-fields">
+            <h3>Détails du transport</h3>
             <div className="form-group">
-              <label>Type de transport</label>
+              <label>Type de marchandise</label>
               <input 
                 type="text" 
-                name="transportType" 
-                value={(formData.policyDetails as TransportDetails).transportType || ''} 
+                name="typeMarchandise" 
+                value={(formData.policyDetails as TransportDetails).typeMarchandise || ''} 
                 onChange={handlePolicyDetailsChange} 
               />
             </div>
             <div className="form-group">
-              <label>Valeur des marchandises</label>
+              <label>Valeur déclarée (€)</label>
               <input 
                 type="number" 
-                name="goodsValue" 
-                value={(formData.policyDetails as TransportDetails).goodsValue || ''} 
+                name="valeurDeclaree" 
+                value={(formData.policyDetails as TransportDetails).valeurDeclaree || 0} 
                 onChange={handlePolicyDetailsChange} 
               />
             </div>
@@ -508,13 +557,134 @@ const SubscribeForm: React.FC<SubscribeFormProps> = ({ existingContract }) => {
                 onChange={handlePolicyDetailsChange} 
               />
             </div>
+            <div className="form-group">
+              <label>Mode d'expédition</label>
+              <select 
+                name="modeDExpedition" 
+                value={(formData.policyDetails as TransportDetails).modeDExpedition || 'routier'} 
+                onChange={handlePolicyDetailsChange}
+              >
+                <option value="routier">Transport routier</option>
+                <option value="maritime">Transport maritime</option>
+                <option value="aerien">Transport aérien</option>
+                <option value="ferroviaire">Transport ferroviaire</option>
+                <option value="multimodal">Transport multimodal</option>
+              </select>
+            </div>
+            <div className="form-group checkbox-group">
+              <label>
+                <input 
+                  type="checkbox" 
+                  name="securiteSupplementaire" 
+                  checked={(formData.policyDetails as TransportDetails).securiteSupplementaire || false} 
+                  onChange={handlePolicyDetailsChange} 
+                />
+                Sécurité supplémentaire
+              </label>
+            </div>
           </div>
         );
-
+      
       default:
         return null;
     }
   };
+
+// Update the handleSubmit function:
+const handleSubmit = async (e: FormEvent) => {
+  e.preventDefault();
+  setIsProcessing(true);
+  setMessage('');
+  setMessageType('');
+
+  if (!stripe || !elements) {
+    setMessage("Stripe n'est pas initialisé");
+    setMessageType('error');
+    setIsProcessing(false);
+    return;
+  }
+
+  // Validate form
+  const validationErrors: ValidationErrors = {};
+  if (!formData.userId) validationErrors.userId = "L'ID utilisateur est requis";
+  if (!formData.policyType) validationErrors.policyType = "Le type de police est requis";
+  if (!formData.startDate) validationErrors.startDate = "La date de début est requise";
+  if (!formData.endDate) validationErrors.endDate = "La date de fin est requise";
+  if (!formData.coverageDetails) validationErrors.coverageDetails = "Les détails de couverture sont requis";
+
+  if (Object.keys(validationErrors).length > 0) {
+    setErrors(validationErrors);
+    setIsProcessing(false);
+    return;
+  }
+
+  try {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      throw new Error('No authentication token found');
+    }
+
+    // Step 1: Create payment intent
+    const response = await axios.post(
+      'http://localhost:5000/api/contracts/subscribe',
+      {
+        ...formData,
+        premiumAmount: Number(formData.premiumAmount),
+        startDate: new Date(formData.startDate).toISOString(),
+        endDate: new Date(formData.endDate).toISOString(),
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    const { clientSecret } = response.data;
+
+    // Step 2: Confirm payment with Stripe
+    const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+      payment_method: {
+        card: elements.getElement(CardElement)!,
+      }
+    });
+
+    if (error) {
+      throw error;
+    }
+
+    if (paymentIntent.status === 'succeeded') {
+      // Step 3: Confirm contract creation
+      await axios.post(
+        'http://localhost:5000/api/contracts/confirm-payment',
+        {
+          ...formData,
+          premiumAmount: Number(formData.premiumAmount),
+          paymentIntentId: paymentIntent.id,
+          startDate: new Date(formData.startDate).toISOString(),
+          endDate: new Date(formData.endDate).toISOString(),
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      setMessage("Paiement réussi et contrat créé !");
+      setMessageType('success');
+      setTimeout(() => navigate('/dashboard'), 2000);
+    }
+  } catch (error: any) {
+    console.error('Error:', error);
+    setMessage(error.response?.data?.message || error.message || "Une erreur s'est produite");
+    setMessageType('error');
+  } finally {
+    setIsProcessing(false);
+  }
+};
 
   const handleBackToSelection = () => {
     setShowPolicySelection(true);
@@ -527,74 +697,63 @@ const SubscribeForm: React.FC<SubscribeFormProps> = ({ existingContract }) => {
   return (
     <div className="subscribe-form-container">
       <h2>Formulaire de souscription - {formData.policyType}</h2>
-      
-      <button className="back-button" type="button" onClick={handleBackToSelection}>
-        Changer de type d'assurance
-      </button>
-      
+      <button className="back-button" onClick={handleBackToSelection}>Changer le type</button>
+
       <form onSubmit={handleSubmit} className="subscribe-form">
-        {/* Hidden userId field */}
         <input type="hidden" name="userId" value={formData.userId || ''} />
-        
-        {/* For debugging only - can be removed in production */}
-        {!formData.userId && (
-          <div className="form-group error-message">
-            <p>Vous devez être connecté pour souscrire à une assurance.</p>
-          </div>
-        )}
 
         <div className="form-group">
           <label>Date de début</label>
-          <input 
-            type="date" 
-            name="startDate" 
-            value={formData.startDate} 
-            onChange={handleChange} 
-          />
+          <input type="date" name="startDate" value={formData.startDate} onChange={handleChange} />
           {errors.startDate && <span className="error">{errors.startDate}</span>}
         </div>
 
         <div className="form-group">
           <label>Date de fin</label>
-          <input 
-            type="date" 
-            name="endDate" 
-            value={formData.endDate} 
-            onChange={handleChange} 
-          />
+          <input type="date" name="endDate" value={formData.endDate} onChange={handleChange} />
           {errors.endDate && <span className="error">{errors.endDate}</span>}
         </div>
 
         <div className="form-group">
-          <label>Montant de la prime</label>
-          <input 
-            type="number" 
-            name="premiumAmount" 
-            value={formData.premiumAmount} 
-            onChange={handleChange} 
-          />
-          {errors.premiumAmount && <span className="error">{errors.premiumAmount}</span>}
+          <label>Montant de la prime (€)</label>
+          <input type="number" name="premiumAmount" value={formData.premiumAmount} readOnly />
         </div>
 
         <div className="form-group">
           <label>Détails de couverture</label>
-          <textarea 
-            name="coverageDetails" 
-            value={formData.coverageDetails} 
-            onChange={handleChange} 
-          />
+          <textarea name="coverageDetails" value={formData.coverageDetails} onChange={handleChange} placeholder="Décrivez les détails de couverture souhaités..." />
           {errors.coverageDetails && <span className="error">{errors.coverageDetails}</span>}
         </div>
 
         {renderPolicyDetailsFields()}
 
-        <button type="submit" className="submit-but" >Soumettre</button>
-        
-        {message && (
-          <p className={`message ${message.includes('Error') || message.includes('error') ? 'error-message' : 'success-message'}`}>
-            {message}
-          </p>
-        )}
+        <div className="form-group">
+          <label>Détails de paiement</label>
+          <div className="card-element-container">
+            <CardElement 
+              options={{
+                style: {
+                  base: {
+                    fontSize: '16px',
+                    color: '#424770',
+                    '::placeholder': {
+                      color: '#aab7c4',
+                    },
+                  },
+                  invalid: {
+                    color: '#9e2146',
+                  },
+                },
+              }}
+            />
+          </div>
+        </div>
+
+        {message && <p className={`message ${messageType === 'success' ? 'success-message' : messageType === 'error' ? 'error-message' : ''}`}>{message}</p>}
+
+        <button type="submit" className="submit-but" disabled={isProcessing || !stripe}>
+          {isProcessing ? 'Traitement en cours...' : 'Souscrire et payer'}
+        </button>
       </form>
     </div>
   );

@@ -21,6 +21,8 @@ import MesContrats from './pages/MesContrats';
 import SupervisorHome from './pages/SupervisorHome';
 import PolicyType from './pages/PolicyTypes';
 import SupervisorMessages from './components/SupervisorMessages';
+import PaymentSuccess from './components/PaymentSuccess';
+import StripeWrapper from './components/StripeWrapper';
 
 function App() {
   return (
@@ -66,10 +68,12 @@ function AppContent() {
       <Route element={<Layout />}>
         <Route path="/policytypes" element={<PolicyType />} />
         <Route path="/claimform" element={<ClaimForm />} />
-        <Route path="/souscription" element={<SubscribeForm />} />
+        <Route path="/souscription" element={<StripeWrapper />} />
         <Route path="/mes-declarations" element={<MesDeclarations />} />
         <Route path="/guide" element={<UserGuide />} />
         <Route path="/mes-contrats" element={<MesContrats />} />
+        // In your router configuration
+        <Route path= "/payment-success" element={<PaymentSuccess />}/>
       </Route>
 
       {/* Routes without Layout */}

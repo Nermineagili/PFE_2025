@@ -4,9 +4,9 @@ import { useAuth } from "../context/AuthContext";
 import { Container, Nav, Navbar, Image, Dropdown } from "react-bootstrap";
 import { MdLogout, MdMenu, MdDashboard, MdAssignment, MdInsertDriveFile, MdContactSupport, MdDescription } from "react-icons/md";
 import { BsInfoCircle, BsShield } from "react-icons/bs";
-import UserProfileModal from "./UserProfileModal";
 import "./navbar.css";
 import Logo from "../assets/logo.png";
+import ProfileEdit from "./ProfileEdit";
 
 interface Claim {
   _id: string;
@@ -32,7 +32,7 @@ const CustomNavbar: React.FC<NavbarProps> = ({
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isLoggedIn, logout, user, login } = useAuth();
+  const { isLoggedIn, logout, user } = useAuth();
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [hasNewClaimUpdate, setHasNewClaimUpdate] = useState(false);
 
@@ -69,7 +69,7 @@ const CustomNavbar: React.FC<NavbarProps> = ({
     }
   };
 
-  // Rest of your existing navbar code...
+  // Check for new claim updates
   useEffect(() => {
     const seenUpdates = localStorage.getItem("seenClaimUpdate");
     if (seenUpdates === "true") {
@@ -107,14 +107,6 @@ const CustomNavbar: React.FC<NavbarProps> = ({
     navigate("/");
   };
 
-  const handleImageUpload = (imageUrl: string) => {
-    if (user) {
-      const updatedUser = { ...user, profilePic: imageUrl };
-      localStorage.setItem("user", JSON.stringify(updatedUser));
-      login(localStorage.getItem("authToken") || "", updatedUser);
-    }
-  };
-
   const handleNavigateToMesDeclarations = () => {
     localStorage.setItem("seenClaimUpdate", "true");
     setHasNewClaimUpdate(false);
@@ -123,6 +115,15 @@ const CustomNavbar: React.FC<NavbarProps> = ({
 
   const handleNavigateToMesContrats = () => {
     navigate("/mes-contrats");
+  };
+
+  // Handle profile modal
+  const handleOpenProfileModal = () => {
+    setShowProfileModal(true);
+  };
+
+  const handleCloseProfileModal = () => {
+    setShowProfileModal(false);
   };
 
   return (
@@ -137,7 +138,7 @@ const CustomNavbar: React.FC<NavbarProps> = ({
             <Nav className="me-auto">
               <Nav.Link onClick={handleAPropos}><BsInfoCircle className="me-1" /> À propos</Nav.Link>
               <Nav.Link onClick={handleServices}><BsShield className="me-1" /> Nos Services</Nav.Link>
-              
+
               {isLoggedIn && (
                 <Dropdown as={Nav.Item}>
                   <Dropdown.Toggle as={Nav.Link} className="nav-dropdown-toggle">
@@ -196,7 +197,7 @@ const CustomNavbar: React.FC<NavbarProps> = ({
                 <Nav.Item className="d-flex align-items-center">
                   <div
                     className="profile-container"
-                    onClick={() => setShowProfileModal(true)}
+                    onClick={handleOpenProfileModal}
                     style={{ cursor: "pointer" }}
                   >
                     {user?.profilePic ? (
@@ -232,13 +233,16 @@ const CustomNavbar: React.FC<NavbarProps> = ({
         </Container>
       </Navbar>
 
-      <UserProfileModal
-        key={showProfileModal ? "open" : "closed"}
-        show={showProfileModal}
-        onHide={() => setShowProfileModal(false)}
-      />
+      {/* Modal for Profile Edit */}
+      {user && (
+        <ProfileEdit
+          userId={user._id}
+          show={showProfileModal}
+          onHide={handleCloseProfileModal}
+        />
+      )}
     </>
   );
 };
 
-export default CustomNavbar;
+export default CustomNavbar; 

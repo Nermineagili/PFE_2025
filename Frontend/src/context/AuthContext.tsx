@@ -3,13 +3,15 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 
 // Updated User interface with name and lastname, and the optional fullname
 interface User {
-  fullname: any;
+  fullname?: any;
   _id: string;
   email: string;
   name: string;
   lastname: string;
   role: string;
   profilePic?: string;
+  phone?: string;
+  address?: string;
 }
 
 interface AuthContextType {
@@ -17,6 +19,7 @@ interface AuthContextType {
   user: User | null;
   login: (token: string, user: User) => void;
   logout: () => void;
+  updateUserContext: (updatedUser: Partial<User>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -61,12 +64,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setIsLoggedIn(false);
   };
 
+  // New function to update user context
+  const updateUserContext = (updatedUser: Partial<User>) => {
+    if (user) {
+      const newUserData = { ...user, ...updatedUser };
+      localStorage.setItem('user', JSON.stringify(newUserData));
+      setUser(newUserData);
+    }
+  };
+
   useEffect(() => {
     console.log("AuthContext - isLoggedIn:", isLoggedIn);
   }, [isLoggedIn]);
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, user, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, user, login, logout, updateUserContext }}>
       {children}
     </AuthContext.Provider>
   );

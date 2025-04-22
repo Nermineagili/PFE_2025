@@ -9,6 +9,7 @@ const contactRoutes = require('./routes/ContactRoutes');
 const taskRoutes = require('./routes/taskRoutes');
 const contratRoutes = require('./routes/ContratRoutes');
 const supervisorRoutes = require('./routes/supervisorRoutes');
+const paymentRoutes = require("./routes/payment");
 
 require("dotenv").config();
 require("./db");
@@ -59,6 +60,8 @@ app.use('/api/contracts', contratRoutes);  // This line links the routes to /api
 
 app.use('/api/supervisor', supervisorRoutes);
 
+
+app.use("/api/payment", paymentRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

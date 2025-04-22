@@ -5,9 +5,9 @@ const ContractSchema = new mongoose.Schema(
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     policyType: {
       type: String,
-      enum: ['santé', 'voyage', 'automobile', 'responsabilité civile', 'habitation', 'professionnelle'],
+      enum: ['santé', 'voyage', 'automobile', 'responsabilité civile', 'habitation', 'professionnelle', 'transport'],
       required: true
-    },  
+    },
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
     premiumAmount: { type: Number, required: true },
@@ -18,7 +18,8 @@ const ContractSchema = new mongoose.Schema(
     policyDetails: {
       type: mongoose.Schema.Types.Mixed, // to allow flexibility based on policyType
       default: {}
-    }
+    },  // <-- Added the missing comma here
+    paymentIntentId: { type: String, unique: true, sparse: true },
   },
   { timestamps: true }
 );
