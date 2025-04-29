@@ -6,7 +6,9 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   profilePic: { type: String, default: '/uploads/default-avatar.png' },
-  role: { type: String, enum: ['user', 'admin', 'superviseur'], default: 'user' },  contracts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Contract' }],
+  role: { type: String, enum: ['user', 'admin', 'superviseur'], default: 'user' }, 
+   contracts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Contract' }],
+   
   createdAt: { type: Date, default: Date.now }
 });
 

@@ -1,132 +1,219 @@
 /* src/pages/MesContrats.css */
 
 .mes-contrats-container {
-    min-height: 70vh;
-  }
-  
+  min-height: calc(100vh - 120px); /* Account for navbar height */
+  padding-top: 20px;
+  padding-bottom: 40px;
+}
+
+.page-title {
+  color: var(--primary-color, #007bff);
+  font-weight: 600;
+  margin-bottom: 0;
+  font-size: 1.8rem;
+}
+
+.contract-card {
+  height: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin-bottom: 20px;
+}
+
+.contract-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+}
+
+.contract-card.expired {
+  opacity: 0.7;
+}
+
+.contract-card .card-header {
+  padding: 15px 20px;
+}
+
+.contract-title {
+  font-size: 1.1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 70%;
+}
+
+.contract-id {
+  font-size: 0.9rem;
+  color: #6c757d;
+  margin-bottom: 15px;
+}
+
+.contract-dates {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.date-item {
+  flex: 1;
+  text-align: center;
+}
+
+.date-separator {
+  width: 10%;
+  height: 1px;
+  background-color: #dee2e6;
+  margin-top: 20px;
+  position: relative;
+}
+
+.date-separator:after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: calc(50% - 4px);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #dee2e6;
+}
+
+.date-label {
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin-bottom: 5px;
+}
+
+.date-value {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.remaining-days {
+  margin: 15px 0;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.days-number {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-color, #007bff);
+}
+
+.days-label {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+.expiring-soon {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+.premium-amount {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.premium-amount .amount {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.premium-amount .period {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.contract-actions {
+  margin-top: 20px;
+}
+
+/* Modal styling */
+.modal-header h5 {
+  font-weight: 600;
+}
+
+.modal-title {
+  font-size: 1.3rem;
+  white-space: normal;
+}
+
+.coverage-details {
+  white-space: pre-line;
+  word-break: break-word;
+}
+
+/* Spinner styling */
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
   .page-title {
-    color: var(--primary-color, #007bff);
-    font-weight: 600;
-    margin-bottom: 0;
+    font-size: 1.5rem;
   }
   
-  .contract-card {
-    height: 100%;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-  
-  .contract-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
-  }
-  
-  .contract-card.expired {
-    opacity: 0.7;
-  }
-  
-  .contract-card .card-header {
-    padding: 15px 20px;
-  }
-  
-  .contract-id {
-    font-size: 0.9rem;
-    color: #6c757d;
-    margin-bottom: 15px;
-  }
-  
-  .contract-dates {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
-  }
-  
-  .date-item {
-    flex: 1;
-    text-align: center;
-  }
-  
-  .date-separator {
-    width: 10%;
-    height: 1px;
-    background-color: #dee2e6;
-    margin-top: 20px;
-    position: relative;
-  }
-  
-  .date-separator:after {
-    content: '';
-    position: absolute;
-    top: -4px;
-    left: calc(50% - 4px);
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background-color: #dee2e6;
-  }
-  
-  .date-label {
-    font-size: 0.8rem;
-    color: #6c757d;
-    margin-bottom: 5px;
+  .contract-title {
+    font-size: 1rem;
+    max-width: 60%;
   }
   
   .date-value {
-    font-weight: 600;
-  }
-  
-  .remaining-days {
-    margin: 15px 0;
-    padding: 10px;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    text-align: center;
-  }
-  
-  .days-number {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--primary-color, #007bff);
-  }
-  
-  .days-label {
     font-size: 0.8rem;
-    color: #6c757d;
-  }
-  
-  .expiring-soon {
-    color: #dc3545;
-    font-weight: 600;
-  }
-  
-  .premium-amount {
-    text-align: center;
-    margin: 20px 0;
   }
   
   .premium-amount .amount {
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: 1.3rem;
   }
   
-  .premium-amount .period {
-    font-size: 0.9rem;
-    color: #6c757d;
+  .modal-title {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .contract-dates {
+    flex-direction: column;
+    align-items: center;
   }
   
-  .contract-actions {
-    margin-top: 20px;
+  .date-separator {
+    width: 80%;
+    height: 1px;
+    margin: 10px 0;
   }
   
-  /* Modal styling */
-  .modal-header h5 {
-    font-weight: 600;
+  .date-separator:after {
+    display: none;
   }
   
-  /* Spinner styling */
-  .spinner-border {
-    width: 3rem;
-    height: 3rem;
+  .contract-title {
+    max-width: 50%;
   }
+}
+/* Add this to your MesContrats.css */
+body {
+  padding-top: 56px; /* Height of your navbar */
+}
+
+.mes-contrats-container {
+  padding-top: 30px;
+  padding-bottom: 40px;
+  min-height: calc(100vh - 56px); /* Adjust based on navbar height */
+}
+
+/* If your navbar is fixed-top, add this */
+.navbar.fixed-top {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 1030;
+}

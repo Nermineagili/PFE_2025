@@ -22,7 +22,7 @@ app.use(
   cors({
     origin: "http://localhost:3000", // ✅ frontend address
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization" ,"x-debug-request"],
     credentials: true,
   })
 );

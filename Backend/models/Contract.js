@@ -13,12 +13,10 @@ const ContractSchema = new mongoose.Schema(
     premiumAmount: { type: Number, required: true },
     coverageDetails: { type: String, required: true },
     claims: [{ type: mongoose.Schema.Types.ObjectId, ref: "Claim" }],
-    
-    // 🔽 New field here
     policyDetails: {
       type: mongoose.Schema.Types.Mixed, // to allow flexibility based on policyType
       default: {}
-    },  // <-- Added the missing comma here
+    },
     paymentIntentId: { type: String, unique: true, sparse: true },
   },
   { timestamps: true }

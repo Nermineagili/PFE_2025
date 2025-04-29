@@ -163,11 +163,11 @@ const MesContrats: React.FC = () => {
   return (
     <>
       <CustomNavbar />
-      <Container className="mes-contrats-container my-5">
-        <Row className="mb-4">
+      <Container className="mes-contrats-container" style={{ marginTop: '70px' }}>
+      <Row className="mb-4">
           <Col>
-            <div className="d-flex justify-content-between align-items-center">
-              <h2 className="page-title">Mes Contrats d'Assurance</h2>
+            <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+              <h2 className="page-title mb-3 mb-md-0">  </h2>
               <Button 
                 variant="outline-primary" 
                 className="d-flex align-items-center"
@@ -199,13 +199,13 @@ const MesContrats: React.FC = () => {
                 Vous n'avez pas encore souscrit à un contrat d'assurance.
               </Card.Text>
               <Button 
-              variant="outline-secondary" 
-              className="mt-2 w-100"
-              onClick={() => navigate('/souscription', { state: { contract: contracts } })}
-            >
-              <MdEdit className="me-2" /> Modifier
-            </Button>
-              <Button variant="primary" onClick={() => navigate('/souscription')}>
+                variant="outline-secondary" 
+                className="mt-2 w-100"
+                onClick={() => navigate('/souscription', { state: { contract: contracts } })}
+              >
+                <MdEdit className="me-2" /> Modifier
+              </Button>
+              <Button variant="primary" className="mt-2" onClick={() => navigate('/souscription')}>
                 Souscrire à un contrat
               </Button>
             </Card.Body>
@@ -216,11 +216,11 @@ const MesContrats: React.FC = () => {
               const remainingDays = getRemainingDays(contract.endDate);
               
               return (
-                <Col key={contract._id} lg={4} md={6} className="mb-4">
+                <Col key={contract._id} xl={4} lg={6} md={6} sm={12} className="mb-4">
                   <Card className={`contract-card ${contract.status === 'expired' ? 'expired' : ''}`}>
                     <Card.Header className={`bg-${getPolicyColor(contract.policyType)} text-white`}>
                       <div className="d-flex justify-content-between align-items-center">
-                        <h5 className="mb-0 text-capitalize">Assurance {contract.policyType}</h5>
+                        <h5 className="mb-0 text-capitalize contract-title">Assurance {contract.policyType}</h5>
                         <Badge bg={getStatusVariant(contract.status || 'pending')}>
                           {contract.status === 'active' ? 'Actif' : 
                            contract.status === 'expired' ? 'Expiré' : 'En attente'}
@@ -281,15 +281,15 @@ const MesContrats: React.FC = () => {
       </Container>
       
       {/* Contract Details Modal */}
-      <Modal show={showModal} onHide={handleCloseModal} size="lg">
+      <Modal show={showModal} onHide={handleCloseModal} size="lg" centered>
         {selectedContract && (
           <>
             <Modal.Header closeButton className={`bg-${getPolicyColor(selectedContract.policyType)} text-white`}>
-              <Modal.Title>Détails du contrat - {selectedContract.policyType.toUpperCase()}</Modal.Title>
+              <Modal.Title className="modal-title">Détails du contrat - {selectedContract.policyType.toUpperCase()}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
               <Row>
-                <Col md={6}>
+                <Col md={6} className="mb-3">
                   <h5>Informations générales</h5>
                   <p><strong>Numéro de police:</strong> {selectedContract.policyNumber}</p>
                   <p><strong>Type:</strong> {selectedContract.policyType}</p>
@@ -299,7 +299,7 @@ const MesContrats: React.FC = () => {
                   </Badge></p>
                   <p><strong>Prime annuelle:</strong> {selectedContract.premiumAmount} €</p>
                 </Col>
-                <Col md={6}>
+                <Col md={6} className="mb-3">
                   <h5>Période de couverture</h5>
                   <p><strong>Date de début:</strong> {new Date(selectedContract.startDate).toLocaleDateString('fr-FR')}</p>
                   <p><strong>Date de fin:</strong> {new Date(selectedContract.endDate).toLocaleDateString('fr-FR')}</p>
@@ -312,7 +312,7 @@ const MesContrats: React.FC = () => {
               <hr/>
               
               <h5>Détails de couverture</h5>
-              <p>{selectedContract.coverageDetails}</p>
+              <p className="coverage-details">{selectedContract.coverageDetails}</p>
               
               {selectedContract.claims && selectedContract.claims.length > 0 && (
                 <>
@@ -337,18 +337,20 @@ const MesContrats: React.FC = () => {
                 </>
               )}
             </Modal.Body>
-            <Modal.Footer>
-              <Button variant="outline-secondary" onClick={handleCloseModal}>
+            <Modal.Footer className="d-flex flex-column flex-md-row justify-content-between">
+              <Button variant="outline-secondary" onClick={handleCloseModal} className="mb-2 mb-md-0">
                 Fermer
               </Button>
-              <Button variant="primary" className="d-flex align-items-center">
-                <MdFileDownload className="me-2" /> Télécharger le contrat
-              </Button>
-              {selectedContract.status === 'expired' && (
-                <Button variant="success" className="d-flex align-items-center">
-                  <MdAutorenew className="me-2" /> Renouveler
+              <div className="d-flex flex-column flex-md-row gap-2">
+                <Button variant="primary" className="d-flex align-items-center">
+                  <MdFileDownload className="me-2" /> Télécharger
                 </Button>
-              )}
+                {selectedContract.status === 'expired' && (
+                  <Button variant="success" className="d-flex align-items-center">
+                    <MdAutorenew className="me-2" /> Renouveler
+                  </Button>
+                )}
+              </div>
             </Modal.Footer>
           </>
         )}

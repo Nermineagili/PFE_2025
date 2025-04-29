@@ -5,7 +5,7 @@ import PolicyType from '../pages/PolicyTypes';
 import './SubscribeForm.css';
 import { useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
 
-// Policy type interfaces
+// Policy type interfaces - keeping all existing interfaces the same
 interface SanteDetails {
   maladiesPreexistantes: string;
   fumeur: boolean;
@@ -47,7 +47,6 @@ interface ProfessionnelleDetails {
   secteurActivite: string;
 }
 
-// New interface for Transport policy
 interface TransportDetails {
   typeMarchandise: string;
   valeurDeclaree: number;
@@ -170,6 +169,11 @@ const SubscribeForm: React.FC<SubscribeFormProps> = ({ existingContract }) => {
   const [messageType, setMessageType] = useState<'success' | 'error' | ''>('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentIntentId, setPaymentIntentId] = useState('');
+  // Add an option for test mode
+  const [useTestMode, setUseTestMode] = useState(false);
+  // Add retry counter
+  const [finalizationAttempts, setFinalizationAttempts] = useState(0);
+  const MAX_FINALIZATION_ATTEMPTS = 3;
 
   useEffect(() => {
     if (existingContract) {
@@ -255,9 +259,17 @@ const SubscribeForm: React.FC<SubscribeFormProps> = ({ existingContract }) => {
     setShowPolicySelection(false);
   };
 
+  // Add a toggle handler for test mode
+  const toggleTestMode = () => {
+    setUseTestMode(prev => !prev);
+  };
+
+
+  // Keep the existing renderPolicyDetailsFields function
+
   const renderPolicyDetailsFields = () => {
     if (!formData.policyType) return null;
-
+  
     switch(formData.policyType) {
       case 'santé':
         return (
@@ -590,80 +602,47 @@ const SubscribeForm: React.FC<SubscribeFormProps> = ({ existingContract }) => {
     }
   };
 
-// Update the handleSubmit function:
-const handleSubmit = async (e: FormEvent) => {
-  e.preventDefault();
-  setIsProcessing(true);
-  setMessage('');
-  setMessageType('');
-
-  if (!stripe || !elements) {
-    setMessage("Stripe n'est pas initialisé");
-    setMessageType('error');
-    setIsProcessing(false);
-    return;
-  }
-
-  // Validate form
-  const validationErrors: ValidationErrors = {};
-  if (!formData.userId) validationErrors.userId = "L'ID utilisateur est requis";
-  if (!formData.policyType) validationErrors.policyType = "Le type de police est requis";
-  if (!formData.startDate) validationErrors.startDate = "La date de début est requise";
-  if (!formData.endDate) validationErrors.endDate = "La date de fin est requise";
-  if (!formData.coverageDetails) validationErrors.coverageDetails = "Les détails de couverture sont requis";
-
-  if (Object.keys(validationErrors).length > 0) {
-    setErrors(validationErrors);
-    setIsProcessing(false);
-    return;
-  }
-
-  try {
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-      throw new Error('No authentication token found');
-    }
-
-    // Step 1: Create payment intent
-    const response = await axios.post(
-      'http://localhost:5000/api/contracts/subscribe',
-      {
-        ...formData,
-        premiumAmount: Number(formData.premiumAmount),
-        startDate: new Date(formData.startDate).toISOString(),
-        endDate: new Date(formData.endDate).toISOString(),
-      },
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
-
-    const { clientSecret } = response.data;
-
-    // Step 2: Confirm payment with Stripe
-    const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-      payment_method: {
-        card: elements.getElement(CardElement)!,
-      }
-    });
-
-    if (error) {
-      throw error;
-    }
-
-    if (paymentIntent.status === 'succeeded') {
-      // Step 3: Confirm contract creation
-      await axios.post(
-        'http://localhost:5000/api/contracts/confirm-payment',
+  // Update the handleSubmit function to work with the new backend:
+  // Helper function to check contract status
+  const checkContractStatus = async (token: string, paymentIntentId: string): Promise<boolean> => {
+    try {
+      console.log('Checking for existing contracts...');
+      const userContractsResponse = await axios.get(
+        `http://localhost:5000/api/contracts/${formData.userId}`,
         {
-          ...formData,
-          premiumAmount: Number(formData.premiumAmount),
-          paymentIntentId: paymentIntent.id,
-          startDate: new Date(formData.startDate).toISOString(),
-          endDate: new Date(formData.endDate).toISOString(),
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          }
+        }
+      );
+      console.log('User contracts received:', userContractsResponse.data.length);
+      
+      const matchingContract = userContractsResponse.data.find(
+        (contract: any) => contract.paymentIntentId === paymentIntentId
+      );
+      
+      if (matchingContract) {
+        console.log('Found matching contract:', matchingContract);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error checking contract status:', error);
+      return false;
+    }
+  };
+
+  // Helper function to finalize contract
+  const finalizeContract = async (token: string, paymentIntentId: string): Promise<boolean> => {
+    try {
+      console.log('Making finalize-payment request...');
+      // Send more information that might be needed by the backend
+      const finalizeResponse = await axios.post(
+        'http://localhost:5000/api/contracts/finalize-payment',
+        { 
+          paymentIntentId,
+          userId: formData.userId,
+          policyType: formData.policyType
         },
         {
           headers: {
@@ -672,19 +651,211 @@ const handleSubmit = async (e: FormEvent) => {
           }
         }
       );
-
-      setMessage("Paiement réussi et contrat créé !");
-      setMessageType('success');
-      setTimeout(() => navigate('/dashboard'), 2000);
+      console.log('Finalize response:', finalizeResponse.data);
+      return finalizeResponse.data.success || !!finalizeResponse.data.contract;
+    } catch (error: any) {
+      // Log more detailed error information
+      console.error('Error finalizing contract:', error);
+      if (error.response) {
+        console.error('Error response data:', error.response.data);
+        console.error('Error response status:', error.response.status);
+        console.error('Error response headers:', error.response.headers);
+      }
+      return false;
     }
-  } catch (error: any) {
-    console.error('Error:', error);
-    setMessage(error.response?.data?.message || error.message || "Une erreur s'est produite");
-    setMessageType('error');
-  } finally {
-    setIsProcessing(false);
-  }
-};
+  };
+
+  // Update the handleSubmit function to work with the new backend:
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setIsProcessing(true);
+    setMessage('');
+    setMessageType('');
+    setFinalizationAttempts(0);
+  
+    // Log initial state
+    console.log('=== Form Submission Started ===');
+    console.log('Form Data:', formData);
+    console.log('Use Test Mode:', useTestMode);
+  
+    // Validate form
+    const validationErrors: ValidationErrors = {};
+    if (!formData.userId) validationErrors.userId = "L'ID utilisateur est requis";
+    if (!formData.policyType) validationErrors.policyType = "Le type de police est requis";
+    if (!formData.startDate) validationErrors.startDate = "La date de début est requise";
+    if (!formData.endDate) validationErrors.endDate = "La date de fin est requise";
+    if (!formData.coverageDetails) validationErrors.coverageDetails = "Les détails de couverture sont requis";
+  
+    if (Object.keys(validationErrors).length > 0) {
+      console.log('Validation errors:', validationErrors);
+      setErrors(validationErrors);
+      setIsProcessing(false);
+      return;
+    }
+  
+    try {
+      const token = localStorage.getItem('authToken') || localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+  
+      // Log token (be careful with this in production)
+      console.log('Auth token found:', token.substring(0, 10) + '...');
+  
+      let apiUrl = 'http://localhost:5000/api/contracts/subscribe';
+      let requestParams = {
+        ...formData,
+        premiumAmount: Number(formData.premiumAmount),
+        startDate: new Date(formData.startDate).toISOString(),
+        endDate: new Date(formData.endDate).toISOString(),
+      };
+      
+      // Log request parameters
+      console.log('Request params:', requestParams);
+      
+      if (useTestMode) {
+        apiUrl += '?testing=true';
+        console.log('Using test mode endpoint:', apiUrl);
+      }
+      
+      setMessage("Création de la demande de paiement...");
+      
+      console.log('Making initial subscription request to:', apiUrl);
+      const response = await axios.post(
+        apiUrl,
+        requestParams,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      console.log('Subscription response:', response.data);
+  
+      if (useTestMode) {
+        if (response.data.contract) {
+          console.log('Test mode contract created successfully');
+          setIsProcessing(false);
+          setMessage("Contrat créé avec succès en mode test ! Un email de confirmation vous a été envoyé.");
+          setMessageType('success');
+          setTimeout(() => {
+            navigate('/mes-contrats');
+          }, 3000);
+          return;
+        }
+      }
+      
+      const { clientSecret, paymentIntentId } = response.data;
+      setPaymentIntentId(paymentIntentId);
+      
+      console.log('Received clientSecret and paymentIntentId:', { clientSecret, paymentIntentId });
+      setMessage("Traitement du paiement...");
+      
+      if (!stripe || !elements) {
+        console.error('Stripe not initialized');
+        setMessage("Stripe n'est pas initialisé");
+        setMessageType('error');
+        setIsProcessing(false);
+        return;
+      }
+      
+      console.log('Confirming card payment with Stripe...');
+      const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card: elements.getElement(CardElement)!,
+          billing_details: {
+            name: 'Client',
+          },
+        }
+      });
+  
+      if (error) {
+        console.error('Stripe payment error:', error);
+        throw new Error(error.message);
+      }
+  
+      console.log('Payment intent status:', paymentIntent.status);
+      if (paymentIntent.status === 'succeeded') {
+        setMessage("Paiement réussi ! Vérification du contrat...");
+        
+        // Check if contract already exists first
+        const contractExists = await checkContractStatus(token, paymentIntent.id);
+        
+        if (contractExists) {
+          console.log('Contract already exists for payment intent:', paymentIntent.id);
+          setMessage("Contrat créé avec succès ! Un email de confirmation vous a été envoyé.");
+          setMessageType('success');
+          setTimeout(() => {
+            navigate('/mes-contrats');
+          }, 3000);
+          return;
+        }
+        
+        // Implement retry logic for contract finalization
+        const attemptFinalization = async (): Promise<boolean> => {
+          setMessage(`Finalisation du contrat... (tentative ${finalizationAttempts + 1}/${MAX_FINALIZATION_ATTEMPTS})`);
+          
+          // Add an artificial delay to give backend time to process
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+          // Check if contract already exists first (it might have been created in the meantime)
+          const contractNowExists = await checkContractStatus(token, paymentIntent.id);
+          if (contractNowExists) {
+            return true;
+          }
+          
+          // If not, try to create it
+          return await finalizeContract(token, paymentIntent.id);
+        };
+        
+        // Start finalization attempts
+        let finalizationSuccess = false;
+        let attempts = 0;
+        
+        while (!finalizationSuccess && attempts < MAX_FINALIZATION_ATTEMPTS) {
+          setFinalizationAttempts(attempts + 1);
+          finalizationSuccess = await attemptFinalization();
+          attempts++;
+          
+          if (finalizationSuccess) {
+            console.log(`Contract finalized successfully on attempt ${attempts}`);
+            break;
+          } else if (attempts < MAX_FINALIZATION_ATTEMPTS) {
+            console.log(`Finalization attempt ${attempts} failed, retrying...`);
+            // Wait longer between each retry
+            await new Promise(resolve => setTimeout(resolve, 2000 * attempts));
+          }
+        }
+        
+        if (finalizationSuccess) {
+          setMessage("Contrat créé avec succès ! Un email de confirmation vous a été envoyé.");
+          setMessageType('success');
+          setTimeout(() => {
+            navigate('/mes-contrats');
+          }, 3000);
+        } else {
+          // If all finalization attempts failed but payment succeeded, 
+          // instruct user to contact support with payment ID
+          setMessage(`Paiement réussi mais nous n'avons pas pu finaliser votre contrat automatiquement. Veuillez contacter le support avec votre ID de paiement: ${paymentIntent.id}`);
+          setMessageType('error');
+        }
+      } else {
+        throw new Error("Le statut du paiement est: " + paymentIntent.status);
+      }
+    } catch (error: any) {
+      console.error('Global error handler:', {
+        message: error.message,
+        stack: error.stack,
+        response: error.response?.data
+      });
+      setIsProcessing(false);
+      setMessage(error.response?.data?.message || error.message || "Une erreur s'est produite");
+      setMessageType('error');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   const handleBackToSelection = () => {
     setShowPolicySelection(true);
@@ -727,31 +898,57 @@ const handleSubmit = async (e: FormEvent) => {
 
         {renderPolicyDetailsFields()}
 
-        <div className="form-group">
-          <label>Détails de paiement</label>
-          <div className="card-element-container">
-            <CardElement 
-              options={{
-                style: {
-                  base: {
-                    fontSize: '16px',
-                    color: '#424770',
-                    '::placeholder': {
-                      color: '#aab7c4',
-                    },
-                  },
-                  invalid: {
-                    color: '#9e2146',
-                  },
-                },
-              }}
+        {/* Add a toggle for test mode */}
+        <div className="form-group checkbox-group">
+          <label>
+            <input 
+              type="checkbox" 
+              checked={useTestMode} 
+              onChange={toggleTestMode} 
             />
-          </div>
+            Utiliser le mode test (carte de test automatique)
+          </label>
         </div>
 
-        {message && <p className={`message ${messageType === 'success' ? 'success-message' : messageType === 'error' ? 'error-message' : ''}`}>{message}</p>}
+        {/* Only show card element if not using test mode */}
+        {!useTestMode && (
+          <div className="form-group">
+            <label>Détails de paiement</label>
+            <div className="card-element-container">
+              <CardElement 
+                options={{
+                  style: {
+                    base: {
+                      fontSize: '16px',
+                      color: '#424770',
+                      '::placeholder': {
+                        color: '#aab7c4',
+                      },
+                    },
+                    invalid: {
+                      color: '#9e2146',
+                    },
+                  },
+                }}
+              />
+            </div>
+          </div>
+        )}
 
-        <button type="submit" className="submit-but" disabled={isProcessing || !stripe}>
+        {isProcessing && (
+          <div className="payment-processing">
+            <div className="spinner"></div>
+            <p>{message || "Veuillez patienter pendant le traitement de votre demande..."}</p>
+          </div>
+        )}
+
+        {!isProcessing && message && (
+          <p className={`message ${messageType === 'success' ? 'success-message' : messageType === 'error' ? 'error-message' : ''}`}>
+            {message}
+          </p>
+        )}
+        
+        <button type="submit" className="submit-but" disabled={isProcessing || (!useTestMode && !stripe)}>
           {isProcessing ? 'Traitement en cours...' : 'Souscrire et payer'}
         </button>
       </form>
