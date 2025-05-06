@@ -1,53 +1,233 @@
-/* Parent container to center the form vertically & horizontally */
-.signup-background {
-    width: 100%;
-    height: 100vh; /* Full viewport height */
-    background-color: white; /* Main background color */
+/* Auth Pages Shared Styles - Include in both SignIn.css and SignUp.css */
+
+:root {
+  --yomi-gold: #c29046;
+  --yomi-blue: #113c56;
+  --yomi-gold-light: rgba(194, 144, 70, 0.1);
+  --yomi-blue-light: rgba(17, 60, 86, 0.08); 
+  --yomi-text-dark: #333333;
+  --yomi-text-light: #777777;
+}
+
+/* Common styles for auth pages */
+.auth-background {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 0;
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.auth-form {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+  padding: 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-form::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: linear-gradient(to right, var(--yomi-blue), var(--yomi-gold));
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.auth-header h2 {
+  color: var(--yomi-blue);
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.auth-subtitle {
+  color: var(--yomi-text-light);
+  font-size: 15px;
+  margin: 0;
+}
+
+.auth-form-fields {
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--yomi-text-dark);
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 15px;
+  border: 1px solid #e1e5eb;
+  border-radius: 8px;
+  background-color: #fff;
+  transition: all 0.2s ease;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--yomi-gold);
+  box-shadow: 0 0 0 3px var(--yomi-gold-light);
+}
+
+.form-group input::placeholder {
+  color: #a9b0bc;
+}
+
+.auth-submit-btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(to right, var(--yomi-blue), #195980);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 10px;
+  position: relative;
+}
+
+.auth-submit-btn:hover {
+  background: linear-gradient(to right, #0d2c41, var(--yomi-blue));
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(17, 60, 86, 0.2);
+}
+
+.auth-submit-btn:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.auth-submit-btn:disabled {
+  background: #b3c5d3;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: 25px;
+  color: var(--yomi-text-light);
+}
+
+.auth-alt-link {
+  color: var(--yomi-gold);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.auth-alt-link:hover {
+  color: #a67732;
+  text-decoration: underline;
+}
+
+.forgot-password {
+  text-align: right;
+  margin-bottom: 20px;
+}
+
+.forgot-password a {
+  color: var(--yomi-text-light);
+  font-size: 14px;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.forgot-password a:hover {
+  color: var(--yomi-gold);
+  text-decoration: underline;
+}
+
+.auth-error-message {
+  background-color: #fff1f0;
+  border-left: 4px solid #ff4d4f;
+  color: #cf1322;
+  padding: 12px 16px;
+  margin-bottom: 24px;
+  border-radius: 4px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.auth-error-message svg {
+  margin-right: 8px;
+  min-width: 16px;
+}
+
+/* Override for SignIn */
+.signin-form .auth-header h2 {
+  color: var(--yomi-blue);
+}
+
+/* Override for SignUp */
+.signup-form .auth-header h2 {
+  color: var(--yomi-gold);
+}
+
+.signup-form .auth-submit-btn {
+  background: linear-gradient(to right, var(--yomi-gold), #d9a55e);
+}
+
+.signup-form .auth-submit-btn:hover {
+  background: linear-gradient(to right, #b07f36, var(--yomi-gold));
+}
+
+.signup-form::before {
+  background: linear-gradient(to right, var(--yomi-gold), var(--yomi-blue));
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .auth-container {
+    max-width: 100%;
+    padding: 0 15px;
   }
   
-  /* The form container */
-  .signup-form {
-            /* Adjust to your liking */
-    background-color: #1f618d; 
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    border-radius: 20px;
-   
-    position: relative;
-    box-sizing: border-box;
+  .auth-form {
+    padding: 30px 20px;
   }
-  
-  /* Form heading */
-  .signup-form h2 {
-    color: #fff;
-  }
-  
-  /* Input fields */
-  .signup-form .form-control {
-    background-color: #5499c7; /* Lighter blue for inputs */
-    border: none;
-    color: #fff;
-  }
-  
-  /* Placeholder text color */
-  .signup-form .form-control::placeholder {
-    color: #ffffffcc; /* Slightly transparent white */
-  }
-  
-  /* Button styling */
-  .btn-submit {
-    background-color: #fff !important;
-    color: #3790c7 !important;
-    border: none !important;
-    font-weight: 600;
-  }
-  
-  /* Text below button */
-  .existing-account a {
-    color: #fff;
-    text-decoration: underline;
-  }
-  .existing-account {
-    color: #fff;
-  }
-  
+}

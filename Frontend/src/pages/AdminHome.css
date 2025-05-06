@@ -60,3 +60,69 @@
       margin-left: 0;
     }
   }
+  /* Add these to your existing AdminHome.css */
+
+/* Approval notification styles */
+.alert {
+  border-radius: 8px;
+  margin-bottom: 20px;
+  padding: 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.alert-success {
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+  color: #155724;
+}
+
+/* Password reset requests section */
+.reset-requests-card {
+  margin-top: 20px;
+}
+
+.reset-request-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 15px;
+  border-bottom: 1px solid #eee;
+  transition: background-color 0.2s;
+}
+
+.reset-request-item:hover {
+  background-color: #f8f9fa;
+}
+
+.reset-request-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* Approval button */
+.btn-approve {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 5px 12px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.btn-approve:hover {
+  background-color: #218838;
+}
+
+/* Responsive adjustments for approval section */
+@media (max-width: 768px) {
+  .reset-request-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .reset-request-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}

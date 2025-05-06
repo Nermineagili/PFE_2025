@@ -4,6 +4,7 @@ import axios from 'axios';
 import PolicyType from '../pages/PolicyTypes';
 import './SubscribeForm.css';
 import { useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
+import ChatBot from './ChatBot/ChatBot';
 
 // Policy type interfaces - keeping all existing interfaces the same
 interface SanteDetails {
@@ -671,12 +672,6 @@ const SubscribeForm: React.FC<SubscribeFormProps> = ({ existingContract }) => {
     setIsProcessing(true);
     setMessage('');
     setMessageType('');
-    setFinalizationAttempts(0);
-  
-    // Log initial state
-    console.log('=== Form Submission Started ===');
-    console.log('Form Data:', formData);
-    console.log('Use Test Mode:', useTestMode);
   
     // Validate form
     const validationErrors: ValidationErrors = {};
@@ -687,7 +682,6 @@ const SubscribeForm: React.FC<SubscribeFormProps> = ({ existingContract }) => {
     if (!formData.coverageDetails) validationErrors.coverageDetails = "Les détails de couverture sont requis";
   
     if (Object.keys(validationErrors).length > 0) {
-      console.log('Validation errors:', validationErrors);
       setErrors(validationErrors);
       setIsProcessing(false);
       return;
@@ -699,9 +693,6 @@ const SubscribeForm: React.FC<SubscribeFormProps> = ({ existingContract }) => {
         throw new Error('No authentication token found');
       }
   
-      // Log token (be careful with this in production)
-      console.log('Auth token found:', token.substring(0, 10) + '...');
-  
       let apiUrl = 'http://localhost:5000/api/contracts/subscribe';
       let requestParams = {
         ...formData,
@@ -710,17 +701,12 @@ const SubscribeForm: React.FC<SubscribeFormProps> = ({ existingContract }) => {
         endDate: new Date(formData.endDate).toISOString(),
       };
       
-      // Log request parameters
-      console.log('Request params:', requestParams);
-      
       if (useTestMode) {
         apiUrl += '?testing=true';
-        console.log('Using test mode endpoint:', apiUrl);
       }
       
-      setMessage("Création de la demande de paiement...");
+      setMessage("Création du contrat...");
       
-      console.log('Making initial subscription request to:', apiUrl);
       const response = await axios.post(
         apiUrl,
         requestParams,
@@ -731,11 +717,9 @@ const SubscribeForm: React.FC<SubscribeFormProps> = ({ existingContract }) => {
           }
         }
       );
-      console.log('Subscription response:', response.data);
   
       if (useTestMode) {
         if (response.data.contract) {
-          console.log('Test mode contract created successfully');
           setIsProcessing(false);
           setMessage("Contrat créé avec succès en mode test ! Un email de confirmation vous a été envoyé.");
           setMessageType('success');
@@ -746,109 +730,17 @@ const SubscribeForm: React.FC<SubscribeFormProps> = ({ existingContract }) => {
         }
       }
       
-      const { clientSecret, paymentIntentId } = response.data;
-      setPaymentIntentId(paymentIntentId);
-      
-      console.log('Received clientSecret and paymentIntentId:', { clientSecret, paymentIntentId });
-      setMessage("Traitement du paiement...");
-      
-      if (!stripe || !elements) {
-        console.error('Stripe not initialized');
-        setMessage("Stripe n'est pas initialisé");
-        setMessageType('error');
-        setIsProcessing(false);
-        return;
-      }
-      
-      console.log('Confirming card payment with Stripe...');
-      const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-        payment_method: {
-          card: elements.getElement(CardElement)!,
-          billing_details: {
-            name: 'Client',
-          },
-        }
-      });
-  
-      if (error) {
-        console.error('Stripe payment error:', error);
-        throw new Error(error.message);
-      }
-  
-      console.log('Payment intent status:', paymentIntent.status);
-      if (paymentIntent.status === 'succeeded') {
-        setMessage("Paiement réussi ! Vérification du contrat...");
-        
-        // Check if contract already exists first
-        const contractExists = await checkContractStatus(token, paymentIntent.id);
-        
-        if (contractExists) {
-          console.log('Contract already exists for payment intent:', paymentIntent.id);
-          setMessage("Contrat créé avec succès ! Un email de confirmation vous a été envoyé.");
-          setMessageType('success');
-          setTimeout(() => {
-            navigate('/mes-contrats');
-          }, 3000);
-          return;
-        }
-        
-        // Implement retry logic for contract finalization
-        const attemptFinalization = async (): Promise<boolean> => {
-          setMessage(`Finalisation du contrat... (tentative ${finalizationAttempts + 1}/${MAX_FINALIZATION_ATTEMPTS})`);
-          
-          // Add an artificial delay to give backend time to process
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          
-          // Check if contract already exists first (it might have been created in the meantime)
-          const contractNowExists = await checkContractStatus(token, paymentIntent.id);
-          if (contractNowExists) {
-            return true;
-          }
-          
-          // If not, try to create it
-          return await finalizeContract(token, paymentIntent.id);
-        };
-        
-        // Start finalization attempts
-        let finalizationSuccess = false;
-        let attempts = 0;
-        
-        while (!finalizationSuccess && attempts < MAX_FINALIZATION_ATTEMPTS) {
-          setFinalizationAttempts(attempts + 1);
-          finalizationSuccess = await attemptFinalization();
-          attempts++;
-          
-          if (finalizationSuccess) {
-            console.log(`Contract finalized successfully on attempt ${attempts}`);
-            break;
-          } else if (attempts < MAX_FINALIZATION_ATTEMPTS) {
-            console.log(`Finalization attempt ${attempts} failed, retrying...`);
-            // Wait longer between each retry
-            await new Promise(resolve => setTimeout(resolve, 2000 * attempts));
-          }
-        }
-        
-        if (finalizationSuccess) {
-          setMessage("Contrat créé avec succès ! Un email de confirmation vous a été envoyé.");
-          setMessageType('success');
-          setTimeout(() => {
-            navigate('/mes-contrats');
-          }, 3000);
-        } else {
-          // If all finalization attempts failed but payment succeeded, 
-          // instruct user to contact support with payment ID
-          setMessage(`Paiement réussi mais nous n'avons pas pu finaliser votre contrat automatiquement. Veuillez contacter le support avec votre ID de paiement: ${paymentIntent.id}`);
-          setMessageType('error');
-        }
+      // For non-test mode, just check the response
+      if (response.data.contract) {
+        setMessage("Contrat créé avec succès ! Un email de confirmation vous a été envoyé.");
+        setMessageType('success');
+        setTimeout(() => {
+          navigate('/mes-contrats');
+        }, 3000);
       } else {
-        throw new Error("Le statut du paiement est: " + paymentIntent.status);
+        throw new Error(response.data.message || "Erreur lors de la création du contrat");
       }
     } catch (error: any) {
-      console.error('Global error handler:', {
-        message: error.message,
-        stack: error.stack,
-        response: error.response?.data
-      });
       setIsProcessing(false);
       setMessage(error.response?.data?.message || error.message || "Une erreur s'est produite");
       setMessageType('error');
@@ -952,6 +844,7 @@ const SubscribeForm: React.FC<SubscribeFormProps> = ({ existingContract }) => {
           {isProcessing ? 'Traitement en cours...' : 'Souscrire et payer'}
         </button>
       </form>
+      <ChatBot />
     </div>
   );
 };

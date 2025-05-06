@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import "./PolicyTypes.css";
+import ChatBot from "../components/ChatBot/ChatBot";
 
 // Define the policy type string literal type to match SubscribeForm
 type PolicyType = 
@@ -100,6 +101,7 @@ const PolicyType: React.FC<PolicyTypeProps> = ({ onSelectPolicyType, standalone 
           </div>
         ))}
       </div>
+      <ChatBot />
     </section>
   );
 };

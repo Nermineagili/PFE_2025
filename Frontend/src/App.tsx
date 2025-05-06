@@ -23,6 +23,9 @@ import PolicyType from './pages/PolicyTypes';
 import SupervisorMessages from './components/SupervisorMessages';
 import PaymentSuccess from './components/PaymentSuccess';
 import StripeWrapper from './components/StripeWrapper';
+import ManageUsers from './components/ManageUsers';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 function App() {
   return (
@@ -63,8 +66,11 @@ function AppContent() {
       {/* Auth */}
       <Route path="/signup" element={!isLoggedIn ? <SignUp /> : <Navigate to="/" replace />} />
       <Route path="/signin" element={!isLoggedIn ? <SignIn /> : <Navigate to="/" replace />} />
-      
-      {/* Routes with Layout */}
+      <Route path="/forgot-password" element={!isLoggedIn ? <ForgotPassword /> : <Navigate to="/" replace />} />
+      <Route 
+        path="/reset-password/:token" 
+        element={!isLoggedIn ? <ResetPassword /> : <Navigate to="/" replace />} 
+      />      {/* Routes with Layout */}
       <Route element={<Layout />}>
         <Route path="/policytypes" element={<PolicyType />} />
         <Route path="/claimform" element={<ClaimForm />} />
@@ -85,6 +91,8 @@ function AppContent() {
         path="/adminhome" 
         element={isLoggedIn && user?.role === 'admin' ? <AdminHome /> : <Navigate to="/" replace />} 
       />
+      <Route path="/admin/approve-reset/:token/:userId" element={isLoggedIn && user?.role === 'admin' ?<ManageUsers />: <Navigate to="/" replace />} />
+
       <Route 
         path="/supervisorhome" 
         element={isLoggedIn && user?.role === 'superviseur' ? <SupervisorHome /> : <Navigate to="/" replace />} 

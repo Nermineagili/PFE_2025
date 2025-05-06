@@ -1,8 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { Container, Nav, Navbar, Image, Dropdown } from "react-bootstrap";
-import { MdLogout, MdMenu, MdDashboard, MdAssignment, MdInsertDriveFile, MdContactSupport, MdDescription } from "react-icons/md";
+import { Container, Nav, Navbar, Image, Dropdown, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { 
+  MdLogout, 
+  MdMenu, 
+  MdDashboard, 
+  MdAssignment, 
+  MdInsertDriveFile, 
+  MdContactSupport, 
+  MdDescription, 
+  MdAccountCircle,
+  MdEdit
+} from "react-icons/md";
 import { BsInfoCircle, BsShield } from "react-icons/bs";
 import "./navbar.css";
 import Logo from "../assets/logo.png";
@@ -35,6 +45,7 @@ const CustomNavbar: React.FC<NavbarProps> = ({
   const { isLoggedIn, logout, user } = useAuth();
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [hasNewClaimUpdate, setHasNewClaimUpdate] = useState(false);
+  const [showEditIndicator, setShowEditIndicator] = useState(false);
 
   // Navigation handlers
   const handleAPropos = () => {
@@ -128,47 +139,52 @@ const CustomNavbar: React.FC<NavbarProps> = ({
 
   return (
     <>
-      <Navbar collapseOnSelect expand="lg" className="custom-navbar">
+      <Navbar collapseOnSelect expand="lg" className="yomi-navbar">
         <Container>
-          <Navbar.Brand href="/">
-            <Image src={Logo} alt="Logo" height="50" width="50" />
+          <Navbar.Brand href="/" className="yomi-navbar-brand">
+            <Image src={Logo} alt="Yomi Assurance" height="50" width="50" className="yomi-logo" />
+            <span className="yomi-brand-text">Yomi Assurance</span>
           </Navbar.Brand>
-          <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+          <Navbar.Toggle aria-controls="responsive-navbar-nav" className="yomi-navbar-toggler" />
           <Navbar.Collapse id="responsive-navbar-nav">
-            <Nav className="me-auto">
-              <Nav.Link onClick={handleAPropos}><BsInfoCircle className="me-1" /> À propos</Nav.Link>
-              <Nav.Link onClick={handleServices}><BsShield className="me-1" /> Nos Services</Nav.Link>
+            <Nav className="me-auto yomi-nav-links">
+              <Nav.Link onClick={handleAPropos} className="yomi-nav-link">
+                <BsInfoCircle className="yomi-nav-icon" /> À propos
+              </Nav.Link>
+              <Nav.Link onClick={handleServices} className="yomi-nav-link">
+                <BsShield className="yomi-nav-icon" /> Nos Services
+              </Nav.Link>
 
               {isLoggedIn && (
-                <Dropdown as={Nav.Item}>
-                  <Dropdown.Toggle as={Nav.Link} className="nav-dropdown-toggle">
-                    <MdMenu className="me-1" /> Plus
+                <Dropdown as={Nav.Item} className="yomi-dropdown">
+                  <Dropdown.Toggle as={Nav.Link} className="yomi-dropdown-toggle">
+                    <MdMenu className="yomi-nav-icon" /> Plus
                   </Dropdown.Toggle>
-                  <Dropdown.Menu className="nav-dropdown-menu">
+                  <Dropdown.Menu className="yomi-dropdown-menu">
                     {location.pathname === "/clienthome" && (
-                      <Dropdown.Item onClick={handleClaimForm}>
-                        <MdAssignment className="me-2" /> Déclaration de sinistre
+                      <Dropdown.Item onClick={handleClaimForm} className="yomi-dropdown-item">
+                        <MdAssignment className="yomi-dropdown-icon" /> Déclaration de sinistre
                       </Dropdown.Item>
                     )}
-                    <Dropdown.Item onClick={handleContactUs}>
-                      <MdContactSupport className="me-2" /> Contactez-nous
+                    <Dropdown.Item onClick={handleContactUs} className="yomi-dropdown-item">
+                      <MdContactSupport className="yomi-dropdown-icon" /> Contactez-nous
                     </Dropdown.Item>
-                    <Dropdown.Item onClick={() => navigate("/souscription")}>
-                      <MdInsertDriveFile className="me-2" /> Souscrire à un contrat
+                    <Dropdown.Item onClick={() => navigate("/souscription")} className="yomi-dropdown-item">
+                      <MdInsertDriveFile className="yomi-dropdown-icon" /> Souscrire à un contrat
                     </Dropdown.Item>
                     <Dropdown.Item 
                       onClick={handleNavigateToMesDeclarations}
-                      className="dropdown-item-with-notification"
+                      className="yomi-dropdown-item-with-notification"
                     >
-                      <MdDashboard className="me-2" /> Mes Déclarations
+                      <MdDashboard className="yomi-dropdown-icon" /> Mes Déclarations
                       {hasNewClaimUpdate && (
-                        <span className="dropdown-notification-badge">
-                          <span className="notification-dot"></span>
+                        <span className="yomi-notification-badge">
+                          <span className="yomi-notification-dot"></span>
                         </span>
                       )}
                     </Dropdown.Item>
-                    <Dropdown.Item onClick={handleNavigateToMesContrats}>
-                      <MdDescription className="me-2" /> Mes Contrats
+                    <Dropdown.Item onClick={handleNavigateToMesContrats} className="yomi-dropdown-item">
+                      <MdDescription className="yomi-dropdown-icon" /> Mes Contrats
                     </Dropdown.Item>
                   </Dropdown.Menu>
                 </Dropdown>
@@ -176,57 +192,71 @@ const CustomNavbar: React.FC<NavbarProps> = ({
               
               {!isLoggedIn && (
                 <>
-                  <Nav.Link onClick={handleContactUs}>Contactez-nous</Nav.Link>
-                  <Nav.Link onClick={() => navigate("/signin")}>
-                    Souscrire à un contrat
+                  <Nav.Link onClick={handleContactUs} className="yomi-nav-link">
+                    <MdContactSupport className="yomi-nav-icon" /> Contactez-nous
+                  </Nav.Link>
+                  <Nav.Link onClick={() => navigate("/signin")} className="yomi-nav-link">
+                    <MdInsertDriveFile className="yomi-nav-icon" /> Souscrire à un contrat
                   </Nav.Link>
                 </>
               )}
             </Nav>
-            <Nav className="d-flex align-items-center">
+            <Nav className="yomi-auth-nav">
               {!isLoggedIn ? (
                 <>
-                  <Nav.Link onClick={() => navigate("/signin")}>Se connecter</Nav.Link>
-                  <Nav.Link>
-                    <button className="custom-button" onClick={() => navigate("/signup")}>
+                  <Nav.Link onClick={() => navigate("/signin")} className="yomi-login-link">
+                    Se connecter
+                  </Nav.Link>
+                  <Nav.Link className="yomi-signup-link">
+                    <button className="yomi-signup-button" onClick={() => navigate("/signup")}>
                       S'inscrire
                     </button>
                   </Nav.Link>
                 </>
               ) : (
-                <Nav.Item className="d-flex align-items-center">
-                  <div
-                    className="profile-container"
-                    onClick={handleOpenProfileModal}
-                    style={{ cursor: "pointer" }}
+                <div className="yomi-user-profile-container">
+                  <OverlayTrigger
+                    placement="bottom"
+                    overlay={<Tooltip id="profile-tooltip">Cliquez pour modifier votre profil</Tooltip>}
+                    onToggle={(show) => setShowEditIndicator(show)}
                   >
-                    {user?.profilePic ? (
-                      <Image
-                        src={user.profilePic}
-                        roundedCircle
-                        width="40"
-                        height="40"
-                        className="profile-image"
-                      />
-                    ) : (
-                      <div className="profile-initials">
-                        {user?.name ? user.name.charAt(0).toUpperCase() : "?"}
+                    <div
+                      className="yomi-profile-wrapper"
+                      onClick={handleOpenProfileModal}
+                    >
+                      <div className="yomi-profile-image-container">
+                        {user?.profilePic ? (
+                          <Image
+                            src={user.profilePic}
+                            roundedCircle
+                            className="yomi-profile-image"
+                            alt="Photo de profil"
+                          />
+                        ) : (
+                          <div className="yomi-profile-initials">
+                            {user?.name ? user.name.charAt(0).toUpperCase() : "?"}
+                          </div>
+                        )}
+                        <div className="yomi-profile-edit-overlay">
+                          <MdEdit className="yomi-profile-edit-icon" />
+                        </div>
                       </div>
-                    )}
-                  </div>
+                      
+                      <span className="yomi-user-name">
+                        {user?.name} {user?.lastname}
+                      </span>
+                    </div>
+                  </OverlayTrigger>
 
-                  <span className="navbar-user-name" style={{ margin: "0 8px" }}>
-                    {user?.name} {user?.lastname}
-                  </span>
-
-                  <MdLogout
-                    size={24}
-                    className="nav-icon"
+                  <button 
+                    className="yomi-logout-button" 
                     onClick={handleLogout}
                     title="Se déconnecter"
-                    style={{ cursor: "pointer", marginLeft: "4px" }}
-                  />
-                </Nav.Item>
+                  >
+                    <MdLogout className="yomi-logout-icon" />
+                    <span className="yomi-logout-text">Déconnexion</span>
+                  </button>
+                </div>
               )}
             </Nav>
           </Navbar.Collapse>
@@ -245,4 +275,4 @@ const CustomNavbar: React.FC<NavbarProps> = ({
   );
 };
 
-export default CustomNavbar; 
+export default CustomNavbar;

@@ -13,8 +13,8 @@ const Footer: React.FC = () => {
 
 
         <nav className="footer-nav">
-          <a href="#homepage" className="footer-link">Home</a>
-          <a href="#about" className="footer-link">About</a>
+          <a href="#homepage" className="footer-link">Acceuil</a>
+          <a href="#about" className="footer-link">A propos</a>
           <a href="#services" className="footer-link">Services</a>
           <a href="#contact" className="footer-link">Contact</a>
         </nav>
@@ -36,7 +36,7 @@ const Footer: React.FC = () => {
           <img src={logo} alt="Insurance App Logo" className="footer-logo-img" />
         </div>
         <div className="footer-copy">
-          <p>&copy; {new Date().getFullYear()} YOMI Assurance. All Rights Reserved.</p>
+          <p>&copy; {new Date().getFullYear()} YOMI Assurance. Tous droits réservés.</p>
         </div>
       </div>
     </footer>

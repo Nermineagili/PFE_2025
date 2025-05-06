@@ -1,213 +1,217 @@
-.policy-details-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
+/* Prefix all classes with "yomi-policy" to make them specific to this component */
+.yomi-policy-details-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: yomi-policy-fadeIn 0.3s ease;
+}
+
+@keyframes yomi-policy-fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.yomi-policy-details-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  animation: yomi-policy-slideUp 0.4s ease;
+}
+
+@keyframes yomi-policy-slideUp {
+  from { transform: translateY(50px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.yomi-policy-close-button {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: #f1f1f1;
+  border: none;
+  font-size: 20px;
+  color: #333;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease;
+  z-index: 2;
+}
+
+.yomi-policy-close-button:hover {
+  background-color: #e0e0e0;
+  transform: rotate(90deg);
+}
+
+.yomi-policy-header {
+  background-color: #1f618d;
+  background-image: linear-gradient(135deg, #1f618d 0%, #154360 100%);
+  color: white;
+  padding: 40px 30px;
+  text-align: center;
+  border-radius: 12px 12px 0 0;
+  position: relative;
+}
+
+.yomi-policy-icon {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: 15px;
+}
+
+.yomi-policy-header h2 {
+  font-size: 2.2rem;
+  margin: 0 0 15px;
+  font-weight: 700;
+  color: #ffffff; /* Making title explicitly white for readability */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); /* Adding subtle text shadow for better contrast */
+}
+
+.yomi-policy-tagline {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  max-width: 600px;
+  margin: 0 auto;
+  color: #ffffff; /* Ensuring tagline is also white and readable */
+}
+
+.yomi-policy-content {
+  padding: 30px;
+}
+
+.yomi-policy-description {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #444;
+  margin-bottom: 25px;
+}
+
+.yomi-policy-benefits {
+  background-color: #f8f9fa;
+  padding: 25px;
+  border-radius: 10px;
+  margin-bottom: 25px;
+  border-left: 4px solid #1f618d;
+}
+
+.yomi-policy-benefits h3 {
+  color: #1f618d;
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 1.3rem;
+}
+
+.yomi-policy-benefits ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.yomi-policy-benefits li {
+  margin-bottom: 12px;
+  position: relative;
+  padding-left: 5px;
+  color: #555;
+}
+
+.yomi-policy-benefits li:last-child {
+  margin-bottom: 0;
+}
+
+.yomi-policy-testimonial {
+  background-color: #fff;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  margin-bottom: 20px;
+}
+
+.yomi-policy-testimonial blockquote {
+  margin: 0;
+  font-style: italic;
+  color: #555;
+  line-height: 1.6;
+  position: relative;
+  padding-left: 20px;
+  border-left: 3px solid #c29046;
+}
+
+.yomi-policy-testimonial footer {
+  margin-top: 10px;
+  font-weight: bold;
+  color: #1f618d;
+  text-align: right;
+}
+
+.yomi-policy-cta {
+  padding: 0 30px 30px;
+  text-align: center;
+}
+
+.yomi-policy-cta-button {
+  background-color: #1f618d;
+  color: white;
+  border: none;
+  font-weight: 600;
+  padding: 14px 35px;
+  border-radius: 30px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 10px rgba(31, 97, 141, 0.3);
+}
+
+.yomi-policy-cta-button:hover, .yomi-policy-cta-button.hover {
+  background-color: #154360;
+  box-shadow: 0 6px 12px rgba(31, 97, 141, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .yomi-policy-details-card {
+    max-width: 95%;
+  }
+  
+  .yomi-policy-header {
+    padding: 30px 20px;
+  }
+  
+  .yomi-policy-icon {
+    font-size: 3rem;
+  }
+  
+  .yomi-policy-header h2 {
+    font-size: 1.8rem;
+  }
+  
+  .yomi-policy-content {
     padding: 20px;
-    animation: fadeIn 0.3s ease;
   }
   
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+  .yomi-policy-tagline {
+    font-size: 1rem;
   }
   
-  .policy-details-card {
-    background-color: white;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    width: 100%;
-    max-width: 800px;
-    max-height: 90vh;
-    overflow-y: auto;
-    position: relative;
-    animation: slideUp 0.4s ease;
+  .yomi-policy-cta {
+    padding: 0 20px 20px;
   }
-  
-  @keyframes slideUp {
-    from { transform: translateY(50px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-  }
-  
-  .close-button {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    background-color: #f1f1f1;
-    border: none;
-    font-size: 20px;
-    color: #333;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: all 0.3s ease;
-    z-index: 2;
-  }
-  
-  .close-button:hover {
-    background-color: #e0e0e0;
-    transform: rotate(90deg);
-  }
-  
-  .policy-header {
-    background-color: #1f618d;
-    background-image: linear-gradient(135deg, #1f618d 0%, #154360 100%);
-    color: white;
-    padding: 40px 30px;
-    text-align: center;
-    border-radius: 12px 12px 0 0;
-    position: relative;
-  }
-  
-  .policy-icon {
-    font-size: 4rem;
-    display: block;
-    margin-bottom: 15px;
-  }
-  
-  .policy-header h2 {
-    font-size: 2.2rem;
-    margin: 0 0 15px;
-    font-weight: 700;
-  }
-  
-  .policy-tagline {
-    font-size: 1.2rem;
-    opacity: 0.9;
-    max-width: 600px;
-    margin: 0 auto;
-  }
-  
-  .policy-content {
-    padding: 30px;
-  }
-  
-  .policy-description {
-    font-size: 1.1rem;
-    line-height: 1.6;
-    color: #444;
-    margin-bottom: 25px;
-  }
-  
-  .policy-benefits {
-    background-color: #f8f9fa;
-    padding: 25px;
-    border-radius: 10px;
-    margin-bottom: 25px;
-    border-left: 4px solid #1f618d;
-  }
-  
-  .policy-benefits h3 {
-    color: #1f618d;
-    margin-top: 0;
-    margin-bottom: 15px;
-    font-size: 1.3rem;
-  }
-  
-  .policy-benefits ul {
-    margin: 0;
-    padding-left: 20px;
-  }
-  
-  .policy-benefits li {
-    margin-bottom: 12px;
-    position: relative;
-    padding-left: 5px;
-    color: #555;
-  }
-  
-  .policy-benefits li:last-child {
-    margin-bottom: 0;
-  }
-  
-  .policy-testimonial {
-    background-color: #fff;
-    padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-    margin-bottom: 20px;
-  }
-  
-  .policy-testimonial blockquote {
-    margin: 0;
-    font-style: italic;
-    color: #555;
-    line-height: 1.6;
-    position: relative;
-    padding-left: 20px;
-    border-left: 3px solid #c29046;
-  }
-  
-  .policy-testimonial footer {
-    margin-top: 10px;
-    font-weight: bold;
-    color: #1f618d;
-    text-align: right;
-  }
-  
-  .policy-cta {
-    padding: 0 30px 30px;
-    text-align: center;
-  }
-  
-  .cta-button {
-    background-color: #1f618d;
-    color: white;
-    border: none;
-    font-weight: 600;
-    padding: 14px 35px;
-    border-radius: 30px;
-    font-size: 1.1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    box-shadow: 0 4px 10px rgba(31, 97, 141, 0.3);
-  }
-  
-  .cta-button:hover, .cta-button.hover {
-    background-color: #154360;
-    box-shadow: 0 6px 12px rgba(31, 97, 141, 0.4);
-    transform: translateY(-2px);
-  }
-  
-  /* Responsive Adjustments */
-  @media (max-width: 768px) {
-    .policy-details-card {
-      max-width: 95%;
-    }
-    
-    .policy-header {
-      padding: 30px 20px;
-    }
-    
-    .policy-icon {
-      font-size: 3rem;
-    }
-    
-    .policy-header h2 {
-      font-size: 1.8rem;
-    }
-    
-    .policy-content {
-      padding: 20px;
-    }
-    
-    .policy-tagline {
-      font-size: 1rem;
-    }
-    
-    .policy-cta {
-      padding: 0 20px 20px;
-    }
-  }
+}

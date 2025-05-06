@@ -27,14 +27,14 @@ const SupervisorMessages: React.FC = () => {
   const [alert, setAlert] = useState<{ type: "success" | "danger"; text: string } | null>(null);
   const [sending, setSending] = useState(false);
 
-  // Fetch messages from the backend
+  // Récupérer les messages depuis le backend
   const fetchMessages = async () => {
     try {
       const response = await axios.get(`${API_URL}/messages`);
       setMessages(response.data);
     } catch (error) {
-      console.error("Error fetching messages:", error);
-      setAlert({ type: "danger", text: "Failed to fetch messages. Try again later." });
+      console.error("Erreur lors de la récupération des messages:", error);
+      setAlert({ type: "danger", text: "Échec du chargement des messages. Veuillez réessayer plus tard." });
     } finally {
       setLoading(false);
     }
@@ -43,17 +43,16 @@ const SupervisorMessages: React.FC = () => {
   useEffect(() => {
     fetchMessages();
     
-    // Check if user is logged in and has supervisor role
-    // This is just a placeholder - implement according to your auth system
+    // Vérifier si l'utilisateur est connecté et a le rôle de superviseur
     const checkAccess = async () => {
       try {
-        // Example: Check user role from your auth context or API
+        // Exemple : Vérification du rôle depuis votre système d'authentification
         // const { data } = await axios.get('/api/auth/check-role');
         // if (data.role !== 'supervisor') {
         //   navigate('/dashboard');
         // }
       } catch (error) {
-        // Handle authentication errors
+        // Gérer les erreurs d'authentification
         // navigate('/login');
       }
     };
@@ -71,13 +70,13 @@ const SupervisorMessages: React.FC = () => {
         message: replyText,
         messageId: selectedMessage._id,
       });
-      setAlert({ type: "success", text: "Reply sent successfully." });
+      setAlert({ type: "success", text: "Réponse envoyée avec succès." });
       setSelectedMessage(null);
       setReplySubject("");
       setReplyText("");
-      fetchMessages(); // Refresh the messages list
+      fetchMessages(); // Actualiser la liste des messages
     } catch (error) {
-      setAlert({ type: "danger", text: "Error sending reply. Try again later." });
+      setAlert({ type: "danger", text: "Erreur lors de l'envoi de la réponse. Veuillez réessayer plus tard." });
     } finally {
       setSending(false);
     }
@@ -91,13 +90,13 @@ const SupervisorMessages: React.FC = () => {
         <Container className="py-4 mt-5">
           <Card className="messages-card">
             <Card.Header className="messages-card-header d-flex justify-content-between align-items-center">
-              <h2 className="messages-title mb-0">Supervisor Inbox</h2>
+              <h2 className="messages-title mb-0">Boîte de réception</h2>
               <Button 
                 variant="outline-secondary" 
                 size="sm"
                 onClick={() => fetchMessages()}
               >
-                Refresh
+                Actualiser
               </Button>
             </Card.Header>
             <Card.Body>
@@ -110,7 +109,7 @@ const SupervisorMessages: React.FC = () => {
               ) : (
                 <ListGroup className="message-list">
                   {messages.length === 0 ? (
-                    <p className="text-center p-4">No messages found.</p>
+                    <p className="text-center p-4">Aucun message trouvé.</p>
                   ) : (
                     messages.map((msg) => (
                       <ListGroup.Item key={msg._id} className="message-item">
@@ -120,7 +119,7 @@ const SupervisorMessages: React.FC = () => {
                             <span className="message-email">({msg.email})</span>
                           </div>
                           <span className={`message-badge ${msg.replied ? "bg-success" : "bg-warning text-dark"}`}>
-                            {msg.replied ? "Replied" : "Not Replied"}
+                            {msg.replied ? "Répondu" : "Non répondu"}
                           </span>
                         </div>
                         <div className="message-date">{new Date(msg.createdAt).toLocaleString()}</div>
@@ -133,7 +132,7 @@ const SupervisorMessages: React.FC = () => {
                               className="reply-button"
                               onClick={() => setSelectedMessage(msg)}
                             >
-                              Reply
+                              Répondre
                             </Button>
                           </div>
                         )}
@@ -147,7 +146,7 @@ const SupervisorMessages: React.FC = () => {
         </Container>
       </div>
 
-      {/* Reply Modal */}
+      {/* Modal de réponse */}
       <Modal 
         show={!!selectedMessage} 
         onHide={() => setSelectedMessage(null)}
@@ -155,24 +154,24 @@ const SupervisorMessages: React.FC = () => {
         centered
       >
         <Modal.Header closeButton className="message-modal-header">
-          <Modal.Title>Reply to {selectedMessage?.name}</Modal.Title>
+          <Modal.Title>Réponse à {selectedMessage?.name}</Modal.Title>
         </Modal.Header>
         <Modal.Body className="message-modal-body">
           {selectedMessage && (
             <div className="original-message-content p-3 mb-3">
-              <small>Original message:</small>
+              <small>Message original :</small>
               <p className="mb-0 mt-1">{selectedMessage.message}</p>
             </div>
           )}
           
           <Form>
             <Form.Group className="mb-3">
-              <Form.Label>Subject</Form.Label>
+              <Form.Label>Sujet</Form.Label>
               <Form.Control
                 type="text"
                 value={replySubject}
                 onChange={(e) => setReplySubject(e.target.value)}
-                placeholder="Subject of the reply"
+                placeholder="Objet de la réponse"
                 required
               />
             </Form.Group>
@@ -183,7 +182,7 @@ const SupervisorMessages: React.FC = () => {
                 rows={4}
                 value={replyText}
                 onChange={(e) => setReplyText(e.target.value)}
-                placeholder="Your reply message"
+                placeholder="Votre message de réponse"
                 required
               />
             </Form.Group>
@@ -191,14 +190,14 @@ const SupervisorMessages: React.FC = () => {
         </Modal.Body>
         <Modal.Footer className="message-modal-footer">
           <Button variant="secondary" onClick={() => setSelectedMessage(null)}>
-            Cancel
+            Annuler
           </Button>
           <Button 
             variant="success" 
             onClick={handleReply} 
             disabled={sending || !replySubject.trim() || !replyText.trim()}
           >
-            {sending ? <Spinner animation="border" size="sm" /> : "Send Reply"}
+            {sending ? <Spinner animation="border" size="sm" /> : "Envoyer la réponse"}
           </Button>
         </Modal.Footer>
       </Modal>

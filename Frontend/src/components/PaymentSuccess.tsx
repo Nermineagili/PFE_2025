@@ -28,7 +28,7 @@ const PaymentSuccess = () => {
 
         // Show success message or redirect
       } catch (error) {
-        console.error('Error confirming payment:', error);
+        console.error('Erreur lors de la confirmation du paiement:', error);
         navigate('/');
       }
     };
@@ -38,8 +38,8 @@ const PaymentSuccess = () => {
 
   return (
     <div className="payment-success">
-      <h2>Payment Successful!</h2>
-      <p>Your contract has been successfully created.</p>
+      <h2>Paiement réussi !</h2>
+      <p>Votre contrat a été créé avec succès.</p>
     </div>
   );
 };

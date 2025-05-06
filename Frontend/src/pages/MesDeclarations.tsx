@@ -6,6 +6,7 @@ import { Badge, Table, Spinner, Container, Card, Button } from "react-bootstrap"
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { FiX } from "react-icons/fi";
 import "./MesDeclarations.css";
+import ChatBot from "../components/ChatBot/ChatBot";
 interface Claim {
   _id: string;
   incidentDescription: string;
@@ -28,31 +29,34 @@ const MesDeclarations = () => {
         try {
           const response = await axios.get(`http://localhost:5000/api/claims/user/${user._id}`);
           const fetchedClaims = response.data;
-          
-          // Check for updates since last visit
+        
+          // Gestion des mises à jour
           const lastVisit = localStorage.getItem(`lastVisit_${user._id}`);
           if (lastVisit) {
-            const newUpdates = fetchedClaims.filter((claim: { updatedAt: string | number | Date; status: string; }) => 
-              new Date(claim.updatedAt) > new Date(lastVisit) && 
+            const newUpdates = fetchedClaims.filter((claim: { updatedAt: string | number | Date; status: string; }) =>
+              new Date(claim.updatedAt) > new Date(lastVisit) &&
               claim.status !== 'pending'
             );
-            
+        
             if (newUpdates.length > 0) {
               setUpdatedClaims(newUpdates);
               setShowToast(true);
               setTimeout(() => setShowToast(false), 5000);
             }
           }
-          
-          setClaims(fetchedClaims);
-          
-          // Clear the navbar notification
-          localStorage.setItem("seenClaimUpdate", "true");
-        } catch (error) {
-          console.error("Error fetching claims", error);
+        
+          setClaims(fetchedClaims); // même si vide, c’est correct
+        } catch (error: any) {
+          // Si le backend renvoie une 404, on considère simplement qu’il n’y a pas encore de déclarations
+          if (axios.isAxiosError(error) && error.response?.status === 404) {
+            setClaims([]);
+          } else {
+            console.error("Erreur lors de la récupération des déclarations", error);
+          }
         } finally {
           setLoading(false);
         }
+        
       } else {
         navigate("/signin");
       }
@@ -169,7 +173,7 @@ const MesDeclarations = () => {
           </Card.Body>
         </Card>
       </Container>
-    
+      <ChatBot />
     </section>
   );
 };

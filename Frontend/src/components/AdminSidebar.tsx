@@ -9,7 +9,9 @@ import {
   faBars,
   faClipboardList,
   faEnvelope,
-  faFileContract // Added contract icon
+  faFileContract ,
+  faKey, 
+
 } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "@themesberg/react-bootstrap";
 import { useAuth } from "../context/AuthContext";
@@ -24,6 +26,8 @@ interface AdminSidebarProps {
   onSidebarToggle?: (collapsed: boolean) => void;
   onMessagesClick?: () => void;
   onManageContractsClick?: () => void; // Fixed typo in property name
+  onResetPasswordClick?:()=>void
+
 }
 
 const AdminSidebar: React.FC<AdminSidebarProps> = ({
@@ -34,7 +38,8 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
   onManageClaimsClick,
   onSidebarToggle,
   onMessagesClick,
-  onManageContractsClick
+  onManageContractsClick,
+  onResetPasswordClick
 }) => {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
@@ -88,6 +93,12 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
       onManageContractsClick();
   
   };
+  const handleResetPasswordClick = (event: React.MouseEvent) => {
+    event.preventDefault();
+    if (onResetPasswordClick) 
+      onResetPasswordClick();
+  
+  };
 
   return (
     <div
@@ -114,6 +125,12 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
           <a href="#!" className="admin-nav-item" onClick={handleManageUsersClick}>
             <FontAwesomeIcon icon={faUsers} className="admin-nav-icon" />
             <span>Manage Users</span>
+          </a>
+        )}
+        {role === "admin" && (
+          <a href="#!" className="admin-nav-item" onClick={handleResetPasswordClick}>
+            <FontAwesomeIcon icon={faKey} className="admin-nav-icon" />
+            <span>Password Requests</span>
           </a>
         )}
         

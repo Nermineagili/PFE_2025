@@ -10,7 +10,7 @@ const EditUser = ({ id, onClose }: { id: string; onClose: () => void }) => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Fetch user data
+  // Récupérer les données utilisateur
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -23,7 +23,7 @@ const EditUser = ({ id, onClose }: { id: string; onClose: () => void }) => {
 
         setUserData(response.data);
       } catch (err) {
-        setError("Failed to fetch user data.");
+        setError("Échec de la récupération des données de l'utilisateur.");
       } finally {
         setLoading(false);
       }
@@ -32,7 +32,7 @@ const EditUser = ({ id, onClose }: { id: string; onClose: () => void }) => {
     fetchUserData();
   }, [id]);
 
-  // Handle form submission
+  // Soumettre le formulaire
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
@@ -43,10 +43,10 @@ const EditUser = ({ id, onClose }: { id: string; onClose: () => void }) => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      alert("User updated successfully!");
-      onClose(); // Close modal after successful update
+      alert("Utilisateur mis à jour avec succès !");
+      onClose(); // Fermer la fenêtre après la mise à jour
     } catch (err) {
-      setError("Failed to update user.");
+      setError("Échec de la mise à jour de l'utilisateur.");
     }
   };
 
@@ -67,7 +67,7 @@ const EditUser = ({ id, onClose }: { id: string; onClose: () => void }) => {
       {!loading && !error && (
         <Form onSubmit={handleSubmit} className="edit-user-form-container">
           <Form.Group controlId="name" className="edit-user-form-group">
-            <Form.Label className="edit-user-form-label">Name</Form.Label>
+            <Form.Label className="edit-user-form-label">Prénom</Form.Label>
             <Form.Control
               type="text"
               value={userData.name}
@@ -77,7 +77,7 @@ const EditUser = ({ id, onClose }: { id: string; onClose: () => void }) => {
           </Form.Group>
 
           <Form.Group controlId="lastname" className="edit-user-form-group">
-            <Form.Label className="edit-user-form-label">Last Name</Form.Label>
+            <Form.Label className="edit-user-form-label">Nom</Form.Label>
             <Form.Control
               type="text"
               value={userData.lastname}
@@ -102,14 +102,14 @@ const EditUser = ({ id, onClose }: { id: string; onClose: () => void }) => {
               onClick={onClose}
               className="edit-user-cancel-btn"
             >
-              Cancel
+              Annuler
             </Button>
             <Button
               variant="primary"
               type="submit"
               className="edit-user-submit-btn"
             >
-              Update User
+              Mettre à jour
             </Button>
           </div>
         </Form>

@@ -148,20 +148,20 @@ const PolicyDetails: React.FC<PolicyDetailsProps> = ({ selectedPolicy, onClose }
   };
   
   return (
-    <div className="policy-details-container">
-      <div className="policy-details-card">
-        <button className="close-button" onClick={onClose}>×</button>
+    <div className="yomi-policy-details-container">
+      <div className="yomi-policy-details-card">
+        <button className="yomi-policy-close-button" onClick={onClose}>×</button>
         
-        <div className="policy-header">
-          <span className="policy-icon">{policy.icon}</span>
+        <div className="yomi-policy-header">
+          <span className="yomi-policy-icon">{policy.icon}</span>
           <h2>{policy.title}</h2>
-          <p className="policy-tagline">{policy.tagline}</p>
+          <p className="yomi-policy-tagline">{policy.tagline}</p>
         </div>
         
-        <div className="policy-content">
-          <p className="policy-description">{policy.description}</p>
+        <div className="yomi-policy-content">
+          <p className="yomi-policy-description">{policy.description}</p>
           
-          <div className="policy-benefits">
+          <div className="yomi-policy-benefits">
             <h3>Ce que cette assurance vous offre:</h3>
             <ul>
               {policy.benefits.map((benefit, index) => (
@@ -170,7 +170,7 @@ const PolicyDetails: React.FC<PolicyDetailsProps> = ({ selectedPolicy, onClose }
             </ul>
           </div>
           
-          <div className="policy-testimonial">
+          <div className="yomi-policy-testimonial">
             <blockquote>
               "{policy.testimonial.text}"
               <footer>— {policy.testimonial.author}</footer>
@@ -178,9 +178,9 @@ const PolicyDetails: React.FC<PolicyDetailsProps> = ({ selectedPolicy, onClose }
           </div>
         </div>
         
-        <div className="policy-cta">
+        <div className="yomi-policy-cta">
           <button 
-            className={`cta-button ${hoverButton ? 'hover' : ''}`}
+            className={`yomi-policy-cta-button ${hoverButton ? 'hover' : ''}`}
             onMouseEnter={() => setHoverButton(true)}
             onMouseLeave={() => setHoverButton(false)}
             onClick={handleSubscribeClick}

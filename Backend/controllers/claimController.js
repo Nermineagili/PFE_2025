@@ -76,11 +76,7 @@ const getUserClaims = async (req, res) => {
 
         const claims = await Claim.find({ userId }).sort({ createdAt: -1 });
 
-        if (!claims.length) {
-            return res.status(404).json({ message: "No claims found for this user" });
-        }
-
-        res.json(claims);
+        return res.status(200).json(claims); 
     } catch (err) {
         res.status(500).json({ error: "Failed to fetch user claims" });
     }

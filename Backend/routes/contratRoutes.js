@@ -1,11 +1,30 @@
+const mongoose = require('mongoose');
 const express = require('express');
 const { body } = require('express-validator');
-const { createContract, finalizePayment, getUserContracts, handleStripeWebhook } = require('../controllers/ContratController');
+const { 
+  createContract, 
+  finalizePayment, 
+  getUserContracts, 
+  handleStripeWebhook,
+  getRenewableContracts,
+  prepareRenewal,
+  executeRenewal,
+  fixContractStatuses
+} = require('../controllers/ContratController');
 const { authenticateToken, validateObjectId } = require('../middleware/authMiddleware');
 
-// This middleware is needed to get the raw body for webhook signature verification
-const stripeWebhookMiddleware = express.raw({type: 'application/json'});
 const router = express.Router();
+const stripeWebhookMiddleware = express.raw({type: 'application/json'});
+// Middleware to validate contract IDs
+const validateContractId = (req, res, next) => {
+  if (!mongoose.Types.ObjectId.isValid(req.params.contractId)) {
+    return res.status(400).json({ 
+      success: false,
+      message: 'Invalid contract ID format' 
+    });
+  }
+  next();
+};
 
 // POST route to subscribe to a new contract (payment initiation)
 router.post(
@@ -23,7 +42,7 @@ router.post(
   createContract
 );
 
-// Route to finalize a test payment
+// Route to finalize a payment
 router.post('/finalize-payment', finalizePayment);
 
 // GET route to fetch all contracts for a user
@@ -36,5 +55,30 @@ router.get(
 
 // Add this route - no auth needed as it's called by Stripe
 router.post('/webhook', stripeWebhookMiddleware, handleStripeWebhook);
+// Get contracts eligible for renewal
+router.get(
+  '/renewable/:userId',
+  authenticateToken,
+  validateObjectId,
+  getRenewableContracts
+);
+router.post('/fix-statuses', fixContractStatuses);
+
+
+// Prepare contract renewal
+router.post(
+  '/prepare-renewal/:contractId',
+  authenticateToken,
+  validateContractId,
+  prepareRenewal
+);
+
+// Execute contract renewal
+router.post(
+  '/execute-renewal/:contractId',
+  authenticateToken,
+  validateContractId,
+  executeRenewal
+);
 
 module.exports = router;

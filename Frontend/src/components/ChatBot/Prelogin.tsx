@@ -12,12 +12,12 @@ interface Message {
 const Prelogin = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { text: "Welcome! I can help with:", sender: 'bot', options: ['Login issues', 'Registration', 'General info'] }
+    { text: "Bienvenue ! Je peux vous aider avec :", sender: 'bot', options: ['Problèmes de connexion', 'Inscription', 'Informations générales'] }
   ]);
 
   const handleSend = (text: string) => {
     setMessages(prev => [...prev, { text, sender: 'user' }]);
-    // Add bot response logic here
+    // Ajouter ici la logique de réponse du bot
   };
 
   return (
@@ -27,7 +27,7 @@ const Prelogin = () => {
           <div className="chatbot-header">
             <div className="chatbot-title">
               <FaRobot className="icon" />
-              <h5>Help Center</h5>
+              <h5>Centre d'aide</h5>
             </div>
             <button onClick={() => setIsOpen(false)} className="close-btn">
               <FaTimes />
@@ -43,7 +43,7 @@ const Prelogin = () => {
             ))}
           </div>
           <div className="chatbot-input">
-            <input placeholder="Type your question..." />
+            <input placeholder="Tapez votre question..." />
             <button className="send-btn">
               <FaPaperPlane />
             </button>
@@ -55,7 +55,7 @@ const Prelogin = () => {
           onClick={() => setIsOpen(true)}
         >
           <FaRobot />
-          <span>Help</span>
+          <span>Aide</span>
         </button>
       )}
     </div>

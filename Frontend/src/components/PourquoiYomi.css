@@ -1,322 +1,290 @@
-/* Variables pour vos couleurs spécifiques */
+/* PourquoiYomi Component Variables */
 :root {
-    --primary-gold: #c29046;
-    --primary-blue: #113c56;
-    --gold-light: rgba(194, 144, 70, 0.1);
-    --blue-light: rgba(17, 60, 86, 0.1);
-    --text-dark: #333333;
-    --text-light: #777777;
+  --yomi-gold: #c29046;
+  --yomi-blue: #113c56;
+  --yomi-gold-light: rgba(194, 144, 70, 0.1);
+  --yomi-blue-light: rgba(17, 60, 86, 0.08);
+  --yomi-text-dark: #333333;
+  --yomi-text-light: #777777;
+}
+
+/* Main Section Styles */
+.yomi-why-section {
+  padding: 80px 0 50px;
+  background-color: #f9f9f9;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Decorative elements */
+.yomi-why-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, var(--yomi-gold-light) 0%, rgba(255,255,255,0) 70%);
+  border-radius: 50%;
+  transform: translate(30%, -30%);
+  z-index: 0;
+}
+
+.yomi-why-section::after {
+  content: '';
+  position: absolute;
+  bottom: -50px;
+  left: -50px;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, var(--yomi-blue-light) 0%, rgba(255,255,255,0) 70%);
+  border-radius: 50%;
+  z-index: 0;
+}
+
+.yomi-why-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Header Styles */
+.yomi-why-header {
+  text-align: center;
+  margin-bottom: 50px;
+  position: relative;
+}
+
+.yomi-why-title {
+
+  margin-bottom: 40px;
+  color: #222;
+  
+}
+
+.yomi-why-title-underline {
+  width: 100px;
+  height: 4px;
+  background: linear-gradient(90deg, var(--yomi-blue) 0%, var(--yomi-gold) 100%);
+  margin: 0 auto;
+  border-radius: 2px;
+  position: relative;
+}
+
+/* Features Grid Layout */
+.yomi-why-features-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px;
+  margin-bottom: 50px;
+}
+
+.yomi-why-feature-item {
+  display: flex;
+}
+
+.yomi-why-feature-box {
+  display: flex;
+  width: 100%;
+  padding: 30px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(17, 60, 86, 0.08);
+  transition: all 0.4s ease;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  border-left: 4px solid transparent;
+}
+
+.yomi-why-feature-box:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 30px rgba(17, 60, 86, 0.15);
+  border-left: 4px solid var(--yomi-gold);
+}
+
+.yomi-why-feature-box::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 5px;
+  background: linear-gradient(90deg, var(--yomi-gold) 0%, var(--yomi-blue) 100%);
+  bottom: 0;
+  left: 0;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s ease;
+  z-index: -1;
+}
+
+.yomi-why-feature-box:hover::after {
+  transform: scaleX(1);
+}
+
+/* Feature Icon Styles */
+.yomi-why-feature-icon {
+  min-width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--yomi-gold-light);
+  border-radius: 12px;
+  margin-right: 25px;
+  transition: all 0.3s ease;
+}
+
+.yomi-why-feature-box:hover .yomi-why-feature-icon {
+  background-color: var(--yomi-gold);
+}
+
+.yomi-why-feature-icon i {
+  font-size: 28px;
+  color: var(--yomi-gold);
+  transition: all 0.3s ease;
+}
+
+.yomi-why-feature-box:hover .yomi-why-feature-icon i {
+  color: #fff;
+}
+
+/* Feature Content Styles */
+.yomi-why-feature-content h3 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--yomi-blue);
+  position: relative;
+  padding-bottom: 10px;
+}
+
+.yomi-why-feature-content h3::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 40px;
+  height: 2px;
+  background-color: var(--yomi-gold);
+  transition: width 0.3s ease;
+}
+
+.yomi-why-feature-box:hover .yomi-why-feature-content h3::after {
+  width: 60px;
+}
+
+.yomi-why-feature-content p {
+  color: var(--yomi-text-light);
+  line-height: 1.6;
+  margin-bottom: 0;
+  font-size: 1rem;
+}
+
+/* CTA Section */
+.yomi-why-cta {
+  margin-top: 40px;
+  text-align: center;
+  padding: 30px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(17, 60, 86, 0.1);
+}
+
+.yomi-why-cta p {
+  font-size: 1.1rem;
+  color: var(--yomi-text-dark);
+  margin-bottom: 25px;
+}
+
+.yomi-why-button {
+  display: inline-block;
+  padding: 14px 36px;
+  background: linear-gradient(135deg, var(--yomi-blue) 0%, #1f618d 100%);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1.05rem;
+  text-decoration: none;
+  box-shadow: 0 8px 20px rgba(17, 60, 86, 0.25);
+  transition: all 0.4s ease;
+  cursor: pointer;
+}
+
+.yomi-why-button:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 25px rgba(17, 60, 86, 0.35);
+  background: linear-gradient(135deg, #154360 0%, #1a5276 100%);
+}
+
+.yomi-why-button:active {
+  transform: translateY(-2px);
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+  .yomi-why-title {
+    font-size: 2.2rem;
   }
   
-  .pourquoi-yomi-section {
-    padding: 60px 0 30px; /* Réduit l'espace vertical */
-    background-color: #f9f9f9;
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .pourquoi-yomi-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 300px;
-    height: 300px;
-    border-radius: 50%;
-    transform: translate(30%, -30%);
-  }
-  
-  .section-header {
-    text-align: center;
-    margin-bottom: 30px; /* Réduit de 50px à 30px */
-    position: relative;
-  }
-  
-  .section-title {
-    color: #1a1a1a;
-    margin-bottom: 15px; /* Réduit de 20px à 15px */
-  }
-  
-  .title-underline {
-    width: 80px;
-    height: 4px;
-    margin: 0 auto;
-    border-radius: 2px;
-  }
-  
-  .features-container {
-    margin-top: 30px; /* Réduit de 40px à 30px */
-  }
-  
-  .feature-box {
-    display: flex;
-    padding: 25px; /* Réduit de 30px à 25px */
-    margin-bottom: 20px; /* Réduit de 30px à 20px */
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(17, 60, 86, 0.08);
-    transition: all 0.3s ease;
-    position: relative;
-    z-index: 1;
-    overflow: hidden;
-  }
-  
-  .feature-box:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(17, 60, 86, 0.15);
-  }
-  
-  .feature-box::after {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 5px;
-    background: var(--primary-gold);
-    bottom: 0;
-    left: 0;
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.3s ease;
-    z-index: -1;
-  }
-  
-  .feature-box:hover::after {
-    transform: scaleX(1);
-  }
-  
-  .feature-icon {
-    min-width: 65px; /* Réduit de 70px à 65px */
-    height: 65px; /* Réduit de 70px à 65px */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: var(--gold-light);
-    border-radius: 50%;
-    margin-right: 20px;
-  }
-  
-  .feature-icon i {
-    font-size: 24px; /* Réduit de 26px à 24px */
-    color: var(--primary-gold);
-  }
-  
-  .feature-content h3 {
+  .yomi-why-feature-content h3 {
     font-size: 1.25rem;
-    font-weight: 600;
-    margin-bottom: 8px; /* Réduit de 10px à 8px */
-    color: var(--primary-blue);
   }
-  
-  .feature-content p {
-    color: var(--text-light);
-    line-height: 1.5; /* Réduit légèrement */
-    margin-bottom: 0;
-  }
-  
-  .cta-container {
-    margin-top: 30px; /* Réduit de 50px à 30px */
-    margin-bottom: 0; /* Assure qu'il n'y a pas de marge en bas */
-    text-align: center;
-  }
-  
-  .btn-primary {
-    display: inline-block;
-    padding: 12px 30px;
-    background: #1f618d;
-    color: white;
-    border-radius: 50px;
-    font-weight: 600;
-    text-decoration: none;
-    box-shadow: 0 4px 15px rgba(17,60,86,255);
-    transition: all 0.3s ease;
-  }
-  
-  .btn-primary:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(17,60,86,255);
-    background-color: #154360 !important;
-  }
-  
-  /* Responsive adjustments */
-  @media (max-width: 768px) {
-    .feature-box {
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      padding: 20px 15px; /* Réduit davantage sur mobile */
-    }
-  
-    .feature-icon {
-      margin-right: 0;
-      margin-bottom: 12px; /* Réduit de 15px à 12px */
-    }
-    
-    .section-title {
-      font-size: 2rem;
-    }
-    
-    .pourquoi-yomi-section {
-      padding: 40px 0 25px; /* Encore plus compact sur mobile */
-    }
-  }/* Variables pour vos couleurs spécifiques */
-:root {
-    --primary-gold: #c29046;
-    --primary-blue: #113c56;
-    --gold-light: rgba(194, 144, 70, 0.1);
-    --blue-light: rgba(17, 60, 86, 0.1);
-    --text-dark: #333333;
-    --text-light: #777777;
 }
 
-.pourquoi-yomi-section {
-    padding: 60px 0 30px; 
-    background-color: #f9f9f9;
-    position: relative;
-    overflow: hidden;
-}
-
-.pourquoi-yomi-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 300px;
-    height: 300px;
-    border-radius: 50%;
-    transform: translate(30%, -30%);
-}
-
-.section-header {
-    text-align: center;
-    margin-bottom: 30px; 
-    position: relative;
-}
-
-.section-title {
-    color: #1a1a1a;
-    margin-bottom: 15px; 
-}
-
-.title-underline {
-    width: 80px;
-    height: 4px;
-    background: var(--primary-gold);
-    margin: 0 auto;
-    border-radius: 2px;
-}
-
-.features-container {
-    margin-top: 30px; 
-}
-
-.feature-box {
-    display: flex;
-    padding: 25px; 
-    margin-bottom: 20px; 
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(17, 60, 86, 0.08);
-    transition: all 0.3s ease;
-    position: relative;
-    z-index: 1;
-    overflow: hidden;
-}
-
-.feature-box:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(17, 60, 86, 0.15);
-}
-
-.feature-box::after {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 5px;
-    background: var(--primary-gold);
-    bottom: 0;
-    left: 0;
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.3s ease;
-    z-index: -1;
-}
-
-.feature-box:hover::after {
-    transform: scaleX(1);
-}
-
-.feature-icon {
-    min-width: 65px; 
-    height: 65px; 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: var(--gold-light);
-    border-radius: 50%;
-    margin-right: 20px;
-}
-
-.feature-icon i {
-    font-size: 24px; 
-    color: var(--primary-gold);
-}
-
-.feature-content h3 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-bottom: 8px; 
-    color: var(--primary-blue);
-}
-
-.feature-content p {
-    color: var(--text-light);
-    line-height: 1.5; 
-    margin-bottom: 0;
-}
-
-.cta-container {
-    margin-top: 30px; 
-    margin-bottom: 0; 
-    text-align: center;
-}
-
-.btn-primary1 {
-    display: inline-block;
-    padding: 12px 30px;
-    background: #1f618d;
-    color: white;
-    border-radius: 50px;
-    font-weight: 600;
-    text-decoration: none;
-    box-shadow: 0 4px 15px rgba(17,60,86,255);
-    transition: all 0.3s ease;
-}
-
-.btn-primary1:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(17,60,86,255);
-    background-color: #154360 !important;
-}
-
-/* Responsive adjustments */
 @media (max-width: 768px) {
-    .feature-box {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        padding: 20px 15px; 
-    }
+  .yomi-why-section {
+    padding: 60px 0 40px;
+  }
+  
+  .yomi-why-features-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .yomi-why-title {
+    font-size: 2rem;
+  }
+  
+  .yomi-why-feature-box {
+    padding: 25px;
+  }
+  
+  .yomi-why-button {
+    padding: 12px 30px;
+    font-size: 1rem;
+  }
+}
 
-    .feature-icon {
-        margin-right: 0;
-        margin-bottom: 12px; 
-    }
-    
-    .section-title {
-        font-size: 2rem;
-    }
-    
-    .pourquoi-yomi-section {
-        padding: 40px 0 25px; 
-    }
+@media (max-width: 576px) {
+  .yomi-why-section {
+    padding: 50px 0 30px;
+  }
+  
+  .yomi-why-feature-box {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 25px 20px;
+  }
+  
+  .yomi-why-feature-icon {
+    margin-right: 0;
+    margin-bottom: 15px;
+  }
+  
+  .yomi-why-feature-content h3::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .yomi-why-title {
+    font-size: 1.8rem;
+  }
+  
+  .yomi-why-cta {
+    padding: 25px 15px;
+  }
 }

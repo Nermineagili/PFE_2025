@@ -7,8 +7,13 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   profilePic: { type: String, default: '/uploads/default-avatar.png' },
   role: { type: String, enum: ['user', 'admin', 'superviseur'], default: 'user' }, 
-   contracts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Contract' }],
-   
+  contracts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Contract' }],
+  resetPasswordToken: { type: String },
+  resetPasswordExpires: { type: Date },
+  originalResetToken: { type: String }, // Add this new field
+  /////
+  userResetToken: { type: String },
+  userResetExpires: { type: Date },
   createdAt: { type: Date, default: Date.now }
 });
 

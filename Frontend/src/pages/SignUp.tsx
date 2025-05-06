@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
-import { Form, Button } from 'react-bootstrap';
-import './SignUp.css'; // Custom CSS for styling
-import axios from 'axios';  // Import axios and AxiosError
-import { useNavigate } from 'react-router-dom';  // Import useNavigate for navigation
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import './SignUp.css';
 
-function SignUp() {
+const SignUp: React.FC = () => {
   const [user, setUser] = useState({
-    name: '',         // 'nom' changed to 'name'
-    lastname: '',     // 'prenom' changed to 'lastname'
+    name: '',
+    lastname: '',
     email: '',
     phone: '',
     password: '',
   });
   
   const [errorMessage, setErrorMessage] = useState('');
-  const navigate = useNavigate();  // Initialize the navigate function
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUser({ ...user, [e.target.name]: e.target.value });
@@ -22,110 +22,138 @@ function SignUp() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
+    
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/register', user);  // Adjust URL to your backend
+      const response = await axios.post('http://localhost:5000/api/auth/register', user);
       console.log('Registration successful:', response.data);
 
-      // You can also check response.data for specific success status or data if needed
       if (response.data.success) {
-        // If the backend returns a success field or similar, you can use it to verify.
-        // Assuming you want to navigate to the clienthome after successful signup
-        navigate('/clienthome');  // Redirect to ClientHome if the user is a regular user
+        navigate('/clienthome');
       } else {
-        // Handle cases where there may be an issue with registration.
-        setErrorMessage(response.data.message || 'Registration failed');
+        setErrorMessage(response.data.message || 'Inscription échouée');
       }
       
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         console.error(error.response?.data);
-        setErrorMessage(error.response?.data.error || "Registration failed");
+        setErrorMessage(error.response?.data.error || "L'inscription a échoué");
       } else {
-        console.error('An unexpected error occurred:', error);
-        setErrorMessage('An unexpected error occurred');
+        console.error('Une erreur inattendue est survenue:', error);
+        setErrorMessage('Une erreur inattendue est survenue');
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="signup-background d-flex justify-content-center align-items-center">
-      <Form onSubmit={handleSubmit} className="signup-form p-4">
-        <h2 className="text-center mb-4">S'inscrire</h2>
-        
-        {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
-        
-        {/* Name */}
-        <Form.Group className="mb-3">
-          <Form.Control
-            type="text"
-            name="name"  // Changed 'nom' to 'name'
-            placeholder="Nom"
-            value={user.name}
-            onChange={handleChange}
-            required
-          />
-        </Form.Group>
-        
-        {/* Lastname */}
-        <Form.Group className="mb-3">
-          <Form.Control
-            type="text"
-            name="lastname"  // Changed 'prenom' to 'lastname'
-            placeholder="Prénom"
-            value={user.lastname}
-            onChange={handleChange}
-            required
-          />
-        </Form.Group>
+    <div className="auth-background">
+      <div className="auth-container">
+        <div className="auth-form signup-form">
+          <div className="auth-header">
+            <h2>S'inscrire</h2>
+            <p className="auth-subtitle">Créez votre compte</p>
+          </div>
+          
+          {errorMessage && (
+            <div className="auth-error-message">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
+              </svg>
+              <span>{errorMessage}</span>
+            </div>
+          )}
+          
+          <form onSubmit={handleSubmit} className="auth-form-fields">
+            <div className="form-group">
+              <label htmlFor="name">Nom</label>
+              <input
+                id="name"
+                type="text"
+                name="name"
+                placeholder="Votre nom"
+                value={user.name}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="lastname">Prénom</label>
+              <input
+                id="lastname"
+                type="text"
+                name="lastname"
+                placeholder="Votre prénom"
+                value={user.lastname}
+                onChange={handleChange}
+                required
+              />
+            </div>
 
-        {/* Email */}
-        <Form.Group className="mb-3">
-          <Form.Control
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={user.email}
-            onChange={handleChange}
-            required
-          />
-        </Form.Group>
+            <div className="form-group">
+              <label htmlFor="email">Email</label>
+              <input
+                id="email"
+                type="email"
+                name="email"
+                placeholder="Votre adresse email"
+                value={user.email}
+                onChange={handleChange}
+                required
+              />
+            </div>
 
-        {/* Phone */}
-        <Form.Group className="mb-3">
-          <Form.Control
-            type="tel"
-            name="phone"
-            placeholder="Téléphone"
-            value={user.phone}
-            onChange={handleChange}
-            required
-          />
-        </Form.Group>
+            <div className="form-group">
+              <label htmlFor="phone">Téléphone</label>
+              <input
+                id="phone"
+                type="tel"
+                name="phone"
+                placeholder="Votre numéro de téléphone"
+                value={user.phone}
+                onChange={handleChange}
+                required
+              />
+            </div>
 
-        {/* Password */}
-        <Form.Group className="mb-3">
-          <Form.Control
-            type="password"
-            name="password"
-            placeholder="Mot de passe"
-            value={user.password}
-            onChange={handleChange}
-            required
-          />
-        </Form.Group>
+            <div className="form-group">
+              <label htmlFor="password">Mot de passe</label>
+              <input
+                id="password"
+                type="password"
+                name="password"
+                placeholder="Choisissez un mot de passe sécurisé"
+                value={user.password}
+                onChange={handleChange}
+                required
+              />
+            </div>
 
-        <Button type="submit" className="w-100 mt-3 btn-submit">
-          Soumettre
-        </Button>
+            <button 
+              type="submit" 
+              className="auth-submit-btn"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <span className="loading-spinner"></span>
+              ) : (
+                "S'inscrire"
+              )}
+            </button>
+          </form>
 
-        <div className="text-center mt-3">
-          <span className="existing-account">
-            Vous avez déjà un compte ? <a href="/signin">Se connecter</a>.
-          </span>
+          <div className="auth-footer">
+            <p>
+              Vous avez déjà un compte ? <Link to="/signin" className="auth-alt-link">Se connecter</Link>
+            </p>
+          </div>
         </div>
-      </Form>
+      </div>
     </div>
   );
-}
+};
 
 export default SignUp;

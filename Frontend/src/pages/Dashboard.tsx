@@ -40,43 +40,43 @@ interface CardStat {
 const Dashboard: React.FC = () => {
   // Chart data
   const chartHoursData: ChartData[] = [
-    { name: "9:00AM", value: 287 },
-    { name: "12:00AM", value: 385 },
-    { name: "3:00PM", value: 490 },
-    { name: "6:00PM", value: 492 },
-    { name: "9:00PM", value: 554 },
-    { name: "12:00PM", value: 586 },
-    { name: "3:00AM", value: 698 },
-    { name: "6:00AM", value: 695 },
+    { name: "9:00", value: 287 },
+    { name: "12:00", value: 385 },
+    { name: "15:00", value: 490 },
+    { name: "18:00", value: 492 },
+    { name: "21:00", value: 554 },
+    { name: "00:00", value: 586 },
+    { name: "3:00", value: 698 },
+    { name: "6:00", value: 695 },
   ];
 
   const chartPreferencesData: ChartData[] = [
-    { name: "Open", value: 40 },
-    { name: "Bounce", value: 20 },
-    { name: "Unsubscribe", value: 40 },
+    { name: "Ouverts", value: 40 },
+    { name: "Rebonds", value: 20 },
+    { name: "Désabonnés", value: 40 },
   ];
 
   const chartActivityData: ChartData[] = [
     { name: "Jan", value: 542 },
-    { name: "Feb", value: 443 },
+    { name: "Fév", value: 443 },
     { name: "Mar", value: 320 },
-    { name: "Apr", value: 780 },
-    { name: "May", value: 553 },
-    { name: "Jun", value: 453 },
-    { name: "Jul", value: 326 },
-    { name: "Aug", value: 434 },
+    { name: "Avr", value: 780 },
+    { name: "Mai", value: 553 },
+    { name: "Juin", value: 453 },
+    { name: "Juil", value: 326 },
+    { name: "Août", value: 434 },
     { name: "Sep", value: 568 },
     { name: "Oct", value: 610 },
     { name: "Nov", value: 756 },
-    { name: "Dec", value: 895 },
+    { name: "Déc", value: 895 },
   ];
 
   // Card stats data
   const cardStats: CardStat[] = [
-    { title: "Number", value: "150GB", icon: "fas fa-chart-line", color: "warning" },
-    { title: "Revenue", value: "$ 1,345", icon: "fas fa-lightbulb", color: "success" },
-    { title: "Errors", value: "23", icon: "fas fa-exclamation-triangle", color: "danger" },
-    { title: "Followers", value: "+45K", icon: "fas fa-heart", color: "primary" },
+    { title: "Stockage", value: "150GB", icon: "fas fa-chart-line", color: "warning" },
+    { title: "Revenus", value: "1 345 €", icon: "fas fa-lightbulb", color: "success" },
+    { title: "Erreurs", value: "23", icon: "fas fa-exclamation-triangle", color: "danger" },
+    { title: "Abonnés", value: "+45K", icon: "fas fa-heart", color: "primary" },
   ];
 
   // Colors for pie chart
@@ -111,7 +111,7 @@ const Dashboard: React.FC = () => {
                     <hr />
                     <div className="stats">
                       <i className="fas fa-redo mr-1"></i>
-                      Update Now
+                      Mettre à jour
                     </div>
                   </Card.Footer>
                 </Card>
@@ -124,8 +124,8 @@ const Dashboard: React.FC = () => {
             <Col md="8">
               <Card>
                 <Card.Header>
-                  <Card.Title as="h4">Users Behavior</Card.Title>
-                  <p className="card-category">24 Hours performance</p>
+                  <Card.Title as="h4">Comportement des utilisateurs</Card.Title>
+                  <p className="card-category">Performances sur 24 heures</p>
                 </Card.Header>
                 <Card.Body>
                   <ResponsiveContainer width="100%" height={300}>
@@ -141,13 +141,13 @@ const Dashboard: React.FC = () => {
                 </Card.Body>
                 <Card.Footer>
                   <div className="legend">
-                    <i className="fas fa-circle text-info"></i> Open{" "}
-                    <i className="fas fa-circle text-danger"></i> Click{" "}
-                    <i className="fas fa-circle text-warning"></i> Click Second Time
+                    <i className="fas fa-circle text-info"></i> Ouverts{" "}
+                    <i className="fas fa-circle text-danger"></i> Clics{" "}
+                    <i className="fas fa-circle text-warning"></i> Second clic
                   </div>
                   <hr />
                   <div className="stats">
-                    <i className="fas fa-history"></i> Updated 3 minutes ago
+                    <i className="fas fa-history"></i> Mis à jour il y a 3 minutes
                   </div>
                 </Card.Footer>
               </Card>
@@ -155,8 +155,8 @@ const Dashboard: React.FC = () => {
             <Col md="4">
               <Card>
                 <Card.Header>
-                  <Card.Title as="h4">Email Statistics</Card.Title>
-                  <p className="card-category">Last Campaign Performance</p>
+                  <Card.Title as="h4">Statistiques emails</Card.Title>
+                  <p className="card-category">Performance de la dernière campagne</p>
                 </Card.Header>
                 <Card.Body>
                   <ResponsiveContainer width="100%" height={300}>

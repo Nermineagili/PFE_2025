@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Container } from "react-bootstrap";
 import AdminSidebarProps from "../components/AdminSidebar";
 import Dashboard from "./Dashboard";
@@ -7,7 +7,25 @@ import Settings from "../components/Settings";
 import ManageClaims from "../components/ManageClaims";
 import Postlogin from "../components/ChatBot/Postlogin";
 import AdsupNavbar from "../components/AdsupNavbar";
-import "./AdminHome.css"; // Make sure to include your CSS
+import ResetPasswordApproval from "./ResetPasswordApproval";
+import { useLocation } from "react-router-dom";
+import "./AdminHome.css";
+
+// Function to extract token and userId from URL
+const extractResetParams = () => {
+  const url = new URL(window.location.href);
+  const pathParts = url.pathname.split('/');
+  
+  if (pathParts.includes('approve-reset')) {
+    const token = pathParts[pathParts.indexOf('approve-reset') + 1];
+    const userId = pathParts[pathParts.indexOf('approve-reset') + 2];
+    
+    // Return undefined if either value is falsy
+    return token && userId ? { token, userId } : { token: undefined, userId: undefined };
+  }
+  
+  return { token: undefined, userId: undefined };
+};
 
 const AdminHome: React.FC = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -15,6 +33,25 @@ const AdminHome: React.FC = () => {
   const manageDashboardRef = useRef<HTMLDivElement>(null);
   const manageSettingsRef = useRef<HTMLDivElement>(null);
   const manageClaimsRef = useRef<HTMLDivElement>(null);
+  const resetPasswordRef = useRef<HTMLDivElement>(null);
+  
+  // For reset password approval
+  const [showResetSection, setShowResetSection] = useState<boolean>(false);
+  const location = useLocation();
+  const { token: resetToken, userId: resetUserId } = extractResetParams();
+
+  // If reset token is in the URL, automatically show reset approval section and scroll to it
+  useEffect(() => {
+    if (resetToken && resetUserId) {
+      setShowResetSection(true);
+      // After state update, scroll to the reset section
+      setTimeout(() => {
+        if (resetPasswordRef.current) {
+          resetPasswordRef.current.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 500);
+    }
+  }, [resetToken, resetUserId]);
 
   const scrollToManageUsers = () => {
     if (manageUsersRef.current) {
@@ -40,6 +77,15 @@ const AdminHome: React.FC = () => {
     }
   };
 
+  const scrollToResetPassword = () => {
+    setShowResetSection(true);
+    setTimeout(() => {
+      if (resetPasswordRef.current) {
+        resetPasswordRef.current.scrollIntoView({ behavior: "smooth" });
+      }
+    }, 100);
+  };
+
   // Handle sidebar collapse state change
   const handleSidebarToggle = (collapsed: boolean) => {
     setSidebarCollapsed(collapsed);
@@ -55,7 +101,8 @@ const AdminHome: React.FC = () => {
         onManageUsersClick={scrollToManageUsers} 
         onManageDashboardClick={scrollToDashboard} 
         onManageSettingsClick={scrollToSettings} 
-        onManageClaimsClick={scrollToClaims} 
+        onManageClaimsClick={scrollToClaims}
+        onResetPasswordClick={scrollToResetPassword}
         role="admin" 
         onSidebarToggle={handleSidebarToggle}
       />
@@ -66,6 +113,14 @@ const AdminHome: React.FC = () => {
           <div ref={manageDashboardRef}>
             <Dashboard />
           </div>
+          <div ref={resetPasswordRef}>
+          {showResetSection && (
+  <ResetPasswordApproval 
+    tokenFromURL={resetToken}  // This will be undefined if not in URL
+    userIdFromURL={resetUserId} // This will be undefined if not in URL
+  />
+)}
+</div>
           
           <div ref={manageUsersRef}>
             <ManageUsers />

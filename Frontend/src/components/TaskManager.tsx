@@ -43,8 +43,8 @@ function TaskManager() {
       });
       setTasks(response.data);
     } catch (err) {
-      console.error("Error fetching tasks:", err);
-      setError("Failed to fetch tasks. Please try again.");
+      console.error("Erreur lors de la récupération des tâches:", err);
+      setError("Échec du chargement des tâches. Veuillez réessayer.");
     } finally {
       setLoading(false);
     }
@@ -76,13 +76,13 @@ function TaskManager() {
       setShowModal(false);
       resetForm();
     } catch (err) {
-      console.error("Error saving task:", err);
-      alert(`Failed to ${isEditing ? "update" : "add"} task.`);
+      console.error("Erreur lors de l'enregistrement de la tâche:", err);
+      alert(`Échec de ${isEditing ? "la mise à jour" : "l'ajout"} de la tâche.`);
     }
   };
 
   const deleteTask = async (taskId: string) => {
-    if (!window.confirm("Are you sure you want to delete this task?")) return;
+    if (!window.confirm("Êtes-vous sûr de vouloir supprimer cette tâche ?")) return;
   
     try {
       const token = localStorage.getItem("authToken");
@@ -93,8 +93,8 @@ function TaskManager() {
       });
       setTasks(tasks.filter(task => task._id !== taskId));
     } catch (err) {
-      console.error("Error deleting task:", err);
-      alert("Failed to delete task.");
+      console.error("Erreur lors de la suppression de la tâche:", err);
+      alert("Échec de la suppression de la tâche.");
     }
   };
 
@@ -135,7 +135,7 @@ function TaskManager() {
               className="add-task-button"
             >
               <FaPlus className="me-2" />
-              Add Task
+              Ajouter une tâche
             </Button>
           </div>
 
@@ -153,7 +153,7 @@ function TaskManager() {
 
           {!loading && !error && tasks.length === 0 && (
             <Alert variant="info" className="text-center">
-              No tasks found. Create your first task!
+              Aucune tâche trouvée. Créez votre première tâche !
             </Alert>
           )}
 
@@ -173,7 +173,7 @@ function TaskManager() {
                       <td className="task-title">{task.title}</td>
                       <td className="task-description">{task.description}</td>
                       <td className="actions-cell">
-                        <OverlayTrigger overlay={<Tooltip id={`edit-tooltip-${task._id}`}>Edit Task</Tooltip>}>
+                        <OverlayTrigger overlay={<Tooltip id={`edit-tooltip-${task._id}`}>Modifier</Tooltip>}>
                           <Button
                             size="sm"
                             className="action-btn analyze-btn"
@@ -182,7 +182,7 @@ function TaskManager() {
                             <FaRegEdit />
                           </Button>
                         </OverlayTrigger>
-                        <OverlayTrigger overlay={<Tooltip id={`delete-tooltip-${task._id}`}>Delete Task</Tooltip>}>
+                        <OverlayTrigger overlay={<Tooltip id={`delete-tooltip-${task._id}`}>Supprimer</Tooltip>}>
                           <Button
                             size="sm"
                             className="action-btn delete-btn"
@@ -210,19 +210,19 @@ function TaskManager() {
       >
         <Modal.Header closeButton className="modal-header">
           <Modal.Title className="modal-title">
-            {isEditing ? "Edit Task" : "Create New Task"}
+            {isEditing ? "Modifier la tâche" : "Créer une nouvelle tâche"}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body className="modal-body">
           <Form className="task-form">
             <Form.Group className="form-group">
-              <Form.Label className="form-label">Title</Form.Label>
+              <Form.Label className="form-label">Titre</Form.Label>
               <Form.Control
                 type="text"
                 name="title"
                 value={newTask.title}
                 onChange={handleInputChange}
-                placeholder="Enter task title"
+                placeholder="Entrez le titre de la tâche"
                 className="form-input"
               />
             </Form.Group>
@@ -235,7 +235,7 @@ function TaskManager() {
                 value={newTask.description}
                 onChange={handleInputChange}
                 rows={4}
-                placeholder="Enter task description"
+                placeholder="Entrez la description de la tâche"
                 className="form-textarea"
               />
             </Form.Group>
@@ -247,7 +247,7 @@ function TaskManager() {
             onClick={() => { setShowModal(false); resetForm(); }}
             className="close-button"
           >
-            Cancel
+            Annuler
           </Button>
           <Button 
             variant="primary" 
@@ -257,12 +257,12 @@ function TaskManager() {
             {isEditing ? (
               <>
                 <FaCheck className="button-icon" />
-                Update Task
+                Mettre à jour
               </>
             ) : (
               <>
                 <FaPlus className="button-icon" />
-                Create Task
+                Créer
               </>
             )}
           </Button>

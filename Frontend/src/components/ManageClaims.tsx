@@ -98,19 +98,20 @@ const ManageClaims: React.FC = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "approved":
-        return <Badge bg="success">Approved</Badge>;
+        return <Badge bg="success">Approuvé</Badge>;
       case "rejected":
-        return <Badge bg="danger">Rejected</Badge>;
+        return <Badge bg="danger">Rejeté</Badge>;
       default:
-        return <Badge bg="warning" text="dark">Pending</Badge>;
+        return <Badge bg="warning" text="dark">En attente</Badge>;
     }
+    
   };
 
   return (
     <Container className={`manage-claims-container ${currentTheme}-theme`}>
       <Card className="manage-claims-card">
         <Card.Body>
-          <h2 className="manage-claims-title">Manage Claims</h2>
+          <h2 className="manage-claims-title">Déclarations</h2>
 
           {loading && (
             <div className="text-center py-4">
@@ -126,7 +127,7 @@ const ManageClaims: React.FC = () => {
 
           {!loading && !error && claims.length === 0 && (
             <Alert variant="info" className="text-center">
-              No claims found
+              pas de déclarations
             </Alert>
           )}
 
@@ -136,9 +137,9 @@ const ManageClaims: React.FC = () => {
                 <thead>
                   <tr>
                     <th>#</th>
-                    <th>User</th>
+                    <th>Utilisateur</th>
                     <th>Email</th>
-                    <th>Phone</th>
+                    <th>Téléphone</th>
                     <th>Description</th>
                     <th>Status</th>
                     <th>Actions</th>
@@ -204,14 +205,14 @@ const ManageClaims: React.FC = () => {
       <Modal show={showModal} onHide={() => setShowModal(false)} centered className="claim-modal">
         <Modal.Header closeButton className="modal-header">
           <Modal.Title className="modal-title">
-            Claim Analysis
+            Analyse des déclarations
           </Modal.Title>
         </Modal.Header>
         <Modal.Body className="modal-body">
           {selectedClaim && (
             <div className="claim-details">
               <div className="detail-row">
-                <span className="detail-label">Name:</span>
+                <span className="detail-label">Nom et Prénom:</span>
                 <span className="detail-value">{selectedClaim.firstName} {selectedClaim.lastName}</span>
               </div>
               <div className="detail-row">
@@ -219,7 +220,7 @@ const ManageClaims: React.FC = () => {
                 <span className="detail-value">{selectedClaim.email}</span>
               </div>
               <div className="detail-row">
-                <span className="detail-label">Phone:</span>
+                <span className="detail-label">Téléphone:</span>
                 <span className="detail-value">{selectedClaim.phone}</span>
               </div>
               <div className="detail-row">
@@ -227,7 +228,7 @@ const ManageClaims: React.FC = () => {
                 <span className="detail-value">{getStatusBadge(selectedClaim.status)}</span>
               </div>
               <div className="detail-row">
-                <span className="detail-label">Created:</span>
+                <span className="detail-label">Crée:</span>
                 <span className="detail-value">
                   {new Date(selectedClaim.createdAt).toLocaleString()}
                 </span>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form, Row, Col, Image, Alert, Tabs, Tab } from "react-bootstrap";
 import { useAuth } from "../context/AuthContext";
-import "./ProfileEdit.css"; // Import the CSS file
+import "./ProfileEdit.css"; // Import du fichier CSS
 
 interface ProfileEditProps {
   userId: string;
@@ -12,7 +12,7 @@ interface ProfileEditProps {
 const ProfileEdit: React.FC<ProfileEditProps> = ({ userId, show, onHide }) => {
   const { user, updateUserContext } = useAuth();
 
-  // Form states
+  // États du formulaire
   const [formData, setFormData] = useState({
     name: user?.name || "",
     lastname: user?.lastname || "",
@@ -21,39 +21,37 @@ const ProfileEdit: React.FC<ProfileEditProps> = ({ userId, show, onHide }) => {
     address: user?.address || "",
   });
 
-  // Image upload state
+  // États pour l'upload d'image
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(user?.profilePic || null);
   const [uploading, setUploading] = useState(false);
 
-  // Password change state
+  // États pour le changement de mot de passe
   const [passwordData, setPasswordData] = useState({
     oldPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
 
-  // Feedback states
+  // États pour les messages de feedback
   const [profileUpdateMessage, setProfileUpdateMessage] = useState({ type: "", message: "" });
   const [passwordUpdateMessage, setPasswordUpdateMessage] = useState({ type: "", message: "" });
   const [imageUpdateMessage, setImageUpdateMessage] = useState({ type: "", message: "" });
 
-  // Fetch user data on component mount or when userId changes
+  // Récupération des données utilisateur
   useEffect(() => {
     if (userId && show) {
       fetchUserData();
     }
   }, [userId, show]);
 
-  // Reset form when modal is opened
+  // Réinitialisation du formulaire
   useEffect(() => {
     if (show) {
-      // Reset feedback messages
       setProfileUpdateMessage({ type: "", message: "" });
       setPasswordUpdateMessage({ type: "", message: "" });
       setImageUpdateMessage({ type: "", message: "" });
       
-      // Reset password form
       setPasswordData({
         oldPassword: "",
         newPassword: "",
@@ -72,7 +70,7 @@ const ProfileEdit: React.FC<ProfileEditProps> = ({ userId, show, onHide }) => {
       });
       
       if (!response.ok) {
-        throw new Error("Failed to fetch user data");
+        throw new Error("Échec de la récupération des données utilisateur");
       }
       
       const userData = await response.json();
@@ -90,7 +88,7 @@ const ProfileEdit: React.FC<ProfileEditProps> = ({ userId, show, onHide }) => {
         }
       }
     } catch (error) {
-      console.error("Error fetching user data:", error);
+      console.error("Erreur lors de la récupération des données utilisateur:", error);
     }
   };
 
@@ -135,18 +133,17 @@ const ProfileEdit: React.FC<ProfileEditProps> = ({ userId, show, onHide }) => {
       const result = await response.json();
       
       if (result.success) {
-        setProfileUpdateMessage({ type: "success", message: "Profile updated successfully!" });
+        setProfileUpdateMessage({ type: "success", message: "Profil mis à jour avec succès !" });
         
-        // Update user context if available
         if (updateUserContext) {
           updateUserContext(result.data);
         }
       } else {
-        setProfileUpdateMessage({ type: "danger", message: result.message || "Update failed. Please try again." });
+        setProfileUpdateMessage({ type: "danger", message: result.message || "Échec de la mise à jour. Veuillez réessayer." });
       }
     } catch (error) {
-      console.error("Error updating profile:", error);
-      setProfileUpdateMessage({ type: "danger", message: "An error occurred. Please try again." });
+      console.error("Erreur lors de la mise à jour du profil:", error);
+      setProfileUpdateMessage({ type: "danger", message: "Une erreur est survenue. Veuillez réessayer." });
     }
   };
 
@@ -154,7 +151,7 @@ const ProfileEdit: React.FC<ProfileEditProps> = ({ userId, show, onHide }) => {
     e.preventDefault();
     
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setPasswordUpdateMessage({ type: "danger", message: "New passwords don't match." });
+      setPasswordUpdateMessage({ type: "danger", message: "Les nouveaux mots de passe ne correspondent pas." });
       return;
     }
     
@@ -175,14 +172,14 @@ const ProfileEdit: React.FC<ProfileEditProps> = ({ userId, show, onHide }) => {
       const result = await response.json();
       
       if (response.ok) {
-        setPasswordUpdateMessage({ type: "success", message: "Password updated successfully!" });
+        setPasswordUpdateMessage({ type: "success", message: "Mot de passe mis à jour avec succès !" });
         setPasswordData({ oldPassword: "", newPassword: "", confirmPassword: "" });
       } else {
-        setPasswordUpdateMessage({ type: "danger", message: result.error || "Password update failed." });
+        setPasswordUpdateMessage({ type: "danger", message: result.error || "Échec de la mise à jour du mot de passe." });
       }
     } catch (error) {
-      console.error("Error updating password:", error);
-      setPasswordUpdateMessage({ type: "danger", message: "An error occurred. Please try again." });
+      console.error("Erreur lors de la mise à jour du mot de passe:", error);
+      setPasswordUpdateMessage({ type: "danger", message: "Une erreur est survenue. Veuillez réessayer." });
     }
   };
 
@@ -190,7 +187,7 @@ const ProfileEdit: React.FC<ProfileEditProps> = ({ userId, show, onHide }) => {
     e.preventDefault();
     
     if (!selectedImage) {
-      setImageUpdateMessage({ type: "warning", message: "Please select an image first." });
+      setImageUpdateMessage({ type: "warning", message: "Veuillez d'abord sélectionner une image." });
       return;
     }
     
@@ -213,9 +210,8 @@ const ProfileEdit: React.FC<ProfileEditProps> = ({ userId, show, onHide }) => {
       const result = await response.json();
       
       if (result.success) {
-        setImageUpdateMessage({ type: "success", message: "Profile picture updated successfully!" });
+        setImageUpdateMessage({ type: "success", message: "Photo de profil mise à jour avec succès !" });
         
-        // Update user context if available
         if (updateUserContext && result.data.profilePic) {
           updateUserContext({
             ...user,
@@ -223,11 +219,11 @@ const ProfileEdit: React.FC<ProfileEditProps> = ({ userId, show, onHide }) => {
           });
         }
       } else {
-        setImageUpdateMessage({ type: "danger", message: result.message || "Upload failed." });
+        setImageUpdateMessage({ type: "danger", message: result.message || "Échec de l'upload." });
       }
     } catch (error) {
-      console.error("Error uploading image:", error);
-      setImageUpdateMessage({ type: "danger", message: "An error occurred during upload." });
+      console.error("Erreur lors de l'upload de l'image:", error);
+      setImageUpdateMessage({ type: "danger", message: "Une erreur est survenue pendant l'upload." });
     } finally {
       setUploading(false);
     }
@@ -236,11 +232,11 @@ const ProfileEdit: React.FC<ProfileEditProps> = ({ userId, show, onHide }) => {
   return (
     <Modal show={show} onHide={onHide} size="lg" centered>
       <Modal.Header closeButton>
-        <Modal.Title>Edit Profile</Modal.Title>
+        <Modal.Title>Modifier le profil</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Tabs defaultActiveKey="profileInfo" id="profile-edit-tabs" className="mb-3">
-          <Tab eventKey="profileInfo" title="Profile Information">
+          <Tab eventKey="profileInfo" title="Informations du profil">
             {profileUpdateMessage.message && (
               <Alert variant={profileUpdateMessage.type}>
                 {profileUpdateMessage.message}
@@ -251,7 +247,7 @@ const ProfileEdit: React.FC<ProfileEditProps> = ({ userId, show, onHide }) => {
               <Row>
                 <Col md={6}>
                   <Form.Group className="mb-3">
-                    <Form.Label>First Name</Form.Label>
+                    <Form.Label>Prénom</Form.Label>
                     <Form.Control
                       type="text"
                       name="name"
@@ -263,7 +259,7 @@ const ProfileEdit: React.FC<ProfileEditProps> = ({ userId, show, onHide }) => {
                 </Col>
                 <Col md={6}>
                   <Form.Group className="mb-3">
-                    <Form.Label>Last Name</Form.Label>
+                    <Form.Label>Nom</Form.Label>
                     <Form.Control
                       type="text"
                       name="lastname"
@@ -276,7 +272,7 @@ const ProfileEdit: React.FC<ProfileEditProps> = ({ userId, show, onHide }) => {
               </Row>
               
               <Form.Group className="mb-3">
-                <Form.Label>Email Address</Form.Label>
+                <Form.Label>Adresse email</Form.Label>
                 <Form.Control
                   type="email"
                   name="email"
@@ -287,7 +283,7 @@ const ProfileEdit: React.FC<ProfileEditProps> = ({ userId, show, onHide }) => {
               </Form.Group>
               
               <Form.Group className="mb-3">
-                <Form.Label>Phone Number</Form.Label>
+                <Form.Label>Téléphone</Form.Label>
                 <Form.Control
                   type="text"
                   name="phone"
@@ -297,7 +293,7 @@ const ProfileEdit: React.FC<ProfileEditProps> = ({ userId, show, onHide }) => {
               </Form.Group>
               
               <Form.Group className="mb-3">
-                <Form.Label>Address</Form.Label>
+                <Form.Label>Adresse</Form.Label>
                 <Form.Control
                   type="text"
                   name="address"
@@ -307,12 +303,12 @@ const ProfileEdit: React.FC<ProfileEditProps> = ({ userId, show, onHide }) => {
               </Form.Group>
               
               <Button variant="primary" type="submit" className="w-100">
-                Update Profile
+                Mettre à jour le profil
               </Button>
             </Form>
           </Tab>
           
-          <Tab eventKey="profilePicture" title="Profile Picture">
+          <Tab eventKey="profilePicture" title="Photo de profil">
             {imageUpdateMessage.message && (
               <Alert variant={imageUpdateMessage.type}>
                 {imageUpdateMessage.message}
@@ -335,7 +331,7 @@ const ProfileEdit: React.FC<ProfileEditProps> = ({ userId, show, onHide }) => {
             
             <Form onSubmit={handleImageUpload}>
               <Form.Group className="mb-3">
-                <Form.Label>Upload New Profile Picture</Form.Label>
+                <Form.Label>Changer la photo de profil</Form.Label>
                 <Form.Control
                   type="file"
                   accept="image/*"
@@ -349,12 +345,12 @@ const ProfileEdit: React.FC<ProfileEditProps> = ({ userId, show, onHide }) => {
                 className="w-100"
                 disabled={!selectedImage || uploading}
               >
-                {uploading ? "Uploading..." : "Update Profile Picture"}
+                {uploading ? "Envoi en cours..." : "Mettre à jour la photo"}
               </Button>
             </Form>
           </Tab>
           
-          <Tab eventKey="changePassword" title="Change Password">
+          <Tab eventKey="changePassword" title="Changer le mot de passe">
             {passwordUpdateMessage.message && (
               <Alert variant={passwordUpdateMessage.type}>
                 {passwordUpdateMessage.message}
@@ -363,7 +359,7 @@ const ProfileEdit: React.FC<ProfileEditProps> = ({ userId, show, onHide }) => {
             
             <Form onSubmit={handlePasswordUpdate}>
               <Form.Group className="mb-3">
-                <Form.Label>Current Password</Form.Label>
+                <Form.Label>Mot de passe actuel</Form.Label>
                 <Form.Control
                   type="password"
                   name="oldPassword"
@@ -374,7 +370,7 @@ const ProfileEdit: React.FC<ProfileEditProps> = ({ userId, show, onHide }) => {
               </Form.Group>
               
               <Form.Group className="mb-3">
-                <Form.Label>New Password</Form.Label>
+                <Form.Label>Nouveau mot de passe</Form.Label>
                 <Form.Control
                   type="password"
                   name="newPassword"
@@ -385,7 +381,7 @@ const ProfileEdit: React.FC<ProfileEditProps> = ({ userId, show, onHide }) => {
               </Form.Group>
               
               <Form.Group className="mb-3">
-                <Form.Label>Confirm New Password</Form.Label>
+                <Form.Label>Confirmer le nouveau mot de passe</Form.Label>
                 <Form.Control
                   type="password"
                   name="confirmPassword"
@@ -396,7 +392,7 @@ const ProfileEdit: React.FC<ProfileEditProps> = ({ userId, show, onHide }) => {
                 {passwordData.newPassword !== passwordData.confirmPassword && 
                   passwordData.confirmPassword && (
                     <Form.Text className="text-danger">
-                      Passwords do not match
+                      Les mots de passe ne correspondent pas
                     </Form.Text>
                   )
                 }
@@ -413,7 +409,7 @@ const ProfileEdit: React.FC<ProfileEditProps> = ({ userId, show, onHide }) => {
                   passwordData.newPassword !== passwordData.confirmPassword
                 }
               >
-                Change Password
+                Changer le mot de passe
               </Button>
             </Form>
           </Tab>
@@ -421,7 +417,7 @@ const ProfileEdit: React.FC<ProfileEditProps> = ({ userId, show, onHide }) => {
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={onHide}>
-          Close
+          Fermer
         </Button>
       </Modal.Footer>
     </Modal>

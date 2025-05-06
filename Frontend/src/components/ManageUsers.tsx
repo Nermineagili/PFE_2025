@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Table, Button, Alert, Spinner, Card, Container, Modal, OverlayTrigger, Tooltip, Form, Row, Col } from "react-bootstrap";
-import { FaRegEdit, FaRegTrashAlt, FaFilter, FaUserCheck, FaUserPlus } from 'react-icons/fa';
+import { FaRegEdit, FaRegTrashAlt, FaFilter, FaUserCheck, FaUserPlus, FaKey } from 'react-icons/fa';
 import EditUser from "./EditUser";
+import ResetPasswordApproval from "../pages/ResetPasswordApproval";
+import { useLocation } from "react-router-dom";
 import "./ManageUsers.css";
 
 interface User {
@@ -21,6 +23,22 @@ interface NewUserData {
   password: string;
   role: string;
 }
+
+// Fonction pour extraire le token et l'ID utilisateur de l'URL
+const extractResetParams = () => {
+  const url = new URL(window.location.href);
+  const pathParts = url.pathname.split('/');
+  
+  // Vérifie si c'est une URL d'approbation de réinitialisation admin
+  if (pathParts.includes('approve-reset')) {
+    const token = pathParts[pathParts.indexOf('approve-reset') + 1];
+    const userId = pathParts[pathParts.indexOf('approve-reset') + 2];
+    
+    return { token, userId };
+  }
+  
+  return { token: null, userId: null };
+};
 
 const API_BASE_URL = "http://localhost:5000/api/admin/users";
 const API_BASE_URL2 = "http://localhost:5000/api/admin";
@@ -45,14 +63,27 @@ function ManageUsers() {
   const [addUserLoading, setAddUserLoading] = useState<boolean>(false);
   const [addUserError, setAddUserError] = useState<string | null>(null);
   const [addUserSuccess, setAddUserSuccess] = useState<string | null>(null);
+  
+  // Pour l'approbation de réinitialisation de mot de passe
+  const [showResetSection, setShowResetSection] = useState<boolean>(false);
+  const location = useLocation();
+  const { token: resetToken, userId: resetUserId } = extractResetParams();
+
+  // Si un token de réinitialisation est dans l'URL, affiche automatiquement la section d'approbation
+  useEffect(() => {
+    if (resetToken && resetUserId) {
+      setShowResetSection(true);
+    }
+  }, [resetToken, resetUserId]);
+
 
   const fetchUsers = async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("authToken");
-      if (!token) throw new Error("No authentication token found.");
+      if (!token) throw new Error("Aucun token d'authentification trouvé.");
 
-      // First, get total users count for reference
+      // D'abord, obtenir le nombre total d'utilisateurs comme référence
       if (!totalUsers) {
         const allUsersResponse = await axios.get<User[]>(`${API_BASE_URL}`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -63,7 +94,7 @@ function ManageUsers() {
         }
       }
 
-      // Then get either filtered or all users based on filter setting
+      // Puis obtenir soit les utilisateurs filtrés soit tous selon le paramètre de filtre
       const url = filterContracts
         ? `${API_BASE_URL2}/users-with-contracts-only`
         : `${API_BASE_URL}`;
@@ -72,13 +103,13 @@ function ManageUsers() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      if (!response.data || !Array.isArray(response.data)) throw new Error("Invalid API response format");
+      if (!response.data || !Array.isArray(response.data)) throw new Error("Format de réponse API invalide");
 
       setUsers(response.data);
       setFilteredCount(response.data.length);
     } catch (err) {
-      console.error("Error fetching users:", err);
-      setError("Failed to fetch users.");
+      console.error("Erreur lors de la récupération des utilisateurs:", err);
+      setError("Échec de la récupération des utilisateurs.");
     } finally {
       setLoading(false);
     }
@@ -97,7 +128,7 @@ function ManageUsers() {
 
   const handleAddUserModal = () => {
     setShowAddModal(true);
-    // Reset form and messages when opening the modal
+    // Réinitialiser le formulaire et les messages lors de l'ouverture de la modal
     setAddUserFormData({
       name: "",
       lastname: "",
@@ -137,7 +168,7 @@ function ManageUsers() {
     
     try {
       const token = localStorage.getItem("authToken");
-      if (!token) throw new Error("No authentication token found.");
+      if (!token) throw new Error("Aucun token d'authentification trouvé.");
 
       const response = await axios.post(
         `${API_BASE_URL}`, 
@@ -145,8 +176,8 @@ function ManageUsers() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      setAddUserSuccess("User created successfully!");
-      // Reset form
+      setAddUserSuccess("Utilisateur créé avec succès !");
+      // Réinitialiser le formulaire
       setAddUserFormData({
         name: "",
         lastname: "",
@@ -155,62 +186,82 @@ function ManageUsers() {
         role: "user"
       });
       
-      // Refresh user list
+      // Actualiser la liste des utilisateurs
       fetchUsers();
       
-      // Close modal after a brief delay to show success message
+      // Fermer la modal après un court délai pour afficher le message de succès
       setTimeout(() => {
         setShowAddModal(false);
       }, 1500);
       
     } catch (err: any) {
-      console.error("Error creating user:", err);
-      setAddUserError(err.response?.data?.error || "Failed to create user.");
+      console.error("Erreur lors de la création de l'utilisateur:", err);
+      setAddUserError(err.response?.data?.error || "Échec de la création de l'utilisateur.");
     } finally {
       setAddUserLoading(false);
     }
   };
 
   const deleteUser = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this user?")) return;
+    if (!window.confirm("Êtes-vous sûr de vouloir supprimer cet utilisateur ?")) return;
     try {
       const token = localStorage.getItem("authToken");
-      if (!token) throw new Error("No authentication token found.");
+      if (!token) throw new Error("Aucun token d'authentification trouvé.");
 
       await axios.delete(`${API_BASE_URL}/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUsers(users.filter((user) => user._id !== id));
     } catch (err) {
-      console.error("Error deleting user:", err);
-      alert("Failed to delete user.");
+      console.error("Erreur lors de la suppression de l'utilisateur:", err);
+      alert("Échec de la suppression de l'utilisateur.");
     }
   };
 
   useEffect(() => {
     fetchUsers();
-  }, [filterContracts]); // re-fetch when the filter changes
+  }, [filterContracts]); // recharger quand le filtre change
 
   return (
     <Container className="manage-users-container">
+      {/* Section d'approbation de réinitialisation de mot de passe */}
+      {/* {showResetSection && (
+  <ResetPasswordApproval 
+    tokenFromURL={resetToken}  
+    userIdFromURL={resetUserId} 
+  />
+)} */}
+
+      {/* Bouton pour basculer la section des demandes de réinitialisation */}
+      <div className="d-flex justify-content-end mb-3">
+        <Button 
+          variant={showResetSection ? "outline-secondary" : "outline-primary"}
+          onClick={() => setShowResetSection(!showResetSection)}
+          className="toggle-reset-btn"
+        >
+          <FaKey className="me-2" />
+          {showResetSection ? "Masquer les demandes de réinitialisation" : "Afficher les demandes de réinitialisation"}
+        </Button>
+      </div>
+
       <Card className="manage-users-card">
         <Card.Body>
           <div className="manage-users-header">
-            <h2 className="manage-users-title">Manage Users</h2>
+            <h2 className="manage-users-title">Gestion des utilisateurs</h2>
             <Button 
               variant="primary" 
               className="manage-users-add-btn"
               onClick={handleAddUserModal}
             >
-              <FaUserPlus className="me-2" /> Add New User
+              <FaUserPlus className="me-2" /> Ajouter un utilisateur
             </Button>
           </div>
 
-          {/* Enhanced Filter Toggle */}
+          {/* Sélecteur de filtre amélioré */}
           <div className="manage-users-filter-container">
             <div className="manage-users-filter-title">
               <FaFilter className="manage-users-filter-icon" />
-              {filterContracts ? 'Showing users with contracts' : 'Showing all users'}
+              {filterContracts ? 'Affichage des utilisateurs avec contrats' : 'Affichage de tous les utilisateurs'}
               {!loading && (
                 <span className="manage-users-filter-count">
                   {filterContracts ? filteredCount : totalUsers}
@@ -222,7 +273,7 @@ function ManageUsers() {
               <Form.Check
                 type="switch"
                 id="filter-contracts-switch"
-                label="Show only users with contracts"
+                label="Afficher uniquement les utilisateurs avec contrats"
                 checked={filterContracts}
                 onChange={() => setFilterContracts(!filterContracts)}
                 className="manage-users-custom-switch"
@@ -245,7 +296,7 @@ function ManageUsers() {
           {!loading && !error && users.length === 0 && (
             <Alert variant="info" className="manage-users-no-users text-center">
               <FaUserCheck className="manage-users-no-users-icon mb-2" size={32} />
-              <p className="mb-0">No users found matching the current filter criteria</p>
+              <p className="mb-0">Aucun utilisateur trouvé correspondant aux critères de filtre actuels</p>
             </Alert>
           )}
 
@@ -255,10 +306,10 @@ function ManageUsers() {
                 <thead>
                   <tr>
                     <th>#</th>
-                    <th>Name</th>
-                    <th>Last Name</th>
+                    <th>Prénom</th>
+                    <th>Nom</th>
                     <th>Email</th>
-                    <th>Role</th>
+                    <th>Rôle</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -275,12 +326,12 @@ function ManageUsers() {
                         </span>
                       </td>
                       <td className="manage-users-actions-cell">
-                        <OverlayTrigger overlay={<Tooltip>Edit User</Tooltip>}>
+                        <OverlayTrigger overlay={<Tooltip>Modifier l'utilisateur</Tooltip>}>
                           <Button size="sm" className="manage-users-action-btn manage-users-analyze-btn" onClick={() => handleEditUser(user._id)}>
                             <FaRegEdit />
                           </Button>
                         </OverlayTrigger>
-                        <OverlayTrigger overlay={<Tooltip>Delete</Tooltip>}>
+                        <OverlayTrigger overlay={<Tooltip>Supprimer</Tooltip>}>
                           <Button size="sm" className="manage-users-action-btn manage-users-delete-btn" onClick={() => deleteUser(user._id)}>
                             <FaRegTrashAlt />
                           </Button>
@@ -295,26 +346,26 @@ function ManageUsers() {
         </Card.Body>
       </Card>
 
-      {/* Edit Modal */}
+      {/* Modal d'édition */}
       <Modal show={showModal} onHide={handleCloseModal} centered className="manage-users-modal">
         <Modal.Header closeButton className="manage-users-modal-header">
-          <Modal.Title className="manage-users-modal-title">Edit User</Modal.Title>
+          <Modal.Title className="manage-users-modal-title">Modifier l'utilisateur</Modal.Title>
         </Modal.Header>
         <Modal.Body className="manage-users-modal-body">
           {selectedUserId && <EditUser id={selectedUserId} onClose={handleCloseModal} />}
         </Modal.Body>
         <Modal.Footer className="manage-users-modal-footer">
           <Button variant="secondary" onClick={handleCloseModal} className="manage-users-close-button">
-            Close
+            Fermer
           </Button>
         </Modal.Footer>
       </Modal>
 
-      {/* Add User Modal */}
+      {/* Modal d'ajout d'utilisateur */}
       <Modal show={showAddModal} onHide={handleCloseAddModal} centered className="manage-users-modal add-user-modal">
         <Modal.Header closeButton className="manage-users-modal-header">
           <Modal.Title className="manage-users-modal-title">
-            <FaUserPlus className="me-2" /> Add New User
+            <FaUserPlus className="me-2" /> Ajouter un nouvel utilisateur
           </Modal.Title>
         </Modal.Header>
         <Modal.Body className="manage-users-modal-body">
@@ -334,27 +385,27 @@ function ManageUsers() {
             <Row>
               <Col md={6}>
                 <Form.Group className="mb-3">
-                  <Form.Label>First Name</Form.Label>
+                  <Form.Label>Prénom</Form.Label>
                   <Form.Control 
                     type="text" 
                     name="name" 
                     value={addUserFormData.name}
                     onChange={handleInputChange}
                     required
-                    placeholder="Enter first name"
+                    placeholder="Entrez le prénom"
                   />
                 </Form.Group>
               </Col>
               <Col md={6}>
                 <Form.Group className="mb-3">
-                  <Form.Label>Last Name</Form.Label>
+                  <Form.Label>Nom</Form.Label>
                   <Form.Control 
                     type="text" 
                     name="lastname" 
                     value={addUserFormData.lastname}
                     onChange={handleInputChange}
                     required
-                    placeholder="Enter last name"
+                    placeholder="Entrez le nom"
                   />
                 </Form.Group>
               </Col>
@@ -368,43 +419,43 @@ function ManageUsers() {
                 value={addUserFormData.email}
                 onChange={handleInputChange}
                 required
-                placeholder="Enter email"
+                placeholder="Entrez l'email"
               />
             </Form.Group>
             
             <Form.Group className="mb-3">
-              <Form.Label>Password</Form.Label>
+              <Form.Label>Mot de passe</Form.Label>
               <Form.Control 
                 type="password" 
                 name="password" 
                 value={addUserFormData.password}
                 onChange={handleInputChange}
                 required
-                placeholder="Enter password"
+                placeholder="Entrez le mot de passe"
                 minLength={6}
               />
               <Form.Text className="text-muted">
-                Password must be at least 6 characters long
+                Le mot de passe doit contenir au moins 6 caractères
               </Form.Text>
             </Form.Group>
             
             <Form.Group className="mb-3">
-              <Form.Label>Role</Form.Label>
+              <Form.Label>Rôle</Form.Label>
               <Form.Select 
                 name="role" 
                 value={addUserFormData.role}
                 onChange={handleSelectChange}
                 required
               >
-                <option value="user">User</option>
-                <option value="admin">Admin</option>
-                <option value="superviseur">Supervisor</option>
+                <option value="user">Utilisateur</option>
+                <option value="admin">Administrateur</option>
+                <option value="superviseur">Superviseur</option>
               </Form.Select>
             </Form.Group>
             
             <div className="d-flex justify-content-end mt-4">
               <Button variant="secondary" onClick={handleCloseAddModal} className="me-2">
-                Cancel
+                Annuler
               </Button>
               <Button 
                 type="submit" 
@@ -414,10 +465,10 @@ function ManageUsers() {
                 {addUserLoading ? (
                   <>
                     <Spinner animation="border" size="sm" className="me-2" />
-                    Creating...
+                    Création en cours...
                   </>
                 ) : (
-                  "Create User"
+                  "Créer l'utilisateur"
                 )}
               </Button>
             </div>

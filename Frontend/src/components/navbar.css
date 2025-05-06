@@ -1,426 +1,145 @@
-/* Navbar Styling */
-.custom-navbar {
-    position: fixed; /* La navbar reste fixe */
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000; /* S'assure qu'elle soit au-dessus des autres éléments */
-    background: #e2e1e1;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    padding: 10px 20px;
-    border-bottom: 3px solid #1f618d;
+/* Yomi Navbar Variables */
+:root {
+  --yomi-primary-blue: #113c56;
+  --yomi-primary-gold: #c29046;
+  --yomi-dark-blue: #0a2d42;
+  --yomi-light-blue: #e8f0fe;
+  --yomi-light-gold: rgba(194, 144, 70, 0.1);
+  --yomi-text-dark: #333333;
+  --yomi-text-light: #777777;
+  --yomi-bg-light: #f9f9f9;
+  --yomi-white:  #e2e1e1;    
+
+  --yomi-shadow-light: rgba(0, 0, 0, 0.1);
+  --yomi-shadow-medium: rgba(0, 0, 0, 0.15);
 }
 
-/* Navbar Brand */
-.custom-navbar .navbar-brand {
-    font-size: 1.3rem;
-    font-weight: bold;
-    color: #1f618d !important;
-}
-
-/* Navbar Links */
-.custom-navbar .nav-link {
-    font-size: 1rem;
-    font-weight: bold;
-    color: black !important;
-    margin-right: 15px;
-}
-
-/* Active Navbar Link */
-.custom-navbar .nav-link.active {
-    color: #1f618d !important;
-}
-
-/* "Se connecter" Link */
-.custom-navbar .nav-link[href="/signin"] {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-weight: bold;
-}
-
-/* "S'inscrire" Button */
-.custom-button {
-    background: #1f618d;
-    border-radius: 20px;
-    width: 120px;
-    height: 35px;
-    color: white;
-    border: none;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.3s ease-in-out;
-}
-
-.custom-button:hover {
-    background: #154360;
-}
-
-/* Additional styling for the Logout button */
-.logout-button {
-    background: #e74c3c; /* Red background */
-    border-radius: 20px;
-    width: 120px;
-    height: 35px;
-    color: white;
-    border: none;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.3s ease-in-out;
-    margin-left: 15px;
-}
-
-.logout-button:hover {
-    background: #c0392b; /* Darker red on hover */
-}
-
-/* Navbar Collapse (Ensures Alignment) */
-.navbar-collapse {
-    display: flex;
-    justify-content: space-between;
-}
-
-/* Navbar Right Section */
-.navbar-right {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-}
-.nav-icon {
-    cursor: pointer;
-    color: inherit; /* or a specific color */
-  }
-  /* Profile picture styling */
-.navbar-profile-pic {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    object-fit: cover;
-  }
-  
-  /* Username styling */
-  .navbar-user-name {
-    font-size: 0.9rem;
-    color: inherit; /* or specify a color to match your navbar text */
-  }
-  
-  /* Optional: adjust the logout icon styling */
-  .nav-icon {
-    cursor: pointer;
-    color: inherit;
-    margin-left: 4px;
-  }
-
-
-  .navbar-profile-pic {
-    cursor: pointer;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    object-fit: cover;
-  }
-  
-  .navbar-profile-icon {
-    color: gray;
-    cursor: pointer;
-  }
-  
-  .profile-container {
-    display: flex;
-    align-items: center;
-    margin-right: 10px;
-  }
-  
-  .navbar-user-name {
-    margin: 0 8px;
-    font-weight: bold;
-  }
-  
-  
-  /* Profile picture styling
-.navbar-profile-pic {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    object-fit: cover;
-    cursor: pointer;
-  }
-  
-  /* Default profile icon styling */
-  /* .navbar-profile-icon {
-    cursor: pointer;
-  } */ */
-  
-  /* Username styling */
-  .navbar-user-name {
-    font-size: 0.9rem;
-    color: inherit;
-  }
-  /* Profile Modal Styles */
-/* Profile Modal Styles */
-.profile-tabs .nav-link {
-  color: #103e58;
-  font-weight: 500;
-  border: none;
-  padding: 12px 20px;
-}
-
-.profile-tabs .nav-link.active {
-  color: #bf8f50;
-  background-color: transparent;
-  border-bottom: 2px solid #bf8f50;
-}
-
-.profile-tabs .nav-link:hover {
-  color: #bf8f50;
-}
-
-.profile-tab-content, .password-tab-content {
-  padding: 20px;
-}
-
-.profile-image-section {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.profile-image-container {
-  position: relative;
-  display: inline-block;
-  margin-bottom: 1rem;
-}
-
-.profile-image-large {
-  width: 120px;
-  height: 120px;
-  object-fit: cover;
-  border: 3px solid #f8f9fa;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  border-radius: 50%;
-}
-
-.profile-initials-large {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #103e58, #bf8f50);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 48px;
-  font-weight: bold;
-  margin: 0 auto;
-  border: 3px solid #f8f9fa;
-}
-
-.profile-form, .password-form {
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.profile-info-value {
-  padding: 0.5rem;
-  border-radius: 0.25rem;
-  background-color: #f8f9fa;
-  min-height: 38px;
-  display: flex;
-  align-items: center;
-  border: 1px solid #e9ecef;
-}
-
-/* Buttons */
-.save-btn {
-  background-color: #bf8f50;
-  border-color: #bf8f50;
-}
-
-.save-btn:hover {
-  background-color: #a87d44;
-  border-color: #a87d44;
-}
-
-.edit-btn, .cancel-btn {
-  color: #103e58;
-  border-color: #103e58;
-}
-
-.edit-btn:hover, .cancel-btn:hover {
-  background-color: #f0f0f0;
-  color: #103e58;
-}
-
-.change-password-btn {
-  background-color: #103e58;
-  border-color: #103e58;
+/* Main Navbar Styling */
+.yomi-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
-  padding: 10px;
-  margin-top: 10px;
-}
-
-.change-password-btn:hover {
-  background-color: #0a2d42;
-  border-color: #0a2d42;
-}
-
-/* Profile in Navbar */
-.profile-container {
-  position: relative;
-}
-
-.profile-image {
-  width: 40px;
-  height: 40px;
-  object-fit: cover;
-}
-
-.profile-initials {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #103e58, #bf8f50);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-}
-
-.navbar-user-name {
-  color: #103e58;
-  font-weight: 500;
-}
-
-/* Modal Animation */
-.modal.fade .modal-dialog {
-  transition: transform 0.3s ease-out, opacity 0.3s ease;
-  transform: translateY(-20px);
-  opacity: 0;
-}
-
-.modal.show .modal-dialog {
-  transform: translateY(0);
-  opacity: 1;
-}
-
-/* Form inputs */
-.form-control:focus {
-  border-color: #bf8f50;
-  box-shadow: 0 0 0 0.2rem rgba(191, 143, 80, 0.25);
-}
-  /* Notification Badge Styles */
-/* Modern Notification Badge */
-.notification-badge {
-  position: relative;
-  margin-left: 8px;
-}
-
-.notification-dot {
-  width: 10px;
-  height: 10px;
-  background: linear-gradient(135deg, #c19048 0%, #e0b15f 100%);
-  border-radius: 50%;
-  box-shadow: 0 0 0 2px rgba(255,255,255,0.8);
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(193, 144, 72, 0.7);
-  }
-  70% {
-    transform: scale(1.1);
-    box-shadow: 0 0 0 8px rgba(193, 144, 72, 0);
-  }
-  100% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(193, 144, 72, 0);
-  }
-}
-
-/* Modern Nav Link with Notification */
-.nav-link-with-notification {
-  position: relative;
-  display: flex;
-  align-items: center;
+  z-index: 1000;
+  background: var(--yomi-white);
+  box-shadow: 0 4px 15px var(--yomi-shadow-light);
+  padding: 12px 0;
   transition: all 0.3s ease;
 }
 
-.nav-link-with-notification:hover {
-  color: #c19048 !important;
-}
-
-/* Additional styles for the dropdown navigation */
-.nav-dropdown-toggle {
-  display: flex;
-  align-items: center;
-  font-weight: bold;
-  color: black !important;
-}
-
-.nav-dropdown-toggle::after {
-  margin-left: 6px;
-}
-
-.nav-dropdown-menu {
-  border: none;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+.yomi-navbar.scrolled {
   padding: 8px 0;
-  min-width: 220px;
+  box-shadow: 0 4px 20px var(--yomi-shadow-medium);
 }
 
-.dropdown-item {
+/* Brand and Logo */
+.yomi-navbar-brand {
   display: flex;
   align-items: center;
-  padding: 10px 16px;
-  color: #333;
-  font-weight: 500;
-  transition: background-color 0.2s ease;
+  padding: 0;
 }
 
-.dropdown-item:hover {
-  background-color: #f7f7f7;
-  color: #1f618d;
+.yomi-logo {
+  margin-right: 12px;
+  transition: transform 0.3s ease;
 }
 
-.dropdown-item:active {
-  background-color: #e8f0fe;
-  color: #1f618d;
+.yomi-logo:hover {
+  transform: scale(1.05);
 }
 
-/* Notification in dropdown */
-.dropdown-item-with-notification {
-  position: relative;
+.yomi-brand-text {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--yomi-primary-blue);
+  letter-spacing: -0.5px;
+}
+
+/* Navigation Links */
+.yomi-nav-links {
+  margin-left: 20px;
+}
+
+.yomi-nav-link {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--yomi-text-dark) !important;
+  margin-right: 20px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
 }
 
-.dropdown-notification-badge {
+.yomi-nav-link:hover {
+  color: var(--yomi-primary-blue) !important;
+  background-color: rgba(17, 60, 86, 0.05);
+}
+
+.yomi-nav-link.active {
+  color: var(--yomi-primary-blue) !important;
+  background-color: rgba(17, 60, 86, 0.1);
+}
+
+.yomi-nav-icon {
+  margin-right: 8px;
+  font-size: 1.2rem;
+}
+
+/* Navbar Toggler */
+.yomi-navbar-toggler {
+  border: none;
+  padding: 8px;
+}
+
+.yomi-navbar-toggler:focus {
+  box-shadow: none;
+  outline: none;
+}
+
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3E%3Cpath stroke='rgba(17, 60, 86, 0.8)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
+
+/* Dropdown Menu */
+.yomi-dropdown-toggle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--yomi-text-dark) !important;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+}
+
+.yomi-dropdown-toggle:hover, 
+.yomi-dropdown-toggle:focus {
+  color: var(--yomi-primary-blue) !important;
+  background-color: rgba(17, 60, 86, 0.05);
+}
+
+.yomi-dropdown-toggle::after {
   margin-left: 8px;
+  vertical-align: middle;
 }
 
-/* Add icons to main nav items */
-.nav-link svg, .dropdown-item svg {
-  vertical-align: -0.125em;
+.yomi-dropdown-menu {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  padding: 12px 0;
+  min-width: 240px;
+  margin-top: 15px;
+  animation: yomi-dropdown-animation 0.3s ease;
+  transform-origin: top right;
 }
 
-/* Animation for dropdown */
-.dropdown-menu {
-  animation: dropdown-fade 0.2s ease;
-  transform-origin: top;
-}
-
-@keyframes dropdown-fade {
+@keyframes yomi-dropdown-animation {
   from {
     opacity: 0;
-    transform: translateY(-8px);
+    transform: translateY(-10px);
   }
   to {
     opacity: 1;
@@ -428,25 +147,289 @@
   }
 }
 
-/* Responsive adjustments */
-@media (max-width: 991px) {
-  .nav-dropdown-menu {
+.yomi-dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  color: var(--yomi-text-dark);
+  font-weight: 500;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+}
+
+.yomi-dropdown-item:hover {
+  background-color: var(--yomi-light-blue);
+  color: var(--yomi-primary-blue);
+}
+
+.yomi-dropdown-item:active {
+  background-color: rgba(17, 60, 86, 0.15);
+}
+
+.yomi-dropdown-icon {
+  margin-right: 12px;
+  font-size: 1.2rem;
+  color: var(--yomi-primary-blue);
+}
+
+/* Dropdown item with notification */
+.yomi-dropdown-item-with-notification {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  color: var(--yomi-text-dark);
+  font-weight: 500;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+  position: relative;
+}
+
+.yomi-dropdown-item-with-notification:hover {
+  background-color: var(--yomi-light-blue);
+  color: var(--yomi-primary-blue);
+}
+
+.yomi-notification-badge {
+  position: relative;
+  margin-left: 12px;
+}
+
+.yomi-notification-dot {
+  width: 10px;
+  height: 10px;
+  background: linear-gradient(135deg, var(--yomi-primary-gold) 0%, #e0b15f 100%);
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.8);
+  display: inline-block;
+  animation: yomi-pulse-animation 2s infinite;
+}
+
+@keyframes yomi-pulse-animation {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(194, 144, 70, 0.7);
+  }
+  70% {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 8px rgba(194, 144, 70, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(194, 144, 70, 0);
+  }
+}
+
+/* Authentication Section */
+.yomi-auth-nav {
+  display: flex;
+  align-items: center;
+}
+
+.yomi-login-link {
+  font-weight: 600;
+  color: var(--yomi-primary-blue) !important;
+  margin-right: 15px;
+  transition: all 0.3s ease;
+}
+
+.yomi-login-link:hover {
+  color: var(--yomi-dark-blue) !important;
+  text-decoration: underline;
+}
+
+.yomi-signup-button {
+  background: linear-gradient(135deg, var(--yomi-primary-blue) 0%, #1f618d 100%);
+  border-radius: 50px;
+  padding: 10px 24px;
+  color: white;
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(17, 60, 86, 0.2);
+}
+
+.yomi-signup-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(17, 60, 86, 0.3);
+  background: linear-gradient(135deg, #0d2b3f 0%, #164e73 100%);
+}
+
+.yomi-signup-button:active {
+  transform: translateY(0);
+}
+
+/* User Profile Styles */
+.yomi-user-profile-container {
+  display: flex;
+  align-items: center;
+}
+
+.yomi-profile-wrapper {
+  display: flex;
+  align-items: center;
+  padding: 5px 12px;
+  border-radius: 50px;
+  background-color: rgba(17, 60, 86, 0.03);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  border: 1px solid transparent;
+}
+
+.yomi-profile-wrapper:hover {
+  background-color: rgba(17, 60, 86, 0.08);
+  border-color: rgba(17, 60, 86, 0.1);
+}
+
+.yomi-profile-image-container {
+  position: relative;
+  margin-right: 10px;
+}
+
+.yomi-profile-image {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.yomi-profile-initials {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--yomi-primary-blue) 0%, var(--yomi-primary-gold) 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.yomi-profile-edit-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(17, 60, 86, 0.5);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.yomi-profile-wrapper:hover .yomi-profile-edit-overlay {
+  opacity: 1;
+}
+
+.yomi-profile-edit-icon {
+  color: white;
+  font-size: 18px;
+}
+
+.yomi-user-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--yomi-primary-blue);
+  margin-right: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+/* Logout Button */
+.yomi-logout-button {
+  display: flex;
+  align-items: center;
+  background-color: #fff1f0;
+  border: 1px solid #ffccc7;
+  color: #cf1322;
+  border-radius: 50px;
+  padding: 8px 16px;
+  margin-left: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.yomi-logout-button:hover {
+  background-color: #fff1f0;
+  color: #a8071a;
+  box-shadow: 0 2px 8px rgba(207, 19, 34, 0.2);
+}
+
+.yomi-logout-icon {
+  margin-right: 6px;
+  font-size: 1.1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+  .yomi-nav-link, .yomi-dropdown-toggle {
+    padding: 10px 12px;
+    margin-right: 0;
+  }
+  
+  .yomi-auth-nav {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(17, 60, 86, 0.1);
+  }
+  
+  .yomi-dropdown-menu {
     box-shadow: none;
-    border-left: 3px solid #1f618d;
+    border-left: 3px solid var(--yomi-primary-blue);
     border-radius: 0;
-    margin-left: 15px;
+    margin-left: 20px;
     padding-left: 0;
+    animation: none;
+    margin-top: 0;
   }
   
-  .dropdown-item {
-    padding: 8px 16px;
+  .yomi-user-profile-container {
+    flex-direction: column;
+    align-items: flex-start;
   }
   
-  .nav-dropdown-toggle {
-    padding-left: 0;
+  .yomi-profile-wrapper {
+    margin-bottom: 10px;
+    width: 100%;
   }
   
-  .navbar-collapse {
-    padding-top: 10px;
+  .yomi-logout-button {
+    margin-left: 0;
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .yomi-user-name {
+    max-width: 200px;
+  }
+}
+
+@media (max-width: 576px) {
+  .yomi-brand-text {
+    font-size: 1.2rem;
+  }
+  
+  .yomi-signup-button {
+    padding: 8px 20px;
+    font-size: 0.9rem;
+  }
+  
+  .yomi-user-name {
+    max-width: 150px;
   }
 }

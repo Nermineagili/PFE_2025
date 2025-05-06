@@ -32,7 +32,7 @@ const ContactUs = forwardRef<HTMLDivElement>((_props, ref) => {
       setSuccess(response.data.message);
       setFormData({ name: "", email: "", message: "" });
     } catch (err) {
-      setError("Failed to send message. Try again later.");
+      setError("Échec de l'envoi du message. Veuillez réessayer plus tard.");
     } finally {
       setLoading(false);
     }
@@ -43,9 +43,9 @@ const ContactUs = forwardRef<HTMLDivElement>((_props, ref) => {
       <Container className="contact-container">
         <Card className="contact-card">
           <Card.Body>
-            <h2 className="text-center contact-title">Contact Us</h2>
+            <h2 className="text-center contact-title">Contactez-nous</h2>
             <p className="text-center contact-subtitle">
-              Have questions? Feel free to reach out to us!
+              Vous avez des questions ? N'hésitez pas à nous contacter !
             </p>
 
             {error && <Alert variant="danger">{error}</Alert>}
@@ -53,45 +53,45 @@ const ContactUs = forwardRef<HTMLDivElement>((_props, ref) => {
 
             <Form onSubmit={handleSubmit} className="contact-form">
               <Form.Group controlId="name">
-                <Form.Label>Your Name</Form.Label>
+                <Form.Label>Votre nom</Form.Label>
                 <Form.Control
                   type="text"
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  placeholder="Enter your name"
+                  placeholder="Entrez votre nom"
                   required
                 />
               </Form.Group>
 
               <Form.Group controlId="email">
-                <Form.Label>Your Email</Form.Label>
+                <Form.Label>Votre adresse e-mail</Form.Label>
                 <Form.Control
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="Enter your email"
+                  placeholder="Entrez votre adresse e-mail"
                   required
                 />
               </Form.Group>
 
               <Form.Group controlId="message">
-                <Form.Label>Your Message</Form.Label>
+                <Form.Label>Votre message</Form.Label>
                 <Form.Control
                   as="textarea"
                   rows={4}
                   name="message"
                   value={formData.message}
                   onChange={handleChange}
-                  placeholder="Type your message here..."
+                  placeholder="Tapez votre message ici..."
                   required
                 />
               </Form.Group>
 
               <div className="d-flex justify-content-center">
                 <Button className="send-button" type="submit" disabled={loading}>
-                  {loading ? <Spinner animation="border" size="sm" /> : "Send Message"}
+                  {loading ? <Spinner animation="border" size="sm" /> : "Envoyer le message"}
                 </Button>
               </div>
             </Form>

@@ -3,6 +3,7 @@ import { Card, Row, Col, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { MdAssignment, MdPayment, MdInsertDriveFile, MdDashboard, MdHelpOutline } from "react-icons/md";
 import "./UserGuide.css";
+import ChatBot from "../components/ChatBot/ChatBot";
 
 const UserGuide: React.FC = () => {
   return (
@@ -167,6 +168,7 @@ const UserGuide: React.FC = () => {
           </Link>
         </div>
       </section>
+      <ChatBot />
     </div>
   );
 };
