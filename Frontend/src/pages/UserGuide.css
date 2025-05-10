@@ -1,226 +1,255 @@
-/* UserGuide.css */
+/* UserGuide.css - Fixed version */
 .yomi-user-guide-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 40px 20px;
-  }
-  
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.yomi-guide-hero {
+  text-align: center;
+  padding: 60px 20px;
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  margin-bottom: 40px;
+  background-image: linear-gradient(135deg, rgba(31, 97, 141, 0.1) 0%, rgba(255, 255, 255, 0.9) 100%);
+  border-bottom: 3px solid #1f618d;
+}
+
+.yomi-guide-hero h1 {
+  color: #1f618d;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.yomi-guide-hero .yomi-guide-lead {
+  font-size: 1.25rem;
+  color: #555;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.yomi-guide-steps {
+  margin-bottom: 60px;
+}
+
+.yomi-guide-steps h2 {
+  text-align: center;
+  color: #1f618d;
+  margin-bottom: 10px;
+}
+
+.yomi-guide-steps > p {
+  text-align: center;
+  color: #555;
+  margin-bottom: 30px;
+}
+
+/* Card styling - Fixed to ensure consistent heights and alignments */
+.yomi-guide-card {
+  height: 100%;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.yomi-guide-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+}
+
+.yomi-card-icon-container {
+  position: relative;
+  background-color: #1f618d;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.yomi-card-icon {
+  font-size: 48px;
+  color: white;
+}
+
+.yomi-step-number {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: white;
+  color: #1f618d;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+/* Card body structure - Fixed to create proper layout */
+.yomi-guide-card .card-body {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.yomi-guide-card .card-title {
+  font-weight: bold;
+  color: #1f618d;
+  margin-top: 10px;
+  font-size: 1.4rem;
+  height: 60px; /* Fixed height for titles to ensure alignment */
+  display: flex;
+  align-items: center;
+}
+
+.yomi-guide-card .card-text {
+  margin-bottom: 15px;
+}
+
+.yomi-guide-list {
+  list-style-type: none;
+  padding-left: 0;
+  margin: 20px 0;
+  flex-grow: 1; /* Takes available space */
+}
+
+.yomi-guide-list li {
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+  position: relative;
+  padding-left: 20px;
+}
+
+.yomi-guide-list li:last-child {
+  border-bottom: none;
+}
+
+.yomi-guide-list li:before {
+  content: "✓";
+  color: #1f618d;
+  position: absolute;
+  left: 0;
+}
+
+/* Button positioning - Fixed to ensure buttons are at the bottom */
+.yomi-guide-card a {
+  margin-top: auto; /* Pushes button to bottom */
+}
+
+.yomi-guide-button {
+  background-color: #1f618d;
+  border-color: #1f618d;
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.yomi-guide-button:hover {
+  background-color: #154360;
+  border-color: #154360;
+}
+
+.yomi-guide-cta {
+  text-align: center;
+  padding: 60px 20px;
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  margin-top: 40px;
+  background-image: linear-gradient(135deg, rgba(31, 97, 141, 0.1) 0%, rgba(255, 255, 255, 0.9) 100%);
+  border-top: 3px solid #1f618d;
+}
+
+.yomi-guide-cta h2 {
+  color: #1f618d;
+  margin-bottom: 20px;
+}
+
+.yomi-guide-cta p {
+  color: #555;
+  margin-bottom: 30px;
+  font-size: 1.1rem;
+}
+
+.yomi-guide-buttons {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+/* CTA Button Styles */
+.yomi-btn-signup {
+  background-color: #1f618d;
+  color: white;
+  border: none;
+  font-weight: 600;
+  padding: 12px 30px;
+  border-radius: 30px;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 10px rgba(31, 97, 141, 0.3);
+}
+
+.yomi-btn-signup:hover {
+  background-color: #154360;
+  box-shadow: 0 6px 12px rgba(31, 97, 141, 0.4);
+  transform: translateY(-2px);
+}
+
+.yomi-but-login {
+  background-color: #c29046;
+  color: white;
+  border: none;
+  font-weight: 600;
+  padding: 12px 30px;
+  border-radius: 30px;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 10px rgba(194, 144, 70, 0.3);
+}
+
+.yomi-btn-login:hover {
+  background-color: #a67937;
+  box-shadow: 0 6px 12px rgba(194, 144, 70, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
   .yomi-guide-hero {
-    text-align: center;
-    padding: 60px 20px;
-    background-color: #f8f9fa;
-    border-radius: 12px;
-    margin-bottom: 40px;
-    background-image: linear-gradient(135deg, rgba(31, 97, 141, 0.1) 0%, rgba(255, 255, 255, 0.9) 100%);
-    border-bottom: 3px solid #1f618d;
-  }
-  
-  .yomi-guide-hero h1 {
-    color: #1f618d;
-    font-weight: bold;
-    margin-bottom: 20px;
-  }
-  
-  .yomi-guide-hero .yomi-guide-lead {
-    font-size: 1.25rem;
-    color: #555;
-    max-width: 700px;
-    margin: 0 auto;
-  }
-  
-  .yomi-guide-steps {
-    margin-bottom: 60px;
-  }
-  
-  .yomi-guide-steps h2 {
-    text-align: center;
-    color: #1f618d;
-    margin-bottom: 10px;
-  }
-  
-  .yomi-guide-steps > p {
-    text-align: center;
-    color: #555;
-    margin-bottom: 30px;
+    padding: 40px 15px;
   }
   
   .yomi-guide-card {
-    height: 100%;
-    border: none;
-    border-radius: 10px;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    overflow: hidden;
-  }
-  
-  .yomi-guide-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
-  }
-  
-  .yomi-card-icon-container {
-    position: relative;
-    background-color: #1f618d;
-    height: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .yomi-card-icon {
-    font-size: 48px;
-    color: white;
-  }
-  
-  .yomi-step-number {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background-color: white;
-    color: #1f618d;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 18px;
-  }
-  
-  .yomi-guide-card .card-title {
-    font-weight: bold;
-    color: #1f618d;
-    margin-top: 10px;
-    font-size: 1.4rem;
-  }
-  
-  .yomi-guide-list {
-    list-style-type: none;
-    padding-left: 0;
-    margin: 20px 0;
-  }
-  
-  .yomi-guide-list li {
-    padding: 8px 0;
-    border-bottom: 1px solid #eee;
-    position: relative;
-    padding-left: 20px;
-  }
-  
-  .yomi-guide-list li:last-child {
-    border-bottom: none;
-  }
-  
-  .yomi-guide-list li:before {
-    content: "✓";
-    color: #1f618d;
-    position: absolute;
-    left: 0;
-  }
-  
-  .yomi-guide-button {
-    background-color: #1f618d;
-    border-color: #1f618d;
-    width: 100%;
-    padding: 10px;
-    margin-top: 10px;
-  }
-  
-  .yomi-guide-button:hover {
-    background-color: #154360;
-    border-color: #154360;
-  }
-  
-  .yomi-guide-cta {
-    text-align: center;
-    padding: 60px 20px;
-    background-color: #f8f9fa;
-    border-radius: 12px;
-    margin-top: 40px;
-    background-image: linear-gradient(135deg, rgba(31, 97, 141, 0.1) 0%, rgba(255, 255, 255, 0.9) 100%);
-    border-top: 3px solid #1f618d;
-  }
-  
-  .yomi-guide-cta h2 {
-    color: #1f618d;
     margin-bottom: 20px;
   }
   
-  .yomi-guide-cta p {
-    color: #555;
-    margin-bottom: 30px;
-    font-size: 1.1rem;
+  .yomi-guide-card .card-title {
+    height: auto; /* Allow titles to adjust height on mobile */
+    min-height: 45px;
+  }
+  
+  .yomi-guide-cta {
+    padding: 40px 15px;
   }
   
   .yomi-guide-buttons {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 15px;
+    flex-direction: column;
+    align-items: center;
   }
   
-  /* New CTA Button Styles */
-  .yomi-btn-signup {
-    background-color: #1f618d;
-    color: white;
-    border: none;
-    font-weight: 600;
-    padding: 12px 30px;
-    border-radius: 30px;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    box-shadow: 0 4px 10px rgba(31, 97, 141, 0.3);
+  .yomi-guide-buttons button {
+    margin: 8px 0;
+    width: 100%;
+    max-width: 250px;
   }
-  
-  .yomi-btn-signup:hover {
-    background-color: #154360;
-    box-shadow: 0 6px 12px rgba(31, 97, 141, 0.4);
-    transform: translateY(-2px);
-  }
-  
-  .yomi-btn-login {
-    background-color: #c29046;
-    color: white;
-    border: none;
-    font-weight: 600;
-    padding: 12px 30px;
-    border-radius: 30px;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    box-shadow: 0 4px 10px rgba(194, 144, 70, 0.3);
-  }
-  
-  .yomi-btn-login:hover {
-    background-color: #a67937;
-    box-shadow: 0 6px 12px rgba(194, 144, 70, 0.4);
-    transform: translateY(-2px);
-  }
-  
-  /* Responsive Adjustments */
-  @media (max-width: 768px) {
-    .yomi-guide-hero {
-      padding: 40px 15px;
-    }
-    
-    .yomi-guide-card {
-      margin-bottom: 20px;
-    }
-    
-    .yomi-guide-cta {
-      padding: 40px 15px;
-    }
-    
-    .yomi-guide-buttons {
-      flex-direction: column;
-      align-items: center;
-    }
-    
-    .yomi-guide-buttons button {
-      margin: 8px 0;
-      width: 100%;
-      max-width: 250px;
-    }
-  }
+}

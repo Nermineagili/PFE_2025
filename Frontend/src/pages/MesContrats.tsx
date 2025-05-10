@@ -736,7 +736,7 @@ const MesContrats: React.FC = () => {
           </Button>
         </Modal.Footer>
       </Modal>
-      <ChatBot />
+      <ChatBot isAuthenticated={false} initialMessages={[]} />
     </>
   );
 };

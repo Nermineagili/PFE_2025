@@ -162,13 +162,13 @@ const UserGuide: React.FC = () => {
             </Button>
           </Link>
           <Link to="/signin">
-            <Button className="yomi-btn-login" size="lg">
+            <Button className="yomi-but-login" size="lg">
               Se connecter
             </Button>
           </Link>
         </div>
       </section>
-      <ChatBot />
+      <ChatBot isAuthenticated={false} initialMessages={[]} />
     </div>
   );
 };

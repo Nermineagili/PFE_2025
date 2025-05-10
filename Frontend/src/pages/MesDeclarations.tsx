@@ -173,7 +173,7 @@ const MesDeclarations = () => {
           </Card.Body>
         </Card>
       </Container>
-      <ChatBot />
+      <ChatBot isAuthenticated={false} initialMessages={[]} />
     </section>
   );
 };

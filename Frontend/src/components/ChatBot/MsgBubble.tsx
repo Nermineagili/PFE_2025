@@ -1,5 +1,5 @@
-import { FaUser, FaRobot } from 'react-icons/fa';
-
+import React from 'react';
+// import './MsgBubble.css'
 interface Message {
   text: string;
   sender: 'user' | 'bot';
@@ -11,19 +11,39 @@ interface MsgBubbleProps {
   onOptionSelect: (option: string) => void;
 }
 
-const MsgBubble = ({ message, onOptionSelect }: MsgBubbleProps) => {
+const MsgBubble: React.FC<MsgBubbleProps> = ({ message, onOptionSelect }) => {
+  // Function to convert URLs into clickable links
+  const formatMessage = (text: string) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const parts = text.split(urlRegex);
+    
+    return parts.map((part, index) => {
+      if (part.match(urlRegex)) {
+        return (
+          <a 
+            key={index} 
+            href={part} 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="message-link"
+          >
+            {part}
+          </a>
+        );
+      }
+      return part;
+    });
+  };
+
   return (
-    <div className={`message-bubble ${message.sender}`}>
-      <div className="message-sender">
-        {message.sender === 'user' ? <FaUser /> : <FaRobot />}
-      </div>
-      <div className="message-text">{message.text}</div>
-      {message.options && (
-        <div className="quick-replies">
-          {message.options.map((option, i) => (
-            <button 
-              key={i} 
-              className="quick-reply-btn"
+    <div className={`msg-bubble ${message.sender}`}>
+      <p>{formatMessage(message.text)}</p>
+      {message.options && message.options.length > 0 && (
+        <div className="options">
+          {message.options.map((option, index) => (
+            <button
+              key={index}
+              className="option-btn"
               onClick={() => onOptionSelect(option)}
             >
               {option}

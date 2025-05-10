@@ -1,30 +1,39 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import Prelogin from './Prelogin';
-import './ChatBot.css';
-
-interface Message {
-  text: string;
-  sender: 'user' | 'bot';
-  options?: string[];
-}
+import ChatBot, { Message } from './ChatBot';
 
 const Postlogin = ({ userType }: { userType: 'client' | 'admin' }) => {
   const { user } = useAuth();
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [initialMessages, setInitialMessages] = useState<Message[]>([]);
 
   useEffect(() => {
-    setMessages([{
-      text: `Hello ${user?.name}! How can I assist you ${userType === 'admin' ? 'with admin tasks' : 'with your claims'}?`,
-      sender: 'bot',
-      options: userType === 'admin' 
-        ? ['View reports', 'Manage users', 'System help'] 
-        : ['File claim', 'Check status', 'Account help']
-    }]);
+    if (user?._id) {
+      const fullName = user.name && user.lastname ? `${user.name} ${user.lastname}` : user.name || 'Utilisateur';
+      setInitialMessages([
+        {
+          text: `Bonjour ${fullName} ! Comment puis-je vous aider ${
+            userType === 'admin' ? 'avec vos tâches administratives' : 'avec vos sinistres ou contrats'
+          } ?`,
+          sender: 'bot' as const,
+          options:
+            userType === 'admin'
+              ? ['Voir les rapports', 'Gérer les utilisateurs', 'Aide système']
+              : ['Déclarer un sinistre', 'Vérifier l’état', 'Aide compte'],
+        },
+      ]);
+    }
   }, [user, userType]);
 
+  if (!user?._id) {
+    return <div>Veuillez vous connecter pour accéder au chatbot.</div>;
+  }
+
   return (
-    <Prelogin />
+    <ChatBot
+      isAuthenticated={true}
+      userId={user._id}
+      initialMessages={initialMessages}
+    />
   );
 };
 

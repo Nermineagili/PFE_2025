@@ -9,7 +9,7 @@ console.log('SMTP_USER:', process.env.SMTP_USER ? '✅ Set' : '❌ Not set');
 console.log('SMTP_PASS:', process.env.SMTP_PASS ? '✅ Set' : '❌ Not set');
 console.log('JWT_SECRET:', process.env.JWT_SECRET ? '✅ Set' : '❌ Not set');
 console.log('MONGO_URI:', process.env.MONGO_URI ? '✅ Set' : '❌ Not set');
-
+const { Configuration, OpenAIApi } = require('openai');
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
@@ -27,6 +27,8 @@ const contratRoutes = require('./routes/ContratRoutes');
 const supervisorRoutes = require('./routes/supervisorRoutes');
 const paymentRoutes = require('./routes/payment');
 const contractController = require('./controllers/ContratController'); // Adjust path as needed
+const chatRoutes = require('./routes/chat');
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 const cron = require('node-cron');
@@ -42,8 +44,7 @@ cron.schedule('0 3 * * *', () => {
       json: (data) => console.log('Contract status update result:', data)
     })
   };
-  
-  fixContractStatuses(mockReq, mockRes);
+
 });
 
 // Optional: Run immediately on startup
@@ -94,8 +95,8 @@ app.use("/api/tasks", taskRoutes);
 app.use('/api/contracts', contratRoutes);
 app.use('/api/supervisor', supervisorRoutes);
 app.use("/api/payment", paymentRoutes);
-
-// MongoDB Connection - without deprecated options
+app.use('/api', chatRoutes);
+// MongoDB Connection 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ MongoDB connected!'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
