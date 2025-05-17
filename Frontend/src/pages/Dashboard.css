@@ -1,0 +1,476 @@
+/* Dashboard.css - Styled to match UserGuide.css with smaller stats card widths */
+.yomi-dashboard {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+  background-image: linear-gradient(135deg, rgba(31, 97, 141, 0.05) 0%, rgba(255, 255, 255, 0.95) 100%);
+}
+
+/* Header */
+.yomi-dashboard-header {
+  text-align: center;
+  padding: 40px 20px;
+  margin-bottom: 40px;
+  border-bottom: 3px solid #1f618d;
+}
+
+.yomi-dashboard-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1f618d;
+  margin-bottom: 0.5rem;
+}
+
+.yomi-dashboard-subtitle {
+  font-size: 1.25rem;
+  color: #555;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* Stats Cards */
+.yomi-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.yomi-stat-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(31, 97, 141, 0.1);
+}
+
+.yomi-stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+}
+
+.yomi-stat-card-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+  color: #fff;
+  font-size: 1.75rem;
+  background-image: linear-gradient(135deg, rgba(31, 97, 141, 0.9) 0%, rgba(194, 144, 70, 0.9) 100%);
+}
+
+.yomi-stat-card-content {
+  flex: 1;
+}
+
+.yomi-stat-card-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.yomi-stat-card-title {
+  font-size: 1rem;
+  color: #555;
+  margin: 0.25rem 0;
+  font-weight: 500;
+}
+
+.yomi-stat-card-last-month {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin: 0.25rem 0;
+}
+
+.yomi-stat-card-growth {
+  display: flex;
+  align-items: center;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.yomi-growth-positive {
+  color: #2ecc71;
+  margin-right: 0.5rem;
+  font-weight: 600;
+}
+
+.yomi-growth-negative {
+  color: #e74c3c;
+  margin-right: 0.5rem;
+  font-weight: 600;
+}
+
+.yomi-growth-period {
+  color: #64748b;
+  font-size: 0.75rem;
+}
+
+/* Alert */
+.yomi-alert-warning {
+  background: #fef3c7;
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
+  color: #d97706;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  border-left: 4px solid #d97706;
+}
+
+.yomi-alert-warning i {
+  margin-right: 0.75rem;
+  font-size: 1.5rem;
+}
+
+.yomi-alert-warning strong {
+  margin-right: 0.5rem;
+  font-weight: 600;
+}
+
+.yomi-alert-action {
+  background-color: #d97706;
+  color: white;
+  border: none;
+  font-weight: 600;
+  padding: 8px 20px;
+  border-radius: 30px;
+  margin-left: auto;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(217, 119, 6, 0.3);
+}
+
+.yomi-alert-action:hover {
+  background-color: #b45309;
+  box-shadow: 0 6px 12px rgba(217, 119, 6, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Main Content */
+.yomi-main-content {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.yomi-tab-content {
+  padding: 2rem;
+}
+
+/* Charts Grid */
+.yomi-charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.yomi-chart-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.yomi-chart-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+}
+
+.yomi-chart-lg {
+  grid-column: span 2;
+}
+
+.yomi-chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.yomi-chart-header h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1f618d;
+  margin: 0;
+}
+
+.yomi-chart-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.yomi-chart-action-btn {
+  background: #f1f5f9;
+  border: none;
+  border-radius: 30px;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.875rem;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.yomi-chart-action-btn.active,
+.yomi-chart-action-btn:hover {
+  background: #1f618d;
+  color: #fff;
+  box-shadow: 0 6px 12px rgba(31, 97, 141, 0.3);
+}
+
+.yomi-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.yomi-chart-legend-item {
+  display: flex;
+  align-items: center;
+  font-size: 0.875rem;
+  color: #555;
+}
+
+.yomi-legend-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+}
+
+.yomi-legend-label {
+  font-weight: 500;
+}
+
+/* Recent Activity */
+.yomi-recent-activity .yomi-activity-item {
+  display: flex;
+  align-items: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid #e2e8f0;
+  transition: background 0.2s;
+}
+
+.yomi-recent-activity .yomi-activity-item:hover {
+  background: rgba(31, 97, 141, 0.05);
+}
+
+.yomi-recent-activity .yomi-activity-item:last-child {
+  border-bottom: none;
+}
+
+.yomi-activity-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+  font-size: 1.5rem;
+}
+
+.yomi-activity-content {
+  flex: 1;
+}
+
+.yomi-activity-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.yomi-activity-subtitle {
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.yomi-activity-status .yomi-status-badge {
+  padding: 0.5rem 1rem;
+  border-radius: 30px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #fff;
+  text-transform: capitalize;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* View All Button */
+.yomi-view-all-btn {
+  background: none;
+  border: none;
+  color: #1f618d;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.yomi-view-all-btn:hover {
+  color: #154360;
+  text-decoration: underline;
+}
+
+/* No Data */
+.yomi-no-data {
+  text-align: center;
+  padding: 3rem;
+  color: #64748b;
+}
+
+.yomi-no-data i {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+  color: #1f618d;
+}
+
+/* Loading State */
+.yomi-loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.yomi-loading-spinner {
+  text-align: center;
+  color: #1f618d;
+}
+
+.yomi-loading-spinner .spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid #e2e8f0;
+  border-top: 5px solid #1f618d;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+.yomi-loading-spinner p {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+/* Error State */
+.yomi-error-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.yomi-error-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  padding: 3rem;
+  text-align: center;
+  max-width: 500px;
+  border-left: 4px solid #e74c3c;
+}
+
+.yomi-error-icon {
+  font-size: 4rem;
+  color: #e74c3c;
+  margin-bottom: 1.5rem;
+}
+
+.yomi-error-card h3 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 1rem;
+}
+
+.yomi-error-card p {
+  font-size: 1.1rem;
+  color: #555;
+  margin-bottom: 2rem;
+}
+
+.yomi-error-button {
+  background: #1f618d;
+  color: #fff;
+  border: none;
+  font-weight: 600;
+  padding: 12px 30px;
+  border-radius: 30px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(31, 97, 141, 0.3);
+}
+
+.yomi-error-button:hover {
+  background: #154360;
+  box-shadow: 0 6px 12px rgba(31, 97, 141, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Animations */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .yomi-dashboard {
+    padding: 20px 15px;
+  }
+
+  .yomi-dashboard-header {
+    padding: 20px 15px;
+  }
+
+  .yomi-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .yomi-charts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .yomi-chart-lg {
+    grid-column: span 1;
+  }
+}
+
+@media (max-width: 576px) {
+  .yomi-stat-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .yomi-stat-card-icon {
+    margin-right: 0;
+    margin-bottom: 1rem;
+  }
+
+  .yomi-chart-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .yomi-chart-actions {
+    margin-top: 1rem;
+  }
+
+  .yomi-stat-card-value {
+    font-size: 1.75rem;
+  }
+}

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Alert, Button, Card, Spinner, Table, Modal } from "react-bootstrap";
 import axios from "axios";
-import { FaCheck, FaTimes, FaEnvelope, FaSyncAlt } from "react-icons/fa";
+import { FaCheck, FaTimes, FaEnvelope, FaSyncAlt, FaKey } from "react-icons/fa";
 import "./ResetPasswordApproval.css";
 
 interface ResetRequest {
@@ -130,8 +130,7 @@ const ResetPasswordApproval: React.FC<ResetPasswordApprovalProps> = ({
     <Card className="reset-approval-card">
       <Card.Header as="h5" className="d-flex justify-content-between align-items-center">
         <div>
-          <FaEnvelope className="me-2" /> Demandes de réinitialisation de mot de passe
-        </div>
+        <FaKey className="me-2" style={{ color: '#153a64' }} /> Demandes de réinitialisation de mot de passeè!        </div>
         <Button 
           variant="outline-secondary"
           size="sm"

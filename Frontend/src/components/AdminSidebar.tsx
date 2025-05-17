@@ -117,20 +117,20 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
         {/* Dashboard */}
         <a href="#!" className="admin-nav-item" onClick={handleDashboardClick}>
           <FontAwesomeIcon icon={faTachometerAlt} className="admin-nav-icon" />
-          <span>Dashboard</span>
+            <span>Tableau de bord</span>        
         </a>
 
         {/* Admin-only: Manage Users */}
         {role === "admin" && (
           <a href="#!" className="admin-nav-item" onClick={handleManageUsersClick}>
             <FontAwesomeIcon icon={faUsers} className="admin-nav-icon" />
-            <span>Manage Users</span>
+            <span>Gérer les utilisateurs</span>
           </a>
         )}
         {role === "admin" && (
           <a href="#!" className="admin-nav-item" onClick={handleResetPasswordClick}>
             <FontAwesomeIcon icon={faKey} className="admin-nav-icon" />
-            <span>Password Requests</span>
+            <span>mot de passe</span>
           </a>
         )}
         
@@ -138,7 +138,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
         {role === "supervisor" && (
           <a href="#!" className="admin-nav-item" onClick={handleManageContractsClick}>
             <FontAwesomeIcon icon={faFileContract} className="admin-nav-icon" />
-            <span>Users Contracts</span>
+            <span>Contrats des utilisateurs</span>
           </a>
         )}
 
@@ -146,7 +146,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
         {role === "supervisor" && (
           <a href="#!" className="admin-nav-item" onClick={handleManageClaimsClick}>
             <FontAwesomeIcon icon={faClipboardList} className="admin-nav-icon" />
-            <span>Manage Claims</span>
+            <span>Gérer les réclamations</span>
           </a>
         )}
 
@@ -161,7 +161,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
         {/* Common: Settings */}
         <a href="#!" className="admin-nav-item" onClick={handleSettingsClick}>
           <FontAwesomeIcon icon={faCog} className="admin-nav-icon" />
-          <span>Settings</span>
+          <span>Paramètres</span>
         </a>
 
         {/* Logout */}
@@ -171,7 +171,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
           onClick={handleLogout}
         >
           <FontAwesomeIcon icon={faSignOutAlt} className="admin-nav-icon" />
-          <span>Logout</span>
+          <span>Déconnexion</span>
         </NavLink>
       </nav>
     </div>

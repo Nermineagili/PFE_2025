@@ -15,7 +15,7 @@ const groq = new Groq({
 // }));
 
 const handleChat = async (req, res) => {
-  const { message, isAuthenticated = false, userId = null } = req.body;
+  const { message, isAuthenticated = false, userId = null, userName = null } = req.body;
 
   if (!message || !message.trim()) {
     return res.status(400).json({ error: 'Message requis.' });
@@ -47,11 +47,12 @@ const handleChat = async (req, res) => {
 
   // Customize prompt based on authentication status
   if (isAuthenticated && userId) {
+    const name = userName || 'Utilisateur'; // Fallback to 'Utilisateur' if name is missing
     systemPrompt += `
-      L'utilisateur est connecté (ID: ${userId}). Fournis des réponses personnalisées, par exemple :
+      L'utilisateur est connecté (Nom: ${name}). Fournis des réponses personnalisées, par exemple :
       - Pour "voir mes contrats", indique comment accéder à l'espace client.
       - Pour "déclarer un sinistre", explique le processus dans l'espace client.
-      - Si la question nécessite des données spécifiques (ex. statut d'un sinistre), suppose un scénario générique ou dis : "Veuillez vérifier votre espace client pour des détails précis."
+      - Si la question nécessite des données spécifiques (ex. statut d’un sinistre), suppose un scénario générique ou dis : "Veuillez vérifier votre espace client pour des détails précis."
     `;
   } else {
     systemPrompt += `

@@ -17,6 +17,7 @@ const path = require('path');
 const bodyParser = require('body-parser');
 
 // Route imports
+const settingsRoutes = require('./routes/settings');
 const userRoutes = require('./routes/user');
 const authRoutes = require('./routes/auth');
 const claimRoutes = require('./routes/claim');
@@ -28,7 +29,7 @@ const supervisorRoutes = require('./routes/supervisorRoutes');
 const paymentRoutes = require('./routes/payment');
 const contractController = require('./controllers/ContratController'); // Adjust path as needed
 const chatRoutes = require('./routes/chat');
-
+const dashboardRoutes = require('./routes/dashboard');
 const app = express();
 const PORT = process.env.PORT || 5000;
 const cron = require('node-cron');
@@ -96,6 +97,8 @@ app.use('/api/contracts', contratRoutes);
 app.use('/api/supervisor', supervisorRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use('/api', chatRoutes);
+app.use('/api/settings', settingsRoutes);
+app.use('/api/dashboard' , dashboardRoutes); 
 // MongoDB Connection 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ MongoDB connected!'))

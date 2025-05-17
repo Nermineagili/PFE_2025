@@ -2,15 +2,26 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import axios from "axios";
-import { Badge, Table, Spinner, Container, Card, Button } from "react-bootstrap";
+import { Badge, Table, Spinner, Container, Card, Button, Modal } from "react-bootstrap";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { FiX } from "react-icons/fi";
 import "./MesDeclarations.css";
-import ChatBot from "../components/ChatBot/ChatBot";
+
 interface Claim {
   _id: string;
+  firstName?: string;
+  lastName?: string;
+  birthDate?: { day: number; month: number; year: number };
+  sexe?: string;
+  phone?: string;
+  address?: string;
+  postalAddress?: string;
+  city?: string;
+  postalCode?: string;
+  email?: string;
+  stateProvince?: string;
   incidentDescription: string;
-  status: 'pending' | 'approved' | 'rejected';
+  status: "pending" | "approved" | "rejected";
   createdAt: string;
   updatedAt: string;
 }
@@ -22,6 +33,8 @@ const MesDeclarations = () => {
   const [loading, setLoading] = useState(true);
   const [showToast, setShowToast] = useState(false);
   const [updatedClaims, setUpdatedClaims] = useState<Claim[]>([]);
+  const [selectedClaim, setSelectedClaim] = useState<Claim | null>(null);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const fetchClaims = async () => {
@@ -29,22 +42,22 @@ const MesDeclarations = () => {
         try {
           const response = await axios.get(`http://localhost:5000/api/claims/user/${user._id}`);
           const fetchedClaims = response.data;
-        
+
           // Gestion des mises à jour
           const lastVisit = localStorage.getItem(`lastVisit_${user._id}`);
           if (lastVisit) {
-            const newUpdates = fetchedClaims.filter((claim: { updatedAt: string | number | Date; status: string; }) =>
-              new Date(claim.updatedAt) > new Date(lastVisit) &&
-              claim.status !== 'pending'
+            const newUpdates = fetchedClaims.filter(
+              (claim: { updatedAt: string | number | Date; status: string }) =>
+                new Date(claim.updatedAt) > new Date(lastVisit) && claim.status !== "pending"
             );
-        
+
             if (newUpdates.length > 0) {
               setUpdatedClaims(newUpdates);
               setShowToast(true);
               setTimeout(() => setShowToast(false), 5000);
             }
           }
-        
+
           setClaims(fetchedClaims); // même si vide, c’est correct
         } catch (error: any) {
           // Si le backend renvoie une 404, on considère simplement qu’il n’y a pas encore de déclarations
@@ -56,14 +69,13 @@ const MesDeclarations = () => {
         } finally {
           setLoading(false);
         }
-        
       } else {
         navigate("/signin");
       }
     };
 
     fetchClaims();
-    
+
     // Set current visit time
     if (user) {
       localStorage.setItem(`lastVisit_${user._id}`, new Date().toISOString());
@@ -86,7 +98,22 @@ const MesDeclarations = () => {
   };
 
   const isClaimUpdated = (claimId: string) => {
-    return updatedClaims.some(c => c._id === claimId);
+    return updatedClaims.some((c) => c._id === claimId);
+  };
+
+  const handleShowDetails = async (claimId: string) => {
+    try {
+      const response = await axios.get(`http://localhost:5000/api/claims/user/${user?._id}/${claimId}`);
+      setSelectedClaim(response.data);
+      setShowModal(true);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des détails de la déclaration", error);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedClaim(null);
   };
 
   return (
@@ -109,8 +136,7 @@ const MesDeclarations = () => {
         <Card className="declarations-card">
           <Card.Body>
             <h2 className="declarations-title">Mes Déclarations</h2>
-            
-            
+
             {loading ? (
               <div className="text-center">
                 <Spinner animation="border" variant="primary" />
@@ -119,7 +145,7 @@ const MesDeclarations = () => {
             ) : claims.length === 0 ? (
               <div className="text-center py-4">
                 <p>Aucune déclaration trouvée</p>
-                <Button variant="outline-primary" onClick={() => navigate('/clienthome')}>
+                <Button variant="outline-primary" onClick={() => navigate("/clienthome")}>
                   Faire une déclaration
                 </Button>
               </div>
@@ -145,21 +171,20 @@ const MesDeclarations = () => {
                             : claim.incidentDescription}
                         </td>
                         <td>
-                          <Badge 
-                            pill 
-                            bg={getStatusBadgeColor(claim.status)}
-                            className="status-badge"
-                          >
-                            {claim.status === 'pending' ? 'En attente' : 
-                             claim.status === 'approved' ? 'Approuvé' : 'Rejeté'}
+                          <Badge pill bg={getStatusBadgeColor(claim.status)} className="status-badge">
+                            {claim.status === "pending"
+                              ? "En attente"
+                              : claim.status === "approved"
+                              ? "Approuvé"
+                              : "Rejeté"}
                           </Badge>
                         </td>
-                        <td>{new Date(claim.createdAt).toLocaleDateString('fr-FR')}</td>
+                        <td>{new Date(claim.createdAt).toLocaleDateString("fr-FR")}</td>
                         <td>
-                          <Button 
-                            variant="outline-primary" 
+                          <Button
+                            variant="outline-primary"
                             size="sm"
-                            onClick={() => navigate(`/claim-details/${claim._id}`)}
+                            onClick={() => handleShowDetails(claim._id)}
                           >
                             Détails
                           </Button>
@@ -173,7 +198,50 @@ const MesDeclarations = () => {
           </Card.Body>
         </Card>
       </Container>
-      <ChatBot isAuthenticated={false} initialMessages={[]} />
+
+      {/* Modal for Claim Details */}
+      <Modal show={showModal} onHide={handleCloseModal} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Détails de la Déclaration</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {selectedClaim ? (
+            <div>
+              <p><strong>Référence:</strong> #{selectedClaim._id.slice(-6).toUpperCase()}</p>
+              <p><strong>Nom:</strong> {selectedClaim.firstName} {selectedClaim.lastName}</p>
+              <p><strong>Date de naissance:</strong> {selectedClaim.birthDate
+                ? `${selectedClaim.birthDate.day}/${selectedClaim.birthDate.month}/${selectedClaim.birthDate.year}`
+                : "N/A"}</p>
+              <p><strong>Sexe:</strong> {selectedClaim.sexe === "homme" ? "Homme" : "Femme"}</p>
+              <p><strong>Téléphone:</strong> {selectedClaim.phone}</p>
+              <p><strong>Adresse:</strong> {selectedClaim.address}</p>
+              <p><strong>Adresse postale:</strong> {selectedClaim.postalAddress}</p>
+              <p><strong>Ville:</strong> {selectedClaim.city}</p>
+              <p><strong>Code postal:</strong> {selectedClaim.postalCode}</p>
+              <p><strong>Email:</strong> {selectedClaim.email}</p>
+              <p><strong>Province/État:</strong> {selectedClaim.stateProvince}</p>
+              <p><strong>Description de l'incident:</strong> {selectedClaim.incidentDescription}</p>
+              <p><strong>Statut:</strong> 
+                {selectedClaim.status === "pending"
+                  ? "En attente"
+                  : selectedClaim.status === "approved"
+                  ? "Approuvé"
+                  : "Rejeté"}
+              </p>
+              <p><strong>Date de création:</strong> {new Date(selectedClaim.createdAt).toLocaleDateString("fr-FR")}</p>
+            </div>
+          ) : (
+            <p>Chargement des détails...</p>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseModal}>
+            Fermer
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* <ChatBot isAuthenticated={true} initialMessages={[]} /> */}
     </section>
   );
 };

@@ -38,16 +38,50 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Filter Toggle Styles */
+/* Search and Filter Container - Updated */
 .manage-users-filter-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   margin-bottom: 1.5rem;
-  padding: 0.8rem 1.2rem;
+}
+
+/* Search Input Styles - Updated */
+.manage-users-search-wrapper {
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.manage-users-search-input {
+  height: 48px;
+  border-radius: 24px !important;
+  padding-left: 48px !important;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.manage-users-search-input:focus {
+  border-color: #153a64;
+  box-shadow: 0 4px 12px rgba(21, 58, 100, 0.15);
+}
+
+.manage-users-search-icon {
+  position: absolute;
+  left: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #153a64;
+  z-index: 10;
+}
+
+/* Filter Section Styles - Updated */
+.manage-users-filter-section {
   background-color: #f8f9fa;
-  border-radius: 10px;
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
   border-left: 4px solid #153a64;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
 }
 
 .manage-users-filter-title {
@@ -62,44 +96,7 @@
 .manage-users-filter-icon {
   margin-right: 10px;
   color: #c19048;
-}
-
-.manage-users-filter-switch .form-check-input {
-  height: 1.5rem;
-  width: 3rem;
-  cursor: pointer;
-}
-
-.manage-users-filter-switch .form-check-input:checked {
-  background-color: #153a64;
-  border-color: #153a64;
-}
-
-.manage-users-filter-switch .form-check-input:focus {
-  box-shadow: 0 0 0 0.25rem rgba(21, 58, 100, 0.25);
-}
-
-.manage-users-custom-switch .form-check-input:before {
-  content: '';
-  position: absolute;
-  width: 1.1rem;
-  height: 1.1rem;
-  border-radius: 50%;
-  top: 0.2rem;
-  left: 0.2rem;
-  background-color: white;
-  transition: transform 0.15s ease-in-out;
-}
-
-.manage-users-custom-switch .form-check-input:checked:before {
-  transform: translateX(1.5rem);
-}
-
-.manage-users-filter-switch .form-check-label {
-  cursor: pointer;
-  padding-left: 0.5rem;
-  font-weight: 500;
-  color: #495057;
+  font-size: 1.2rem;
 }
 
 .manage-users-filter-count {
@@ -111,6 +108,35 @@
   border-radius: 20px;
   font-size: 0.8rem;
   font-weight: 500;
+}
+
+.manage-users-filter-switch {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+.manage-users-custom-switch .form-check-input {
+  height: 1.5rem;
+  width: 3rem;
+  cursor: pointer;
+}
+
+.manage-users-custom-switch .form-check-input:checked {
+  background-color: #153a64;
+  border-color: #153a64;
+}
+
+.manage-users-custom-switch .form-check-input:focus {
+  box-shadow: 0 0 0 0.25rem rgba(21, 58, 100, 0.25);
+}
+
+.manage-users-custom-switch .form-check-label {
+  cursor: pointer;
+  padding-left: 0.5rem;
+  font-weight: 500;
+  color: #495057;
+  margin-bottom: 0;
 }
 
 /* Table Styles */
@@ -203,7 +229,7 @@
   color: white;
 }
 
-.role-supervisor {
+.role-supervisor, .role-superviseur {
   background-color: #c19048;
   color: white;
 }
@@ -233,6 +259,7 @@
   font-weight: 600;
   display: flex;
   align-items: center;
+  color: white;
 }
 
 .manage-users-modal-header .btn-close {
@@ -273,6 +300,19 @@
   margin-bottom: 0.5rem;
 }
 
+/* Toggle Reset Button */
+.toggle-reset-btn {
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.toggle-reset-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
 /* Responsive Adjustments */
 @media (max-width: 768px) {
   .manage-users-container {
@@ -285,10 +325,16 @@
     gap: 1rem;
   }
   
-  .manage-users-filter-container {
+  .manage-users-filter-section {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.75rem;
+    gap: 1rem;
+  }
+  
+  .manage-users-filter-switch {
+    margin-left: 0;
+    margin-top: 0.5rem;
+    width: 100%;
   }
   
   .manage-users-table {

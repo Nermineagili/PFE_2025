@@ -2,6 +2,7 @@ import { useAuth } from '../context/AuthContext';
 import HomePage from './HomePage';
 import AdminHome from './AdminHome';
 import Postlogin from '../components/ChatBot/Postlogin';
+import ChatBot from '../components/ChatBot/ChatBot';
 
 const ClientHome = () => {
   const { user } = useAuth();
@@ -13,7 +14,7 @@ const ClientHome = () => {
       ) : (
         <>
           <HomePage extraFeature="true" />
-          <Postlogin userType="client" />
+          {/* <ChatBot isAuthenticated={true} initialMessages={[]} /> */}
         </>
       )}
     </div>

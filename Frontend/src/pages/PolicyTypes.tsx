@@ -101,7 +101,7 @@ const PolicyType: React.FC<PolicyTypeProps> = ({ onSelectPolicyType, standalone 
           </div>
         ))}
       </div>
-      <ChatBot isAuthenticated={false} initialMessages={[]} />
+      {/* <ChatBot isAuthenticated={false} initialMessages={[]} /> */}
     </section>
   );
 };

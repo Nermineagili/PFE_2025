@@ -440,7 +440,24 @@ exports.executeRenewal = async (req, res) => {
     });
   }
 };
-
+// Helper function for expiration email content
+function generateExpirationEmailContent(user, contract) {
+  const renewalLink = `${process.env.FRONTEND_URL}/mes-contrats`;
+  return `
+    <h2>Bonjour ${user.name || user.username},</h2>
+    <p>Votre contrat <strong>${contract.policyType}</strong> a expiré.</p>
+    <p><strong>Détails du contrat :</strong></p>
+    <ul>
+      <li>Référence : ${contract._id}</li>
+      <li>Date de fin : ${new Date(contract.endDate).toLocaleDateString()}</li>
+      <li>Montant : ${contract.premiumAmount} €</li>
+    </ul>
+    <p>Pour renouveler votre contrat, veuillez cliquer sur le lien ci-dessous :</p>
+    <p><a href="${renewalLink}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; border-radius: 5px;">Renouveler mon contrat</a></p>
+    <p>Vous serez redirigé vers la page "Mes Contrats" pour procéder au renouvellement.</p>
+    <p>Si vous avez des questions, n'hésitez pas à nous contacter.</p>
+  `;
+}
 // Helper function for email content
 function generateRenewalEmailContent(user, oldContract, newContract) {
   return `
@@ -523,7 +540,7 @@ exports.fixContractStatuses = async (req, res) => {
     const currentDate = new Date();
     console.log(`[Contract Status Update] Running at ${currentDate.toISOString()}`);
 
-    // 1. First handle expired contracts
+    // 1. Handle expired contracts
     const expiredContracts = await Contract.find({
       endDate: { $lt: currentDate },
       status: { $in: ['active', 'pending_payment'] } // Only these should expire
@@ -531,9 +548,11 @@ exports.fixContractStatuses = async (req, res) => {
 
     console.log(`Found ${expiredContracts.length} contracts to expire`);
 
+    // Update contracts to expired and send emails
+    const expiredContractIds = expiredContracts.map(c => c._id);
     const expiredResult = await Contract.updateMany(
       { 
-        _id: { $in: expiredContracts.map(c => c._id) },
+        _id: { $in: expiredContractIds },
         status: { $in: ['active', 'pending_payment'] }
       },
       { 
@@ -543,6 +562,25 @@ exports.fixContractStatuses = async (req, res) => {
         } 
       }
     );
+
+    // Send expiration emails for each expired contract
+    for (const contract of expiredContracts) {
+      try {
+        const user = await User.findById(contract.userId);
+        if (user) {
+          await sendEmail(
+            user.email,
+            'Votre contrat a expiré',
+            generateExpirationEmailContent(user, contract)
+          );
+          console.log(`Expiration email sent to ${user.email} for contract ${contract._id}`);
+        } else {
+          console.warn(`User not found for contract ${contract._id}`);
+        }
+      } catch (emailError) {
+        console.error(`Failed to send expiration email for contract ${contract._id}:`, emailError);
+      }
+    }
 
     // 2. Handle pending payments that should be active
     const pendingContracts = await Contract.find({

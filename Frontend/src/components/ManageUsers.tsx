@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Table, Button, Alert, Spinner, Card, Container, Modal, OverlayTrigger, Tooltip, Form, Row, Col } from "react-bootstrap";
-import { FaRegEdit, FaRegTrashAlt, FaFilter, FaUserCheck, FaUserPlus, FaKey } from 'react-icons/fa';
+
+import { Table, Button, Alert, Spinner, Card, Container, Modal, OverlayTrigger, Tooltip, Form, Row, Col, InputGroup } from "react-bootstrap";
+import { FaRegEdit, FaRegTrashAlt, FaFilter, FaUserCheck, FaUserPlus, FaKey, FaSearch } from 'react-icons/fa';
 import EditUser from "./EditUser";
 import ResetPasswordApproval from "../pages/ResetPasswordApproval";
 import { useLocation } from "react-router-dom";
@@ -29,11 +30,9 @@ const extractResetParams = () => {
   const url = new URL(window.location.href);
   const pathParts = url.pathname.split('/');
   
-  // Vérifie si c'est une URL d'approbation de réinitialisation admin
   if (pathParts.includes('approve-reset')) {
     const token = pathParts[pathParts.indexOf('approve-reset') + 1];
     const userId = pathParts[pathParts.indexOf('approve-reset') + 2];
-    
     return { token, userId };
   }
   
@@ -63,39 +62,38 @@ function ManageUsers() {
   const [addUserLoading, setAddUserLoading] = useState<boolean>(false);
   const [addUserError, setAddUserError] = useState<string | null>(null);
   const [addUserSuccess, setAddUserSuccess] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [searchLoading, setSearchLoading] = useState<boolean>(false);
   
-  // Pour l'approbation de réinitialisation de mot de passe
   const [showResetSection, setShowResetSection] = useState<boolean>(false);
   const location = useLocation();
   const { token: resetToken, userId: resetUserId } = extractResetParams();
 
-  // Si un token de réinitialisation est dans l'URL, affiche automatiquement la section d'approbation
   useEffect(() => {
     if (resetToken && resetUserId) {
       setShowResetSection(true);
     }
   }, [resetToken, resetUserId]);
 
-
-  const fetchUsers = async () => {
+  const fetchUsers = async (search: string = "") => {
     setLoading(true);
+    setSearchLoading(!!search);
     try {
       const token = localStorage.getItem("authToken");
       if (!token) throw new Error("Aucun token d'authentification trouvé.");
 
-      // D'abord, obtenir le nombre total d'utilisateurs comme référence
-      if (!totalUsers) {
+      if (!totalUsers && !search) {
         const allUsersResponse = await axios.get<User[]>(`${API_BASE_URL}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        
         if (Array.isArray(allUsersResponse.data)) {
           setTotalUsers(allUsersResponse.data.length);
         }
       }
 
-      // Puis obtenir soit les utilisateurs filtrés soit tous selon le paramètre de filtre
-      const url = filterContracts
+      const url = search
+        ? `${API_BASE_URL2}/search-users?query=${encodeURIComponent(search)}`
+        : filterContracts
         ? `${API_BASE_URL2}/users-with-contracts-only`
         : `${API_BASE_URL}`;
 
@@ -112,6 +110,7 @@ function ManageUsers() {
       setError("Échec de la récupération des utilisateurs.");
     } finally {
       setLoading(false);
+      setSearchLoading(false);
     }
   };
 
@@ -123,12 +122,11 @@ function ManageUsers() {
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedUserId(null);
-    fetchUsers();
+    fetchUsers(searchQuery);
   };
 
   const handleAddUserModal = () => {
     setShowAddModal(true);
-    // Réinitialiser le formulaire et les messages lors de l'ouverture de la modal
     setAddUserFormData({
       name: "",
       lastname: "",
@@ -160,6 +158,12 @@ function ManageUsers() {
     });
   };
 
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    fetchUsers(query);
+  };
+
   const handleAddUser = async (e: React.FormEvent) => {
     e.preventDefault();
     setAddUserLoading(true);
@@ -177,7 +181,6 @@ function ManageUsers() {
       );
 
       setAddUserSuccess("Utilisateur créé avec succès !");
-      // Réinitialiser le formulaire
       setAddUserFormData({
         name: "",
         lastname: "",
@@ -185,15 +188,10 @@ function ManageUsers() {
         password: "",
         role: "user"
       });
-      
-      // Actualiser la liste des utilisateurs
-      fetchUsers();
-      
-      // Fermer la modal après un court délai pour afficher le message de succès
+      fetchUsers(searchQuery);
       setTimeout(() => {
         setShowAddModal(false);
       }, 1500);
-      
     } catch (err: any) {
       console.error("Erreur lors de la création de l'utilisateur:", err);
       setAddUserError(err.response?.data?.error || "Échec de la création de l'utilisateur.");
@@ -212,6 +210,7 @@ function ManageUsers() {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUsers(users.filter((user) => user._id !== id));
+      setFilteredCount(prev => prev - 1);
     } catch (err) {
       console.error("Erreur lors de la suppression de l'utilisateur:", err);
       alert("Échec de la suppression de l'utilisateur.");
@@ -220,20 +219,11 @@ function ManageUsers() {
 
   useEffect(() => {
     fetchUsers();
-  }, [filterContracts]); // recharger quand le filtre change
+  }, [filterContracts]);
 
   return (
     <Container className="manage-users-container">
-      {/* Section d'approbation de réinitialisation de mot de passe */}
-      {/* {showResetSection && (
-  <ResetPasswordApproval 
-    tokenFromURL={resetToken}  
-    userIdFromURL={resetUserId} 
-  />
-)} */}
-
-      {/* Bouton pour basculer la section des demandes de réinitialisation */}
-      <div className="d-flex justify-content-end mb-3">
+      {/* <div className="d-flex justify-content-end mb-3">
         <Button 
           variant={showResetSection ? "outline-secondary" : "outline-primary"}
           onClick={() => setShowResetSection(!showResetSection)}
@@ -242,7 +232,7 @@ function ManageUsers() {
           <FaKey className="me-2" />
           {showResetSection ? "Masquer les demandes de réinitialisation" : "Afficher les demandes de réinitialisation"}
         </Button>
-      </div>
+      </div> */}
 
       <Card className="manage-users-card">
         <Card.Body>
@@ -257,18 +247,30 @@ function ManageUsers() {
             </Button>
           </div>
 
-          {/* Sélecteur de filtre amélioré */}
           <div className="manage-users-filter-container">
+  {/* Search Input - Now as a separate section */}
+          <div className="manage-users-search-wrapper">
+            <FaSearch className="manage-users-search-icon" />
+            <Form.Control
+              type="text"
+              placeholder="Rechercher par prénom, nom ou email"
+              value={searchQuery}
+              onChange={handleSearchChange}
+              className="manage-users-search-input"
+            />
+          </div>
+          
+          {/* Filter Toggle - Now as a separate section */}
+          <div className="manage-users-filter-section">
             <div className="manage-users-filter-title">
               <FaFilter className="manage-users-filter-icon" />
               {filterContracts ? 'Affichage des utilisateurs avec contrats' : 'Affichage de tous les utilisateurs'}
               {!loading && (
                 <span className="manage-users-filter-count">
-                  {filterContracts ? filteredCount : totalUsers}
+                  {filterContracts || searchQuery ? filteredCount : totalUsers}
                 </span>
               )}
             </div>
-            
             <div className="manage-users-filter-switch">
               <Form.Check
                 type="switch"
@@ -277,11 +279,13 @@ function ManageUsers() {
                 checked={filterContracts}
                 onChange={() => setFilterContracts(!filterContracts)}
                 className="manage-users-custom-switch"
+                disabled={!!searchQuery} // Désactiver le filtre si une recherche est active
               />
             </div>
           </div>
+        </div>
 
-          {loading && (
+          {(loading || searchLoading) && (
             <div className="manage-users-loading-spinner text-center py-4">
               <Spinner animation="border" variant="primary" />
             </div>
@@ -293,15 +297,15 @@ function ManageUsers() {
             </Alert>
           )}
 
-          {!loading && !error && users.length === 0 && (
+          {!loading && !searchLoading && !error && users.length === 0 && (
             <Alert variant="info" className="manage-users-no-users text-center">
               <FaUserCheck className="manage-users-no-users-icon mb-2" size={32} />
               <p className="mb-0">Aucun utilisateur trouvé correspondant aux critères de filtre actuels</p>
             </Alert>
           )}
 
-          {!loading && !error && users.length > 0 && (
-            <div className="manage-users-table-responsive">
+          {!loading && !searchLoading && !error && users.length > 0 && (
+            <div className="manage-users-table Upserted by Grok: table-responsive">
               <Table hover className="manage-users-table">
                 <thead>
                   <tr>
@@ -346,7 +350,6 @@ function ManageUsers() {
         </Card.Body>
       </Card>
 
-      {/* Modal d'édition */}
       <Modal show={showModal} onHide={handleCloseModal} centered className="manage-users-modal">
         <Modal.Header closeButton className="manage-users-modal-header">
           <Modal.Title className="manage-users-modal-title">Modifier l'utilisateur</Modal.Title>
@@ -361,7 +364,6 @@ function ManageUsers() {
         </Modal.Footer>
       </Modal>
 
-      {/* Modal d'ajout d'utilisateur */}
       <Modal show={showAddModal} onHide={handleCloseAddModal} centered className="manage-users-modal add-user-modal">
         <Modal.Header closeButton className="manage-users-modal-header">
           <Modal.Title className="manage-users-modal-title">
@@ -369,18 +371,16 @@ function ManageUsers() {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body className="manage-users-modal-body">
-          {addUserError && (
+          {addUserError && ( 
             <Alert variant="danger" className="mb-3">
               {addUserError}
             </Alert>
           )}
-          
           {addUserSuccess && (
             <Alert variant="success" className="mb-3">
               {addUserSuccess}
             </Alert>
           )}
-          
           <Form onSubmit={handleAddUser}>
             <Row>
               <Col md={6}>
@@ -410,7 +410,6 @@ function ManageUsers() {
                 </Form.Group>
               </Col>
             </Row>
-            
             <Form.Group className="mb-3">
               <Form.Label>Email</Form.Label>
               <Form.Control 
@@ -422,7 +421,6 @@ function ManageUsers() {
                 placeholder="Entrez l'email"
               />
             </Form.Group>
-            
             <Form.Group className="mb-3">
               <Form.Label>Mot de passe</Form.Label>
               <Form.Control 
@@ -438,7 +436,6 @@ function ManageUsers() {
                 Le mot de passe doit contenir au moins 6 caractères
               </Form.Text>
             </Form.Group>
-            
             <Form.Group className="mb-3">
               <Form.Label>Rôle</Form.Label>
               <Form.Select 
@@ -452,7 +449,6 @@ function ManageUsers() {
                 <option value="superviseur">Superviseur</option>
               </Form.Select>
             </Form.Group>
-            
             <div className="d-flex justify-content-end mt-4">
               <Button variant="secondary" onClick={handleCloseAddModal} className="me-2">
                 Annuler

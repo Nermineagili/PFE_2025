@@ -12,10 +12,11 @@ export interface Message {
 interface ChatBotProps {
   isAuthenticated: boolean;
   userId?: string | null;
+  userName?: string | null;
   initialMessages: Message[];
 }
 
-const ChatBot: React.FC<ChatBotProps> = ({ isAuthenticated, userId, initialMessages }) => {
+const ChatBot: React.FC<ChatBotProps> = ({ isAuthenticated, userId, userName, initialMessages }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [input, setInput] = useState('');
@@ -27,7 +28,6 @@ const ChatBot: React.FC<ChatBotProps> = ({ isAuthenticated, userId, initialMessa
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Focus input when chat opens
   useEffect(() => {
     if (isOpen && inputRef.current) {
       setTimeout(() => {
@@ -48,20 +48,15 @@ const ChatBot: React.FC<ChatBotProps> = ({ isAuthenticated, userId, initialMessa
       const response = await fetch('http://localhost:5000/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text, isAuthenticated, userId }),
+        body: JSON.stringify({ message: text, isAuthenticated, userId, userName }),
       });
-      
       const data = await response.json();
-      
       if (data.error) throw new Error(data.error);
-      
-      // Add a small delay to make the typing effect more natural
       setTimeout(() => {
-        setMessages((prev) => [...prev, { 
-          text: data.response, 
-          sender: 'bot',
-          options: data.options || [] 
-        }]);
+        setMessages((prev) => [
+          ...prev,
+          { text: data.response, sender: 'bot', options: data.options || [] },
+        ]);
         setIsLoading(false);
       }, 500);
     } catch (error) {
@@ -84,7 +79,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ isAuthenticated, userId, initialMessa
   };
 
   const toggleChat = () => {
-    setIsOpen(prev => !prev);
+    setIsOpen((prev) => !prev);
   };
 
   return (
@@ -102,11 +97,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ isAuthenticated, userId, initialMessa
           </div>
           <div className="chatbot-messages">
             {messages.map((msg, i) => (
-              <MsgBubble
-                key={i}
-                message={msg}
-                onOptionSelect={handleOptionSelect}
-              />
+              <MsgBubble key={i} message={msg} onOptionSelect={handleOptionSelect} />
             ))}
             {isLoading && (
               <div className="msg-bubble bot typing-indicator">
@@ -130,8 +121,8 @@ const ChatBot: React.FC<ChatBotProps> = ({ isAuthenticated, userId, initialMessa
               onKeyPress={handleKeyPress}
               disabled={isLoading}
             />
-            <button 
-              className={`send-btn ${isLoading ? 'loading' : ''}`} 
+            <button
+              className={`send-btn ${isLoading ? 'loading' : ''}`}
               onClick={() => handleSend(input)}
               disabled={isLoading || !input.trim()}
               aria-label="Envoyer"

@@ -141,7 +141,7 @@ const UserGuide: React.FC = () => {
                   <li>Appelez notre service client aux heures d'ouverture</li>
                   <li>Prenez rendez-vous avec un conseiller</li>
                 </ul>
-                <Link to="/contact">
+                <Link to="/">
                   <Button variant="primary" className="yomi-guide-button">
                     Contacter un conseiller
                   </Button>
@@ -168,7 +168,7 @@ const UserGuide: React.FC = () => {
           </Link>
         </div>
       </section>
-      <ChatBot isAuthenticated={false} initialMessages={[]} />
+      {/* <ChatBot isAuthenticated={false} initialMessages={[]} /> */}
     </div>
   );
 };

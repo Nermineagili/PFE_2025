@@ -71,3 +71,19 @@ exports.validateObjectId = (req, res, next) => {
     
     next();
 };
+exports.checkAdminOrSupervisor = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        if (!['admin', 'superviseur'].includes(user.role)) {
+            return res.status(403).json({ error: 'Access restricted to admin and supervisor roles' });
+        }
+        req.user.role = user.role; // Store role for potential use
+        next();
+    } catch (err) {
+        console.error('Authorization Error:', err);
+        res.status(500).json({ error: 'Server error during authorization' });
+    }
+};
