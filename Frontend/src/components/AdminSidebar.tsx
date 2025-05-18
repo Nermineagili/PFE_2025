@@ -127,12 +127,12 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
             <span>Gérer les utilisateurs</span>
           </a>
         )}
-        {role === "admin" && (
+        {/* {role === "admin" && (
           <a href="#!" className="admin-nav-item" onClick={handleResetPasswordClick}>
             <FontAwesomeIcon icon={faKey} className="admin-nav-icon" />
             <span>mot de passe</span>
           </a>
-        )}
+        )} */}
         
         {/* Supervisor-only: Users with Contracts */}
         {role === "supervisor" && (

@@ -113,14 +113,14 @@ const AdminHome: React.FC = () => {
           <div ref={manageDashboardRef}>
             <Dashboard />
           </div>
-          <div ref={resetPasswordRef}>
+          {/* <div ref={resetPasswordRef}>
           {showResetSection && (
   <ResetPasswordApproval 
     tokenFromURL={resetToken}  // This will be undefined if not in URL
     userIdFromURL={resetUserId} // This will be undefined if not in URL
   />
 )}
-</div>
+</div> */}
           
           <div ref={manageUsersRef}>
             <ManageUsers />

@@ -1,82 +1,88 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { Container, Card, ListGroup, Button, Spinner, Form, Alert, Modal } from "react-bootstrap";
+import React, { useEffect, useState } from 'react';
+import { Container, Card, ListGroup, Button, Spinner, Form, Alert, Modal } from 'react-bootstrap';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import AdsupNavbar from './AdsupNavbar';
 import './SupervisorMessages.css';
-import { useNavigate } from 'react-router-dom';
 
-const API_URL = "http://localhost:5000/api/contact";
-
-interface Message {
+interface Notification {
   _id: string;
-  name: string;
-  email: string;
+  userId: string;
+  type: string;
   message: string;
+  relatedId: { _id: string; name: string; email: string };
+  isRead: boolean;
   createdAt: string;
-  replied: boolean;
-  replyMessage?: string;
 }
 
 const SupervisorMessages: React.FC = () => {
   const navigate = useNavigate();
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
-  const [replySubject, setReplySubject] = useState("");
-  const [replyText, setReplyText] = useState("");
-  const [alert, setAlert] = useState<{ type: "success" | "danger"; text: string } | null>(null);
+  const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);
+  const [replySubject, setReplySubject] = useState('');
+  const [replyText, setReplyText] = useState('');
+  const [alert, setAlert] = useState<{ type: 'success' | 'danger'; text: string } | null>(null);
   const [sending, setSending] = useState(false);
 
-  // Récupérer les messages depuis le backend
-  const fetchMessages = async () => {
+  // Fetch notifications
+  const fetchNotifications = async () => {
     try {
-      const response = await axios.get(`${API_URL}/messages`);
-      setMessages(response.data);
+      const token = localStorage.getItem('authToken');
+      if (!token) throw new Error('No authentication token found');
+
+      const response = await axios.get('http://localhost:5000/api/notifications', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const contactMessages = response.data.filter((n: Notification) => n.type === 'contact_message');
+      setNotifications(contactMessages);
     } catch (error) {
-      console.error("Erreur lors de la récupération des messages:", error);
-      setAlert({ type: "danger", text: "Échec du chargement des messages. Veuillez réessayer plus tard." });
+      console.error('Error fetching notifications:', error);
+      setAlert({ type: 'danger', text: 'Failed to load messages. Please try again later.' });
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchMessages();
-    
-    // Vérifier si l'utilisateur est connecté et a le rôle de superviseur
-    const checkAccess = async () => {
-      try {
-        // Exemple : Vérification du rôle depuis votre système d'authentification
-        // const { data } = await axios.get('/api/auth/check-role');
-        // if (data.role !== 'supervisor') {
-        //   navigate('/dashboard');
-        // }
-      } catch (error) {
-        // Gérer les erreurs d'authentification
-        // navigate('/login');
-      }
-    };
-    
-    checkAccess();
-  }, [navigate]);
+    fetchNotifications();
+  }, []);
 
   const handleReply = async () => {
-    if (!selectedMessage) return;
+    if (!selectedNotification) return;
     setSending(true);
     try {
-      await axios.post(`${API_URL}/reply`, {
-        to: selectedMessage.email,
-        subject: replySubject,
-        message: replyText,
-        messageId: selectedMessage._id,
-      });
-      setAlert({ type: "success", text: "Réponse envoyée avec succès." });
-      setSelectedMessage(null);
-      setReplySubject("");
-      setReplyText("");
-      fetchMessages(); // Actualiser la liste des messages
+      const token = localStorage.getItem('authToken');
+      if (!token) throw new Error('No authentication token found');
+
+      // Send reply (assumes backend endpoint)
+      await axios.post(
+        'http://localhost:5000/api/contact/reply',
+        {
+          to: selectedNotification.relatedId.email,
+          subject: replySubject,
+          message: replyText,
+          notificationId: selectedNotification._id,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      // Mark notification as read
+      await axios.put(
+        `http://localhost:5000/api/notifications/${selectedNotification._id}/read`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setAlert({ type: 'success', text: 'Reply sent successfully.' });
+      setSelectedNotification(null);
+      setReplySubject('');
+      setReplyText('');
+      fetchNotifications();
     } catch (error) {
-      setAlert({ type: "danger", text: "Erreur lors de l'envoi de la réponse. Veuillez réessayer plus tard." });
+      console.error('Error sending reply:', error);
+      setAlert({ type: 'danger', text: 'Failed to send reply. Please try again later.' });
     } finally {
       setSending(false);
     }
@@ -85,60 +91,60 @@ const SupervisorMessages: React.FC = () => {
   return (
     <div className="supervisor-messages-layout">
       <AdsupNavbar />
-      
       <div className="supervisor-messages-content">
         <Container className="py-4 mt-5">
           <Card className="messages-card">
             <Card.Header className="messages-card-header d-flex justify-content-between align-items-center">
               <h2 className="messages-title mb-0">Boîte de réception</h2>
-              <Button 
-                variant="outline-secondary" 
+              <Button
+                variant="outline-secondary"
                 size="sm"
-                onClick={() => fetchMessages()}
+                onClick={() => fetchNotifications()}
               >
                 Actualiser
               </Button>
             </Card.Header>
             <Card.Body>
-              {alert && <Alert variant={alert.type} className="messages-alert" dismissible onClose={() => setAlert(null)}>{alert.text}</Alert>}
+              {alert && (
+                <Alert variant={alert.type} className="messages-alert" dismissible onClose={() => setAlert(null)}>
+                  {alert.text}
+                </Alert>
+              )}
 
               {loading ? (
                 <div className="text-center p-4">
                   <Spinner animation="border" />
                 </div>
+              ) : notifications.length === 0 ? (
+                <p className="text-center p-4">Aucun message trouvé.</p>
               ) : (
                 <ListGroup className="message-list">
-                  {messages.length === 0 ? (
-                    <p className="text-center p-4">Aucun message trouvé.</p>
-                  ) : (
-                    messages.map((msg) => (
-                      <ListGroup.Item key={msg._id} className="message-item">
-                        <div className="message-header">
-                          <div>
-                            <span className="message-name">{msg.name}</span>
-                            <span className="message-email">({msg.email})</span>
-                          </div>
-                          <span className={`message-badge ${msg.replied ? "bg-success" : "bg-warning text-dark"}`}>
-                            {msg.replied ? "Répondu" : "Non répondu"}
-                          </span>
+                  {notifications.map((msg) => (
+                    <ListGroup.Item key={msg._id} className="message-item">
+                      <div className="message-header">
+                        <div>
+                          <span className="message-name">{msg.relatedId.name}</span>
+                          <span className="message-email">({msg.relatedId.email})</span>
                         </div>
-                        <div className="message-date">{new Date(msg.createdAt).toLocaleString()}</div>
-                        <p className="message-content">{msg.message}</p>
-                        
-                        {!msg.replied && (
-                          <div className="message-actions">
-                            <Button 
-                              variant="primary" 
-                              className="reply-button"
-                              onClick={() => setSelectedMessage(msg)}
-                            >
-                              Répondre
-                            </Button>
-                          </div>
-                        )}
-                      </ListGroup.Item>
-                    ))
-                  )}
+                        <span className={`message-badge ${msg.isRead ? 'bg-success' : 'bg-warning text-dark'}`}>
+                          {msg.isRead ? 'Répondu' : 'Non répondu'}
+                        </span>
+                      </div>
+                      <div className="message-date">{new Date(msg.createdAt).toLocaleString()}</div>
+                      <p className="message-content">{msg.message}</p>
+                      {!msg.isRead && (
+                        <div className="message-actions">
+                          <Button
+                            variant="primary"
+                            className="reply-button"
+                            onClick={() => setSelectedNotification(msg)}
+                          >
+                            Répondre
+                          </Button>
+                        </div>
+                      )}
+                    </ListGroup.Item>
+                  ))}
                 </ListGroup>
               )}
             </Card.Body>
@@ -146,24 +152,22 @@ const SupervisorMessages: React.FC = () => {
         </Container>
       </div>
 
-      {/* Modal de réponse */}
-      <Modal 
-        show={!!selectedMessage} 
-        onHide={() => setSelectedMessage(null)}
+      <Modal
+        show={!!selectedNotification}
+        onHide={() => setSelectedNotification(null)}
         className="message-modal"
         centered
       >
         <Modal.Header closeButton className="message-modal-header">
-          <Modal.Title>Réponse à {selectedMessage?.name}</Modal.Title>
+          <Modal.Title>Réponse à {selectedNotification?.relatedId.name}</Modal.Title>
         </Modal.Header>
         <Modal.Body className="message-modal-body">
-          {selectedMessage && (
+          {selectedNotification && (
             <div className="original-message-content p-3 mb-3">
               <small>Message original :</small>
-              <p className="mb-0 mt-1">{selectedMessage.message}</p>
+              <p className="mb-0 mt-1">{selectedNotification.message}</p>
             </div>
           )}
-          
           <Form>
             <Form.Group className="mb-3">
               <Form.Label>Sujet</Form.Label>
@@ -189,15 +193,15 @@ const SupervisorMessages: React.FC = () => {
           </Form>
         </Modal.Body>
         <Modal.Footer className="message-modal-footer">
-          <Button variant="secondary" onClick={() => setSelectedMessage(null)}>
+          <Button variant="secondary" onClick={() => setSelectedNotification(null)}>
             Annuler
           </Button>
-          <Button 
-            variant="success" 
-            onClick={handleReply} 
+          <Button
+            variant="success"
+            onClick={handleReply}
             disabled={sending || !replySubject.trim() || !replyText.trim()}
           >
-            {sending ? <Spinner animation="border" size="sm" /> : "Envoyer la réponse"}
+            {sending ? <Spinner animation="border" size="sm" /> : 'Envoyer la réponse'}
           </Button>
         </Modal.Footer>
       </Modal>

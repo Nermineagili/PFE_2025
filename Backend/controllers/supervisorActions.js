@@ -95,17 +95,22 @@ const getUsersWithContractsOnly = async (req, res) => {
   }
 };
 
-//get mail messages
-  const getAllMessages = async (req, res) => {
-    try {
-      const messages = await ContactMessage.find().sort({ createdAt: -1 });
-      res.status(200).json(messages);
-    } catch (error) {
-      console.error('Erreur:', error);
-      res.status(500).json({ error: "Erreur lors de la récupération des messages." });
+
+// Get all messages (Superviseur only)
+const getAllMessages = async (req, res) => {
+  try {
+    if (req.user.role !== 'superviseur') {
+      return res.status(403).json({ error: 'Access denied: Supervisor role required' });
     }
-  };
-  
+    const messages = await ContactMessage.find()
+      .sort({ createdAt: -1 })
+      .populate('userId', 'name email');
+    res.status(200).json(messages);
+  } catch (error) {
+    console.error('Error fetching messages:', error.message);
+    res.status(500).json({ error: "Failed to fetch messages", details: error.message });
+  }
+};
 
 module.exports = {
     getAllClaims,

@@ -5,15 +5,15 @@ import SignUp from './pages/SignUp';
 import SignIn from './pages/SignIn';
 import ClientHome from './pages/ClientHome';
 import AdminHome from './pages/AdminHome';
-import { AuthProvider, useAuth } from "./context/AuthContext"; 
-import { ThemeProvider } from "./context/ThemeContext"; 
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { Suspense } from 'react';
 import ClaimForm from './pages/ClaimForm';
 import EditUser from './components/EditUser';
 import '@fortawesome/fontawesome-free/css/all.css';
 import MesDeclarations from './pages/MesDeclarations';
-import Settings from './components/Settings'; 
-import './styles/theme.css'; 
+import Settings from './components/Settings';
+import './styles/theme.css';
 import SubscribeForm from './components/SubscribeForm';
 import UserGuide from './pages/UserGuide';
 import Layout from './pages/Layout';
@@ -26,8 +26,10 @@ import StripeWrapper from './components/StripeWrapper';
 import ManageUsers from './components/ManageUsers';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import ResetPasswordApproval from './pages/ResetPasswordApproval';
 
 function App() {
+  console.log('[App] Initializing app');
   return (
     <AuthProvider>
       <ThemeProvider>
@@ -43,12 +45,13 @@ function App() {
 
 function AppContent() {
   const { isLoggedIn, user } = useAuth();
+  console.log('[AppContent] isLoggedIn:', isLoggedIn, 'User role:', user?.role);
 
   return (
     <Routes>
       {/* Homepage */}
-      <Route 
-        path="/" 
+      <Route
+        path="/"
         element={
           !isLoggedIn ? (
             <HomePage />
@@ -56,21 +59,22 @@ function AppContent() {
             <Navigate to="/adminhome" replace />
           ) : user?.role === 'superviseur' ? (
             <Navigate to="/supervisorhome" replace />
-          )
-          : (
+          ) : (
             <Navigate to="/clienthome" replace />
           )
-        } 
+        }
       />
 
       {/* Auth */}
       <Route path="/signup" element={!isLoggedIn ? <SignUp /> : <Navigate to="/" replace />} />
       <Route path="/signin" element={!isLoggedIn ? <SignIn /> : <Navigate to="/" replace />} />
       <Route path="/forgot-password" element={!isLoggedIn ? <ForgotPassword /> : <Navigate to="/" replace />} />
-      <Route 
-        path="/reset-password/:token" 
-        element={!isLoggedIn ? <ResetPassword /> : <Navigate to="/" replace />} 
-      />      {/* Routes with Layout */}
+      <Route
+        path="/reset-password/:token"
+        element={!isLoggedIn ? <ResetPassword /> : <Navigate to="/" replace />}
+      />
+
+      {/* Routes with Layout */}
       <Route element={<Layout />}>
         <Route path="/policytypes" element={<PolicyType />} />
         <Route path="/claimform" element={<ClaimForm />} />
@@ -78,31 +82,47 @@ function AppContent() {
         <Route path="/mes-declarations" element={<MesDeclarations />} />
         <Route path="/guide" element={<UserGuide />} />
         <Route path="/mes-contrats" element={<MesContrats />} />
-        // In your router configuration
-        <Route path= "/payment-success" element={<PaymentSuccess />}/>
+        <Route path="/payment-success" element={<PaymentSuccess />} />
       </Route>
 
       {/* Routes without Layout */}
-      <Route 
-          path="/clienthome" 
-          element={isLoggedIn && user?.role === 'user' ? <ClientHome /> : <Navigate to="/" replace />} 
-        />
-      <Route 
-        path="/adminhome" 
-        element={isLoggedIn && user?.role === 'admin' ? <AdminHome /> : <Navigate to="/" replace />} 
+      <Route
+        path="/clienthome"
+        element={isLoggedIn && user?.role === 'user' ? <ClientHome /> : <Navigate to="/" replace />}
       />
-      <Route path="/admin/approve-reset/:token/:userId" element={isLoggedIn && user?.role === 'admin' ?<ManageUsers />: <Navigate to="/" replace />} />
-
-      <Route 
-        path="/supervisorhome" 
-        element={isLoggedIn && user?.role === 'superviseur' ? <SupervisorHome /> : <Navigate to="/" replace />} 
+      <Route
+        path="/adminhome"
+        element={isLoggedIn && user?.role === 'admin' ? <AdminHome /> : <Navigate to="/" replace />}
       />
-<Route 
-  path="/supervisor-messages" 
-  element={isLoggedIn && user?.role === 'superviseur' ? <SupervisorMessages /> : <Navigate to="/" replace />} 
-/>
+      <Route
+        path="/admin/approve-reset/:token/:userId"
+        element={isLoggedIn && user?.role === 'admin' ? <ManageUsers /> : <Navigate to="/" replace />}
+      />
+      <Route
+        path="/supervisorhome"
+        element={isLoggedIn && user?.role === 'superviseur' ? <SupervisorHome /> : <Navigate to="/" replace />}
+      />
+      <Route
+        path="/supervisor-messages"
+        element={isLoggedIn && user?.role === 'superviseur' ? <SupervisorMessages /> : <Navigate to="/" replace />}
+      />
+      <Route
+        path="/admin-reset-approval"
+        element={isLoggedIn && user?.role === 'admin' ? <ResetPasswordApproval /> : <Navigate to="/" replace />}
+      />
       <Route path="/settings" element={<Settings />} />
       <Route path="/admin/edit-user/:id" element={<EditUserWrapper />} />
+
+      {/* Catch-all route */}
+      <Route
+        path="*"
+        element={
+          <div className="container mt-5">
+            <h2>404 - Page Not Found</h2>
+            <p>The requested page does not exist.</p>
+          </div>
+        }
+      />
     </Routes>
   );
 }

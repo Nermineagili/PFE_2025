@@ -844,7 +844,7 @@ const SubscribeForm: React.FC<SubscribeFormProps> = ({ existingContract }) => {
           {isProcessing ? 'Traitement en cours...' : 'Souscrire et payer'}
         </button>
       </form>
-      <ChatBot />
+      <ChatBot isAuthenticated={true} initialMessages={[]} />
     </div>
   );
 };

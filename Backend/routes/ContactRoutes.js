@@ -1,10 +1,14 @@
 const express = require("express");
 const { sendContactEmail,replyToUser } = require("../controllers/contactController");
-const {getAllMessages} = require("../controllers/supervisorActions")
+const {getAllMessages} = require("../controllers/supervisorActions");
+const { authenticateToken } = require('../middleware/authMiddleware');
 const router = express.Router();
 
-router.post("/", sendContactEmail);
-router.post("/reply", replyToUser); // 👈 NEW ROUTE
+// No authentication for sending contact message
+router.post('/', sendContactEmail);
+
+// Require authentication for replying
+router.post('/reply', authenticateToken, replyToUser);
 // GET /contact/messages
 router.get('/messages', getAllMessages);
 

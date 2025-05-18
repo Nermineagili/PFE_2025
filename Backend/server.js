@@ -30,6 +30,7 @@ const paymentRoutes = require('./routes/payment');
 const contractController = require('./controllers/ContratController'); // Adjust path as needed
 const chatRoutes = require('./routes/chat');
 const dashboardRoutes = require('./routes/dashboard');
+const notificationRoutes = require('./routes/notificationRoutes');
 const app = express();
 const PORT = process.env.PORT || 5000;
 const cron = require('node-cron');
@@ -99,6 +100,7 @@ app.use("/api/payment", paymentRoutes);
 app.use('/api', chatRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/dashboard' , dashboardRoutes); 
+app.use('/api/notifications', notificationRoutes);
 // MongoDB Connection 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ MongoDB connected!'))
