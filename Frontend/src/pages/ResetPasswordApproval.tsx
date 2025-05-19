@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Alert, Button, Card, Spinner, Table, Modal } from 'react-bootstrap';
 import axios from 'axios';
-import { FaCheck, FaSyncAlt, FaKey } from 'react-icons/fa';
+import { FaCheck, FaSyncAlt, FaKey, FaClipboard, FaExclamationTriangle } from 'react-icons/fa';
 import './ResetPasswordApproval.css';
 
 interface Notification {
@@ -21,6 +21,8 @@ const ResetPasswordApproval: React.FC = () => {
   const [success, setSuccess] = useState<string | null>(null);
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [resetLink, setResetLink] = useState<string | null>(null);
+  const [copied, setCopied] = useState<boolean>(false);
+  const [showConfirmModal, setShowConfirmModal] = useState<{ id: string; userId: string; name: string } | null>(null);
 
   const fetchNotifications = async () => {
     setLoading(true);
@@ -39,7 +41,7 @@ const ResetPasswordApproval: React.FC = () => {
       console.error('Failed to fetch notifications:', err);
       setError(
         axios.isAxiosError(err)
-          ? err.response?.data?.error || err.message
+          ? err.response?.data?.error || err.response?.data?.details || err.message
           : err instanceof Error
             ? err.message
             : 'Failed to load password reset requests'
@@ -53,6 +55,7 @@ const ResetPasswordApproval: React.FC = () => {
     setProcessingId(notificationId);
     setSuccess(null);
     setError(null);
+    setResetLink(null);
 
     try {
       const token = localStorage.getItem('authToken');
@@ -86,6 +89,45 @@ const ResetPasswordApproval: React.FC = () => {
       );
     } finally {
       setProcessingId(null);
+      setShowConfirmModal(null);
+    }
+  };
+
+  const copyToClipboard = () => {
+    if (resetLink) {
+      navigator.clipboard.writeText(resetLink)
+        .then(() => {
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+        })
+        .catch(err => {
+          console.error('Failed to copy:', err);
+        });
+    }
+  };
+
+  const formatDateRelative = (dateString: string) => {
+    const now = new Date();
+    const date = new Date(dateString);
+    const diffTime = Math.abs(now.getTime() - date.getTime());
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
+    const diffMinutes = Math.floor(diffTime / (1000 * 60));
+    
+    if (diffMinutes < 60) {
+      return `Il y a ${diffMinutes} minute${diffMinutes !== 1 ? 's' : ''}`;
+    } else if (diffHours < 24) {
+      return `Il y a ${diffHours} heure${diffHours !== 1 ? 's' : ''}`;
+    } else if (diffDays < 3) {
+      return `Il y a ${diffDays} jour${diffDays !== 1 ? 's' : ''}`;
+    } else {
+      return date.toLocaleDateString('fr-FR', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
     }
   };
 
@@ -97,7 +139,7 @@ const ResetPasswordApproval: React.FC = () => {
     <Card className="reset-approval-card">
       <Card.Header as="h5" className="d-flex justify-content-between align-items-center">
         <div>
-          <FaKey className="me-2" style={{ color: '#153a64' }} /> Demandes de réinitialisation de mot de passe
+          <FaKey className="me-2" /> Demandes de réinitialisation de mot de passe
         </div>
         <Button
           variant="outline-secondary"
@@ -105,23 +147,45 @@ const ResetPasswordApproval: React.FC = () => {
           onClick={fetchNotifications}
           disabled={loading}
         >
-          <FaSyncAlt className={loading ? 'spin' : ''} />
+          <FaSyncAlt className={loading ? 'spin' : ''} /> {loading ? '' : 'Actualiser'}
         </Button>
       </Card.Header>
 
       <Card.Body>
         {error && (
           <Alert variant="danger" onClose={() => setError(null)} dismissible>
-            {error}
+            <div className="d-flex align-items-center">
+              <FaExclamationTriangle className="me-2" />
+              <div>{error}</div>
+            </div>
           </Alert>
         )}
+        
         {success && (
           <Alert variant="success" onClose={() => setSuccess(null)} dismissible>
-            {success}
+            <div className="d-flex align-items-center mb-2">
+              <FaCheck className="me-2" />
+              <div>{success}</div>
+            </div>
             {resetLink && (
-              <div className="mt-2">
+              <div className="mt-3">
                 <small>Lien de réinitialisation :</small>
-                <div className="reset-link-box">{resetLink}</div>
+                <div className="d-flex align-items-center">
+                  <div className="reset-link-box flex-grow-1">
+                    {resetLink}
+                  </div>
+                  <Button 
+                    variant="outline-primary" 
+                    size="sm" 
+                    className="ms-2" 
+                    onClick={copyToClipboard}
+                  >
+                    <FaClipboard /> {copied ? 'Copié!' : 'Copier'}
+                  </Button>
+                </div>
+                <small className="d-block mt-2 text-muted">
+                  Partagez ce lien avec l'utilisateur pour qu'il puisse réinitialiser son mot de passe.
+                </small>
               </div>
             )}
           </Alert>
@@ -130,10 +194,16 @@ const ResetPasswordApproval: React.FC = () => {
         {loading ? (
           <div className="text-center py-4">
             <Spinner animation="border" variant="primary" />
-            <p className="mt-2">Chargement des demandes...</p>
+            <p className="mt-3 text-muted">Chargement des demandes de réinitialisation...</p>
           </div>
         ) : notifications.length === 0 ? (
-          <Alert variant="info">Aucune demande de réinitialisation en attente</Alert>
+          <Alert variant="info">
+            <div className="text-center py-3">
+              <FaKey className="mb-3" style={{ fontSize: '2rem', opacity: 0.7 }} />
+              <h5>Aucune demande en attente</h5>
+              <p className="mb-0">Toutes les demandes de réinitialisation de mot de passe ont été traitées.</p>
+            </div>
+          </Alert>
         ) : (
           <div className="table-responsive">
             <Table hover className="reset-requests-table">
@@ -148,14 +218,18 @@ const ResetPasswordApproval: React.FC = () => {
               <tbody>
                 {notifications.map((notification) => (
                   <tr key={notification._id}>
-                    <td>{notification.relatedId.name}</td>
+                    <td className="fw-semibold">{notification.relatedId.name}</td>
                     <td>{notification.relatedId.email}</td>
-                    <td>{new Date(notification.createdAt).toLocaleString()}</td>
+                    <td>{formatDateRelative(notification.createdAt)}</td>
                     <td>
                       <Button
                         variant="success"
                         size="sm"
-                        onClick={() => handleApproveRequest(notification._id, notification.relatedId._id)}
+                        onClick={() => setShowConfirmModal({
+                          id: notification._id,
+                          userId: notification.relatedId._id,
+                          name: notification.relatedId.name
+                        })}
                         disabled={processingId === notification._id}
                       >
                         {processingId === notification._id ? (
@@ -177,6 +251,49 @@ const ResetPasswordApproval: React.FC = () => {
           </div>
         )}
       </Card.Body>
+
+      {/* Confirmation Modal */}
+      <Modal
+        show={!!showConfirmModal}
+        onHide={() => setShowConfirmModal(null)}
+        centered
+        backdrop="static"
+      >
+        <Modal.Header closeButton style={{ 
+          background: 'linear-gradient(135deg, #153a64 0%, #0d2340 100%)',
+          color: 'white',
+          borderBottom: '3px solid #c19048'
+        }}>
+          <Modal.Title>Confirmer la réinitialisation</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="p-4">
+          <p>
+            Vous êtes sur le point d'approuver la réinitialisation de mot de passe pour <strong>{showConfirmModal?.name}</strong>.
+          </p>
+          <p className="text-muted mb-0">
+            Un lien de réinitialisation sera généré et devra être communiqué à l'utilisateur.
+          </p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowConfirmModal(null)}>
+            Annuler
+          </Button>
+          <Button
+            variant="success"
+            onClick={() => showConfirmModal && handleApproveRequest(showConfirmModal.id, showConfirmModal.userId)}
+            disabled={!!processingId}
+          >
+            {processingId ? (
+              <>
+                <Spinner as="span" animation="border" size="sm" className="me-1" />
+                Approbation...
+              </>
+            ) : (
+              'Confirmer l\'approbation'
+            )}
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Card>
   );
 };

@@ -458,14 +458,14 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Task Manager Component */}
-        <div className="yomi-chart-card">
+        {/* <div className="yomi-chart-card">
           <div className="yomi-chart-header">
             <h3>Gestionnaire de tâches</h3>
           </div>
           <div className="yomi-chart-body">
             <TaskManager />
           </div>
-        </div>
+        </div> */}
       </Container>
     </div>
   );

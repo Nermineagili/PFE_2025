@@ -2,14 +2,15 @@ const Notification = require('../models/notification');
 const User = require('../models/user');
 
 // Create a single notification for a user
-const createNotification = async (userId, type, message, relatedId = null) => {
+const createNotification = async (userId, type, message, relatedId = null, relatedModel = null) => {
   try {
-    console.log(`Creating notification for userId: ${userId}, type: ${type}, message: ${message}, relatedId: ${relatedId}`);
+    console.log(`Creating notification for userId: ${userId}, type: ${type}, message: ${message}, relatedId: ${relatedId}, relatedModel: ${relatedModel}`);
     const notification = new Notification({
       userId,
       type,
       message,
       relatedId,
+      relatedModel,
       isRead: false,
       createdAt: new Date(),
     });
@@ -23,7 +24,7 @@ const createNotification = async (userId, type, message, relatedId = null) => {
 };
 
 // Create notifications for all users with a specific role
-const createNotificationForRole = async (role, type, message, relatedId = null) => {
+const createNotificationForRole = async (role, type, message, relatedId = null, relatedModel = null) => {
   try {
     console.log(`Fetching users with role: ${role}`);
     const users = await User.find({ role }).select('_id');
@@ -32,9 +33,13 @@ const createNotificationForRole = async (role, type, message, relatedId = null) 
       console.warn(`No users found with role: ${role}`);
       return [];
     }
+    if (type === 'contact_message' && !relatedId) {
+      console.error(`Invalid relatedId for contact_message notification`);
+      throw new Error('relatedId is required for contact_message notifications');
+    }
     const notifications = await Promise.all(
       users.map(user =>
-        createNotification(user._id, type, message, relatedId)
+        createNotification(user._id, type, message, relatedId, relatedModel)
       )
     );
     console.log(`Created ${notifications.length} notifications for role ${role}`);
@@ -50,11 +55,35 @@ const getUserNotifications = async (req, res) => {
   try {
     const userId = req.user._id;
     console.log(`Fetching notifications for userId: ${userId}`);
-    const notifications = await Notification.find({ userId })
-      .sort({ createdAt: -1 })
-      .populate('relatedId', 'name email');
-    console.log(`Found ${notifications.length} notifications for userId ${userId}`);
-    res.status(200).json(notifications);
+    const notifications = await Notification.find({ userId }).sort({ createdAt: -1 });
+
+    // Populate relatedId based on relatedModel
+    const populatedNotifications = await Promise.all(
+      notifications.map(async (n) => {
+        if (!n.relatedId || !n.relatedModel) {
+          return n;
+        }
+        const model = n.relatedModel === 'User' ? User : require('../models/ContactMessage');
+        const populated = await Notification.populate(n, {
+          path: 'relatedId',
+          select: 'name email',
+          model,
+        });
+        return populated;
+      })
+    );
+
+    // Filter out invalid contact_message notifications
+    const validNotifications = populatedNotifications.filter(n => {
+      if (n.type === 'contact_message' && !n.relatedId) {
+        console.warn(`Invalid notification ${n._id}: missing relatedId for contact_message`);
+        return false;
+      }
+      return true;
+    });
+
+    console.log(`Found ${validNotifications.length} valid notifications for userId ${userId}`);
+    res.status(200).json(validNotifications);
   } catch (error) {
     console.error('Error fetching notifications:', error.message);
     res.status(500).json({ error: 'Failed to fetch notifications', details: error.message });
@@ -109,9 +138,6 @@ const markAllNotificationsAsRead = async (req, res) => {
     res.status(500).json({ error: 'Failed to mark all notifications as read', details: error.message });
   }
 };
-
-module.exports = {
-}
 
 module.exports = {
   createNotification,

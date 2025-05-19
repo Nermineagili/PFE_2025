@@ -59,11 +59,7 @@ const ForgotPassword: React.FC = () => {
             <Alert variant="success">
               <h5>Demande soumise</h5>
               <p>{message}</p>
-              <div className="text-center mt-3">
-                <Link to="/signin" className="btn btn-primary">
-                  Retour à la connexion
-                </Link>
-              </div>
+              
             </Alert>
           ) : (
             <Form onSubmit={handleSubmit}>

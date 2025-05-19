@@ -10,7 +10,8 @@ import {
   faClipboardList,
   faEnvelope,
   faFileContract ,
-  faKey, 
+  faKey,
+  faTasks, 
 
 } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "@themesberg/react-bootstrap";
@@ -27,7 +28,7 @@ interface AdminSidebarProps {
   onMessagesClick?: () => void;
   onManageContractsClick?: () => void; // Fixed typo in property name
   onResetPasswordClick?:()=>void
-
+  onManageTasksClick?: ()=> void ;
 }
 
 const AdminSidebar: React.FC<AdminSidebarProps> = ({
@@ -39,7 +40,8 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
   onSidebarToggle,
   onMessagesClick,
   onManageContractsClick,
-  onResetPasswordClick
+  onResetPasswordClick,
+  onManageTasksClick
 }) => {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
@@ -99,6 +101,11 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
       onResetPasswordClick();
   
   };
+  const handleTaskManagerClick = (event: React.MouseEvent) => {
+    event.preventDefault();
+    if (onManageTasksClick)
+      onManageTasksClick();
+  };
 
   return (
     <div
@@ -118,6 +125,11 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
         <a href="#!" className="admin-nav-item" onClick={handleDashboardClick}>
           <FontAwesomeIcon icon={faTachometerAlt} className="admin-nav-icon" />
             <span>Tableau de bord</span>        
+        </a>
+        {/*tasks section*/}
+        <a href="#!" className="admin-nav-item" onClick={handleTaskManagerClick}>
+          <FontAwesomeIcon icon={faTasks} className="admin-nav-icon" />
+            <span>Tâches à faire</span>        
         </a>
 
         {/* Admin-only: Manage Users */}

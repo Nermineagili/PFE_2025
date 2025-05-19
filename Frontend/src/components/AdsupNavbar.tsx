@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Navbar, Nav, Image, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from '../context/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import { MdEdit } from 'react-icons/md';
 import axios from 'axios';
 import ProfileEdit from './ProfileEdit';
 import './AdsupNavbar.css';
-import Logo from "../assets/logo.png";
+import Logo from '../assets/logo.png';
 
 const AdsupNavbar: React.FC = () => {
   const { user, logout } = useAuth();
@@ -17,10 +17,13 @@ const AdsupNavbar: React.FC = () => {
   const [showEditIndicator, setShowEditIndicator] = useState(false);
   const [unreadCount, setUnreadCount] = useState<number>(0);
 
-  // Fetch unread notification count
   useEffect(() => {
+    console.log('[AdsupNavbar] User:', user);
     const fetchUnreadCount = async () => {
-      if (!user) return;
+      if (!user) {
+        console.warn('[AdsupNavbar] No user, skipping fetch');
+        return;
+      }
       const token = localStorage.getItem('authToken');
       if (!token) {
         console.warn('[AdsupNavbar] No auth token found');
@@ -30,6 +33,7 @@ const AdsupNavbar: React.FC = () => {
         const response = await axios.get('http://localhost:5000/api/notifications/unread-count', {
           headers: { Authorization: `Bearer ${token}` },
         });
+        console.log('[AdsupNavbar] Unread count:', response.data.count);
         setUnreadCount(response.data.count);
       } catch (error) {
         console.error('[AdsupNavbar] Error fetching unread notifications:', error);
@@ -37,35 +41,47 @@ const AdsupNavbar: React.FC = () => {
     };
 
     fetchUnreadCount();
-    const interval = setInterval(fetchUnreadCount, 30000); // Poll every 30 seconds
+    const interval = setInterval(fetchUnreadCount, 30000);
     return () => clearInterval(interval);
   }, [user]);
 
   const handleDashboardClick = () => {
+    console.log('[AdsupNavbar] Navigating to dashboard');
     navigate('/');
   };
 
   const handleNotificationsClick = () => {
-    console.log('[AdsupNavbar] User role:', user?.role);
-    if (user?.role === 'admin') {
-      navigate('/admin-reset-approval');
-    } else if (user?.role === 'superviseur') {
-      navigate('/supervisor-messages');
+    console.log('[AdsupNavbar] Notification clicked, user role:', user?.role);
+    try {
+      if (user?.role === 'admin') {
+        navigate('/admin-reset-approval');
+      } else if (user?.role === 'superviseur') {
+        navigate('/supervisor-messages');
+      } else {
+        console.warn('[AdsupNavbar] Invalid role for notifications:', user?.role);
+      }
+    } catch (error) {
+      console.error('[AdsupNavbar] Navigation error:', error);
     }
   };
 
   const handleProfileClick = () => {
+    console.log('[AdsupNavbar] Opening profile modal');
     setShowProfileModal(true);
   };
 
   const handleCloseProfileModal = () => {
+    console.log('[AdsupNavbar] Closing profile modal');
     setShowProfileModal(false);
   };
 
   const handleLogout = () => {
+    console.log('[AdsupNavbar] Logging out');
     logout();
     navigate('/');
   };
+
+  console.log('[AdsupNavbar] Rendering, user role:', user?.role, 'unreadCount:', unreadCount);
 
   return (
     <>
@@ -86,12 +102,14 @@ const AdsupNavbar: React.FC = () => {
 
           <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
             <Nav>
-              <Nav.Link onClick={handleNotificationsClick} className="adsup-nav-link">
-                <FontAwesomeIcon icon={faBell} />
-                {unreadCount > 0 && (
-                  <span className="notification-badge">{unreadCount}</span>
-                )}
-              </Nav.Link>
+              {(user?.role === 'admin' || user?.role === 'superviseur') && (
+                <Nav.Link onClick={handleNotificationsClick} className="adsup-nav-link">
+                  <FontAwesomeIcon icon={faBell} />
+                  {unreadCount > 0 && (
+                    <span className="notification-badge">{unreadCount}</span>
+                  )}
+                </Nav.Link>
+              )}
 
               <OverlayTrigger
                 placement="bottom"
@@ -110,7 +128,7 @@ const AdsupNavbar: React.FC = () => {
                         />
                       ) : (
                         <div className="adsup-profile-initials">
-                          {user?.name ? user.name.charAt(0).toUpperCase() : "?"}
+                          {user?.name ? user.name.charAt(0).toUpperCase() : '?'}
                         </div>
                       )}
                       <div className="adsup-profile-edit-overlay">
@@ -118,7 +136,7 @@ const AdsupNavbar: React.FC = () => {
                       </div>
                     </div>
                     <span className="ms-2 d-none d-md-inline">
-                      {user?.name || (user?.role === "admin" ? "Admin" : "Superviseur")}
+                      {user?.name || (user?.role === 'admin' ? 'Admin' : user?.role === 'superviseur' ? 'Superviseur' : 'User')}
                     </span>
                   </div>
                 </Nav.Link>

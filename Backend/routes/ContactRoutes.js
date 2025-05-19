@@ -1,5 +1,5 @@
 const express = require("express");
-const { sendContactEmail,replyToUser } = require("../controllers/contactController");
+const { sendContactEmail,replyToUser, deleteContactMessage } = require("../controllers/contactController");
 const {getAllMessages} = require("../controllers/supervisorActions");
 const { authenticateToken } = require('../middleware/authMiddleware');
 const router = express.Router();
@@ -11,5 +11,5 @@ router.post('/', sendContactEmail);
 router.post('/reply', authenticateToken, replyToUser);
 // GET /contact/messages
 router.get('/messages', getAllMessages);
-
+router.post('/delete', authenticateToken, deleteContactMessage);
 module.exports = router;

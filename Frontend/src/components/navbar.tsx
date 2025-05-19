@@ -163,7 +163,7 @@ const CustomNavbar: React.FC<NavbarProps> = ({
                   <Dropdown.Menu className="yomi-dropdown-menu">
                     {location.pathname === "/clienthome" && (
                       <Dropdown.Item onClick={handleClaimForm} className="yomi-dropdown-item">
-                        <MdAssignment className="yomi-dropdown-icon" /> Déclaration de sinistre
+                        <MdAssignment className="yomi-dropdown-icon" /> Déclarer un sinistre
                       </Dropdown.Item>
                     )}
                     <Dropdown.Item onClick={handleContactUs} className="yomi-dropdown-item">

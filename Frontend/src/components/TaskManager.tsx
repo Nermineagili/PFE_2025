@@ -11,21 +11,26 @@ interface Task {
   _id: string;
   title: string;
   description: string;
-  createdAt?: string; // Made optional with ?
+  status: "pending" | "in-progress" | "completed";
+  createdAt?: string;
 }
 
 interface TaskInput {
   title: string;
   description: string;
+  status: "pending" | "in-progress" | "completed";
 }
 
 function TaskManager() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
+  const [submitLoading, setSubmitLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [newTask, setNewTask] = useState<TaskInput>({ 
     title: "", 
-    description: "" 
+    description: "",
+    status: "pending"
   });
   const [showModal, setShowModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -34,9 +39,13 @@ function TaskManager() {
 
   const fetchTasks = async () => {
     setLoading(true);
+    setError(null);
     try {
       const token = localStorage.getItem("authToken");
-      if (!token) throw new Error("No authentication token found.");
+      if (!token) {
+        navigate("/signin");
+        throw new Error("No authentication token found.");
+      }
 
       const response = await axios.get<Task[]>(API_BASE_URL, {
         headers: { Authorization: `Bearer ${token}` },
@@ -44,16 +53,27 @@ function TaskManager() {
       setTasks(response.data);
     } catch (err) {
       console.error("Erreur lors de la récupération des tâches:", err);
-      setError("Échec du chargement des tâches. Veuillez réessayer.");
+      setError(axios.isAxiosError(err) && err.response?.data?.message 
+        ? err.response.data.message 
+        : "Échec du chargement des tâches. Veuillez réessayer.");
     } finally {
       setLoading(false);
     }
   };
 
   const handleTaskSubmit = async () => {
+    setSubmitLoading(true);
+    setSubmitError(null);
     try {
       const token = localStorage.getItem("authToken");
-      if (!token) throw new Error("No authentication token found.");
+      if (!token) {
+        navigate("/signin");
+        throw new Error("No authentication token found.");
+      }
+
+      if (!newTask.title || !newTask.description) {
+        throw new Error("Titre et description sont requis.");
+      }
 
       if (isEditing && currentTaskId) {
         const response = await axios.put(
@@ -77,7 +97,12 @@ function TaskManager() {
       resetForm();
     } catch (err) {
       console.error("Erreur lors de l'enregistrement de la tâche:", err);
-      alert(`Échec de ${isEditing ? "la mise à jour" : "l'ajout"} de la tâche.`);
+      const errorMessage = axios.isAxiosError(err) && err.response?.data?.message
+        ? err.response.data.message
+        : `Échec de ${isEditing ? "la mise à jour" : "l'ajout"} de la tâche.`;
+      setSubmitError(errorMessage);
+    } finally {
+      setSubmitLoading(false);
     }
   };
 
@@ -86,7 +111,10 @@ function TaskManager() {
   
     try {
       const token = localStorage.getItem("authToken");
-      if (!token) throw new Error("No authentication token found.");
+      if (!token) {
+        navigate("/signin");
+        throw new Error("No authentication token found.");
+      }
 
       await axios.delete(`${API_BASE_URL}/${taskId}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -94,11 +122,15 @@ function TaskManager() {
       setTasks(tasks.filter(task => task._id !== taskId));
     } catch (err) {
       console.error("Erreur lors de la suppression de la tâche:", err);
-      alert("Échec de la suppression de la tâche.");
+      setError(axios.isAxiosError(err) && err.response?.data?.message 
+        ? err.response.data.message 
+        : "Échec de la suppression de la tâche.");
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setNewTask(prev => ({ ...prev, [name]: value }));
   };
@@ -106,7 +138,8 @@ function TaskManager() {
   const openEditModal = (task: Task) => {
     setNewTask({
       title: task.title,
-      description: task.description
+      description: task.description,
+      status: task.status
     });
     setCurrentTaskId(task._id);
     setIsEditing(true);
@@ -114,9 +147,10 @@ function TaskManager() {
   };
 
   const resetForm = () => {
-    setNewTask({ title: "", description: "" });
+    setNewTask({ title: "", description: "", status: "pending" });
     setCurrentTaskId(null);
     setIsEditing(false);
+    setSubmitError(null);
   };
 
   useEffect(() => {
@@ -133,6 +167,7 @@ function TaskManager() {
               variant="primary" 
               onClick={() => setShowModal(true)}
               className="add-task-button"
+              disabled={submitLoading}
             >
               <FaPlus className="me-2" />
               Ajouter une tâche
@@ -146,7 +181,7 @@ function TaskManager() {
           )}
 
           {error && (
-            <Alert variant="danger" className="text-center">
+            <Alert variant="danger" className="text-center" dismissible onClose={() => setError(null)}>
               {error}
             </Alert>
           )}
@@ -164,6 +199,7 @@ function TaskManager() {
                   <tr>
                     <th>Titre</th>
                     <th>Description</th>
+                    <th>Statut</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -172,6 +208,10 @@ function TaskManager() {
                     <tr key={task._id}>
                       <td className="task-title">{task.title}</td>
                       <td className="task-description">{task.description}</td>
+                      <td className="task-status">
+                        {task.status === "pending" ? "En attente" : 
+                         task.status === "in-progress" ? "En cours" : "Terminé"}
+                      </td>
                       <td className="actions-cell">
                         <OverlayTrigger overlay={<Tooltip id={`edit-tooltip-${task._id}`}>Modifier</Tooltip>}>
                           <Button
@@ -214,6 +254,11 @@ function TaskManager() {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body className="modal-body">
+          {submitError && (
+            <Alert variant="danger" dismissible onClose={() => setSubmitError(null)}>
+              {submitError}
+            </Alert>
+          )}
           <Form className="task-form">
             <Form.Group className="form-group">
               <Form.Label className="form-label">Titre</Form.Label>
@@ -224,6 +269,7 @@ function TaskManager() {
                 onChange={handleInputChange}
                 placeholder="Entrez le titre de la tâche"
                 className="form-input"
+                disabled={submitLoading}
               />
             </Form.Group>
             
@@ -237,7 +283,23 @@ function TaskManager() {
                 rows={4}
                 placeholder="Entrez la description de la tâche"
                 className="form-textarea"
+                disabled={submitLoading}
               />
+            </Form.Group>
+
+            <Form.Group className="form-group">
+              <Form.Label className="form-label">Statut</Form.Label>
+              <Form.Select
+                name="status"
+                value={newTask.status}
+                onChange={handleInputChange}
+                className="form-select"
+                disabled={submitLoading}
+              >
+                <option value="pending">En attente</option>
+                <option value="in-progress">En cours</option>
+                <option value="completed">Terminé</option>
+              </Form.Select>
             </Form.Group>
           </Form>
         </Modal.Body>
@@ -246,6 +308,7 @@ function TaskManager() {
             variant="secondary" 
             onClick={() => { setShowModal(false); resetForm(); }}
             className="close-button"
+            disabled={submitLoading}
           >
             Annuler
           </Button>
@@ -253,8 +316,11 @@ function TaskManager() {
             variant="primary" 
             onClick={handleTaskSubmit}
             className="submit-button"
+            disabled={submitLoading || !newTask.title || !newTask.description}
           >
-            {isEditing ? (
+            {submitLoading ? (
+              <Spinner animation="border" size="sm" />
+            ) : isEditing ? (
               <>
                 <FaCheck className="button-icon" />
                 Mettre à jour

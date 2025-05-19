@@ -4,7 +4,7 @@ import PourquoiYomi from "./PourquoiYomi";
 
 const APropos = React.forwardRef<HTMLDivElement>((_props, ref) => {
   return (
-    <section ref={ref} id="apropos-section" className="apropos-section">
+    <section ref={ref} id="about" className="apropos-section">
       <h2>Qui sommes-nous ?</h2>
       <p>
         <strong>Yomi Assurance</strong>, en partenariat avec <strong>Atlanta Assurances</strong>, est votre expert de confiance dans la gestion des risques personnels et professionnels.

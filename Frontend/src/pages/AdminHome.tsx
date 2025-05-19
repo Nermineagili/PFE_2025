@@ -10,6 +10,7 @@ import AdsupNavbar from "../components/AdsupNavbar";
 import ResetPasswordApproval from "./ResetPasswordApproval";
 import { useLocation } from "react-router-dom";
 import "./AdminHome.css";
+import TaskManager from "../components/TaskManager";
 
 // Function to extract token and userId from URL
 const extractResetParams = () => {
@@ -34,6 +35,7 @@ const AdminHome: React.FC = () => {
   const manageSettingsRef = useRef<HTMLDivElement>(null);
   const manageClaimsRef = useRef<HTMLDivElement>(null);
   const resetPasswordRef = useRef<HTMLDivElement>(null);
+  const manageTasksRef = useRef<HTMLDivElement>(null);
   
   // For reset password approval
   const [showResetSection, setShowResetSection] = useState<boolean>(false);
@@ -76,6 +78,11 @@ const AdminHome: React.FC = () => {
       manageClaimsRef.current.scrollIntoView({ behavior: "smooth" });
     }
   };
+  const scrollToTasks = () => {
+    if (manageTasksRef.current) {
+      manageTasksRef.current.scrollIntoView({ behavior: "smooth"});
+    }
+  };
 
   const scrollToResetPassword = () => {
     setShowResetSection(true);
@@ -100,6 +107,7 @@ const AdminHome: React.FC = () => {
       <AdminSidebarProps 
         onManageUsersClick={scrollToManageUsers} 
         onManageDashboardClick={scrollToDashboard} 
+        onManageTasksClick={scrollToTasks}
         onManageSettingsClick={scrollToSettings} 
         onManageClaimsClick={scrollToClaims}
         onResetPasswordClick={scrollToResetPassword}
@@ -112,6 +120,9 @@ const AdminHome: React.FC = () => {
         <Container fluid className="p-4">
           <div ref={manageDashboardRef}>
             <Dashboard />
+          </div>
+          <div ref={manageTasksRef}>
+            <TaskManager/>
           </div>
           {/* <div ref={resetPasswordRef}>
           {showResetSection && (

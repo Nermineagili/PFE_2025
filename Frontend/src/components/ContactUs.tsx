@@ -39,7 +39,7 @@ const ContactUs = forwardRef<HTMLDivElement>((_props, ref) => {
   };
 
   return (
-    <section ref={ref} id="contactus-section" className="contactus-section">
+    <section ref={ref} id="contact" className="contactus-section">
       <Container className="contact-container">
         <Card className="contact-card">
           <Card.Body>

@@ -1,188 +1,382 @@
 
-  .declarations-section {
-    padding: 60px 0;
-    background: #f8f9fa;
-    min-height: calc(100vh - [footer-height]); /* Adjust based on your footer height */
-    position: relative;
-    padding-bottom: 0; /* Remove bottom padding */
-  }
-  
-  .declarations-container {
-    max-width: 1000px;
-    margin: auto;
-    padding-bottom: 60px; /* Add padding to container instead */
-  }
-  
-  /* Footer styling */
-  .declarations-section + footer {
-    margin-top: 0;
-    position: relative;
-    bottom: 0;
-    width: 100%;
-  }
+/* Main section styling with gradient background */
+.declarations-section {
+  padding: 120px 0 0; /* Increased padding-top to clear fixed navbar */
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  min-height: calc(100vh - 80px); /* Adjust based on footer height */
+  position: relative;
+}
 
-  
+.declarations-container {
+  max-width: 1100px;
+  margin: auto;
+  padding-bottom: 80px;
+}
+
+/* Enhanced card styling */
+.declarations-card {
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  padding: 35px;
+  background: white;
+  border: none;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.declarations-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+}
+
+/* Title styling with animation */
+.declarations-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #153a64;
+  margin-bottom: 35px;
+  position: relative;
+  text-align: center;
+}
+
+.declarations-title::after {
+  content: '';
+  display: block;
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, #c19048, #e5b867);
+  margin: 12px auto 0;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.declarations-card:hover .declarations-title::after {
+  width: 120px;
+}
+
+/* Improved table styling */
+.declarations-table {
+  margin-top: 25px;
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.declarations-table thead th {
+  background: linear-gradient(135deg, #153a64 0%, #1e4f88 100%);
+  color: white;
+  padding: 16px;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 14px;
+  letter-spacing: 1px;
+  border: none;
+}
+
+.declarations-table tbody tr {
+  transition: all 0.2s ease;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.declarations-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.declarations-table tbody td {
+  padding: 16px;
+  vertical-align: middle;
+}
+
+.declarations-table tbody tr:hover {
+  background-color: rgba(193, 144, 72, 0.08);
+  transform: scale(1.005);
+}
+
+/* Description cell styling */
+.description-cell {
+  max-width: 280px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #495057;
+}
+
+/* Enhanced status badges */
+.status-badge {
+  font-size: 0.8rem;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.status-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+}
+
+/* Custom badge colors with gradients */
+.bg-warning {
+  background: linear-gradient(135deg, #c19048 0%, #e5b867 100%) !important;
+  color: white !important;
+}
+
+.bg-success {
+  background: linear-gradient(135deg, #28a745 0%, #5cc375 100%) !important;
+}
+
+.bg-danger {
+  background: linear-gradient(135deg, #dc3545 0%, #e57373 100%) !important;
+}
+
+/* Detail button styling */
+.btn-outline-primary {
+  border: 2px solid #153a64;
+  color: #153a64;
+  font-weight: 600;
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-primary:hover {
+  background-color: #153a64;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(21, 58, 100, 0.2);
+}
+
+/* Empty state styling */
+.empty-state {
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.empty-state p {
+  color: #6c757d;
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+}
+
+/* Loading spinner styling */
+.spinner-container {
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.spinner-container p {
+  color: #153a64;
+  font-weight: 500;
+  margin-top: 15px;
+}
+
+/* Modern Toast Notification */
+.update-toast {
+  position: fixed;
+  top: 25px;
+  right: 25px;
+  background: white;
+  border-left: 5px solid #c19048;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+  border-radius: 12px;
+  padding: 20px 25px;
+  display: flex;
+  align-items: center;
+  z-index: 1000;
+  transform: translateX(120%);
+  transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  max-width: 380px;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+  100% { transform: translateY(0px); }
+}
+
+.update-toast.visible {
+  transform: translateX(0);
+}
+
+.toast-icon {
+  color: #c19048;
+  font-size: 28px;
+  margin-right: 18px;
+}
+
+.toast-content {
+  flex: 1;
+}
+
+.toast-title {
+  font-weight: 700;
+  color: #153a64;
+  margin-bottom: 6px;
+  font-size: 16px;
+}
+
+.toast-message {
+  color: #5d6d7e;
+  font-size: 14px;
+}
+
+.toast-close {
+  color: #aaa;
+  margin-left: 16px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 20px;
+}
+
+.toast-close:hover {
+  color: #153a64;
+  transform: rotate(90deg);
+}
+
+/* Updated Claim Highlight with animation */
+.updated-claim {
+  position: relative;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { background-color: rgba(193, 144, 72, 0); }
+  50% { background-color: rgba(193, 144, 72, 0.1); }
+  100% { background-color: rgba(193, 144, 72, 0); }
+}
+
+.updated-claim::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 4px;
+  background: linear-gradient(to bottom, #c19048, #e5b867);
+  border-radius: 4px;
+}
+
+/* Enhanced Modal Styling */
+.modal-content {
+  border-radius: 16px;
+  border: none;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+.modal-header {
+  background: linear-gradient(135deg, #153a64 0%, #1e4f88 100%);
+  color: white;
+  border-bottom: none;
+  padding: 20px 25px;
+}
+
+.modal-title {
+  font-weight: 700;
+  font-size: 20px;
+}
+
+.modal-header .btn-close {
+  color: white;
+  opacity: 1;
+  box-shadow: none;
+  filter: brightness(0) invert(1);
+}
+
+.modal-body {
+  padding: 25px;
+}
+
+.modal-body p {
+  margin-bottom: 12px;
+  color: #495057;
+}
+
+.modal-body strong {
+  color: #153a64;
+  font-weight: 600;
+}
+
+.modal-footer {
+  border-top: none;
+  padding: 15px 25px 25px;
+}
+
+.modal-footer .btn-secondary {
+  background: #6c757d;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.modal-footer .btn-secondary:hover {
+  background: #5a6268;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(108, 117, 125, 0.2);
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
   .declarations-card {
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    padding: 30px;
-    background: white;
-    border: none;
+    padding: 25px;
   }
   
   .declarations-title {
     font-size: 28px;
-    font-weight: bold;
-    color: #153a64;
-    margin-bottom: 30px;
-    position: relative;
-    text-align: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .declarations-section {
+    padding: 100px 0 0; /* Adjusted for smaller screens */
   }
   
-  .declarations-title::after {
-    content: '';
-    display: block;
-    width: 60px;
-    height: 3px;
-    background: #c19048;
-    margin: 10px auto 0;
+  .declarations-card {
+    padding: 20px;
+  }
+  
+  .declarations-title {
+    font-size: 24px;
   }
   
   .declarations-table {
-    margin-top: 20px;
+    font-size: 0.85rem;
   }
   
   .declarations-table thead th {
-    background-color: #153a64;
-    color: white;
-    border-bottom: 2px solid #c19048;
-    font-weight: 500;
+    padding: 12px;
   }
   
-  .declarations-table tbody tr:hover {
-    background-color: rgba(193, 144, 72, 0.05);
+  .declarations-table tbody td {
+    padding: 12px;
   }
   
   .description-cell {
-    max-width: 300px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    max-width: 160px;
   }
   
   .status-badge {
-    font-size: 0.85rem;
-    padding: 6px 12px;
-    text-transform: capitalize;
+    font-size: 0.75rem;
+    padding: 6px 10px;
+  }
+}
+
+@media (max-width: 576px) {
+  .declarations-section {
+    padding: 80px 0 0; /* Further adjusted for mobile */
   }
   
-  /* Custom badge colors */
-  .bg-warning {
-    background-color: #c19048 !important;
+  .declarations-title {
+    font-size: 22px;
   }
   
-  /* Responsive adjustments */
-  @media (max-width: 768px) {
-    .declarations-card {
-      padding: 20px;
-    }
-    
-    .declarations-table {
-      font-size: 0.9rem;
-    }
-    
-    .description-cell {
-      max-width: 150px;
-    }
+  .description-cell {
+    max-width: 100px;
   }
-  /* Update Alert Styles */
-/* Modern Notification Toast */
-.update-toast {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: white;
-    border-left: 4px solid #c19048;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    padding: 16px 24px;
-    display: flex;
-    align-items: center;
-    z-index: 1000;
-    transform: translateX(120%);
-    transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    max-width: 350px;
-  }
-  
-  .update-toast.visible {
-    transform: translateX(0);
-  }
-  
-  .toast-icon {
-    color: #c19048;
-    font-size: 24px;
-    margin-right: 16px;
-  }
-  
-  .toast-content {
-    flex: 1;
-  }
-  
-  .toast-title {
-    font-weight: 600;
-    color: #153a64;
-    margin-bottom: 4px;
-  }
-  
-  .toast-message {
-    color: #5d6d7e;
-    font-size: 14px;
-  }
-  
-  .toast-close {
-    color: #aaa;
-    margin-left: 16px;
-    cursor: pointer;
-    transition: color 0.3s;
-  }
-  
-  .toast-close:hover {
-    color: #153a64;
-  }
-  
-  /* Updated Claim Highlight */
-  .updated-claim {
-    position: relative;
-  }
-  
-  .updated-claim::before {
-    content: '';
-    position: absolute;
-    left: -8px;
-    top: 0;
-    height: 100%;
-    width: 3px;
-    background: linear-gradient(to bottom, #c19048, #e0b15f);
-    border-radius: 3px;
-  }
-  
-  /* Status Badges */
-  .status-badge {
-    font-size: 0.8rem;
-    padding: 6px 12px;
-    border-radius: 12px;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-  }
-  
-  .bg-warning {
-    background-color: #c19048 !important;
-  }
-  
-  .bg-success {
-    background-color: #28a745 !important;
-  }
-  
-  .bg-danger {
-    background-color: #dc3545 !important;
-  }
+}

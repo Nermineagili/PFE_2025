@@ -1,6 +1,7 @@
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 const ContactMessage = require('../models/ContactMessage');
+const Notification = require('../models/notification');
 const User = require('../models/user');
 const { createNotificationForRole } = require('./notification');
 
@@ -94,7 +95,8 @@ const sendContactEmail = async (req, res) => {
         'superviseur',
         'contact_message',
         `New message from ${name} (${email}): ${messageSubject}`,
-        newMessage._id // Use message ID as relatedId since no userId
+        newMessage._id,
+        'ContactMessage'
       );
       console.log('[Contact] Supervisor notification created for message:', newMessage._id);
     } catch (notifError) {
@@ -123,26 +125,44 @@ const replyToUser = async (req, res) => {
       console.log('[Contact] Error: req.user is undefined or missing _id in replyToUser');
       return res.status(401).json({ error: 'Authentication required' });
     }
-    const { to, subject, message, messageId } = req.body;
-    console.log('[Contact] Reply request:', { to, subject, message, messageId });
+    const { to, subject, message, notificationId } = req.body;
+    console.log('[Contact] Reply request:', { to, subject, message, notificationId });
 
     if (!['superviseur', 'admin'].includes(req.user.role)) {
       return res.status(403).json({ error: 'Access denied: Supervisor or Admin role required' });
     }
-    if (!to || !subject || !message || !messageId) {
-      return res.status(400).json({ error: 'To, subject, message, and messageId are required' });
+
+    // Validate required fields
+    if (!to) return res.status(400).json({ error: 'Recipient email (to) is required' });
+    if (!subject) return res.status(400).json({ error: 'Subject is required' });
+    if (!message) return res.status(400).json({ error: 'Message is required' });
+    if (!notificationId) return res.status(400).json({ error: 'Notification ID is required' });
+
+    const notification = await Notification.findById(notificationId);
+    if (!notification) {
+      return res.status(404).json({ error: `Notification not found for ID: ${notificationId}` });
     }
-    const contactMessage = await ContactMessage.findById(messageId);
+    if (notification.type !== 'contact_message') {
+      return res.status(400).json({ error: 'Notification is not a contact message' });
+    }
+    if (!notification.relatedId) {
+      return res.status(400).json({ error: 'Notification is missing relatedId' });
+    }
+
+    const contactMessage = await ContactMessage.findById(notification.relatedId);
     if (!contactMessage) {
-      return res.status(404).json({ error: 'Contact message not found' });
+      return res.status(404).json({ error: `Contact message not found for ID: ${notification.relatedId}` });
     }
+
     const emailText = `Regarding your message (Subject: ${contactMessage.subject}):\n\n${message}\n\nThank you for reaching out!`;
     const emailSent = await sendEmail(to, `Re: ${subject}`, emailText);
-    await ContactMessage.findByIdAndUpdate(messageId, {
+
+    await ContactMessage.findByIdAndUpdate(notification.relatedId, {
       replied: true,
       replyMessage: message,
       repliedAt: new Date(),
     });
+
     res.status(200).json({
       message: 'Reply sent successfully',
       emailSent
@@ -153,4 +173,56 @@ const replyToUser = async (req, res) => {
   }
 };
 
-module.exports = { sendContactEmail, replyToUser };
+// Delete contact message and notification (Supervisor or Admin, requires authentication)
+const deleteContactMessage = async (req, res) => {
+  try {
+    if (!req.user || !req.user._id) {
+      console.log('[Contact] Error: req.user is undefined or missing _id in deleteContactMessage');
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+    const { notificationId, contactMessageId } = req.body;
+    console.log('[Contact] Delete request:', { notificationId, contactMessageId });
+
+    if (!['superviseur', 'admin'].includes(req.user.role)) {
+      return res.status(403).json({ error: 'Access denied: Supervisor or Admin role required' });
+    }
+
+    // Validate required fields
+    if (!notificationId) return res.status(400).json({ error: 'Notification ID is required' });
+    if (!contactMessageId) return res.status(400).json({ error: 'Contact message ID is required' });
+
+    const notification = await Notification.findById(notificationId);
+    if (!notification) {
+      return res.status(404).json({ error: `Notification not found for ID: ${notificationId}` });
+    }
+    if (notification.type !== 'contact_message') {
+      return res.status(400).json({ error: 'Notification is not a contact message' });
+    }
+    if (!notification.isRead) {
+      return res.status(400).json({ error: 'Cannot delete: Message has not been replied to' });
+    }
+    if (notification.relatedId.toString() !== contactMessageId) {
+      return res.status(400).json({ error: 'Notification does not match the contact message ID' });
+    }
+
+    const contactMessage = await ContactMessage.findById(contactMessageId);
+    if (!contactMessage) {
+      return res.status(404).json({ error: `Contact message not found for ID: ${contactMessageId}` });
+    }
+    if (!contactMessage.replied) {
+      return res.status(400).json({ error: 'Cannot delete: Contact message has not been replied to' });
+    }
+
+    // Delete both documents
+    await ContactMessage.findByIdAndDelete(contactMessageId);
+    await Notification.findByIdAndDelete(notificationId);
+    console.log('[Contact] Deleted contact message and notification:', { contactMessageId, notificationId });
+
+    res.status(200).json({ message: 'Contact message and notification deleted successfully' });
+  } catch (error) {
+    console.error('[Contact] Error deleting contact message:', error.message);
+    res.status(500).json({ error: 'Failed to delete message', details: error.message });
+  }
+};
+
+module.exports = { sendContactEmail, replyToUser, deleteContactMessage };

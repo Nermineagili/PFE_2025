@@ -6,7 +6,8 @@ exports.getTasks = async (req, res) => {
     const tasks = await Task.find();
     res.status(200).json(tasks);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching tasks" });
+    console.error("Error fetching tasks:", error);
+    res.status(500).json({ message: "Error fetching tasks", error: error.message });
   }
 };
 
@@ -19,41 +20,49 @@ exports.getTaskById = async (req, res) => {
     }
     res.status(200).json(task);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching task" });
+    console.error("Error fetching task:", error);
+    res.status(500).json({ message: "Error fetching task", error: error.message });
   }
 };
 
 // Create a new task (Admin only)
 exports.createTask = async (req, res) => {
-    try {
-      const { title, description, status } = req.body;
-  
-      // Check if all required fields are provided
-      if (!title || !description || !status) {
-        return res.status(400).json({ message: "All fields are required" });
-      }
-  
-      console.log("Creating task with:", req.body); // Debugging log
-  
-      const newTask = new Task({ title, description, status });
-      await newTask.save();
-  
-      res.status(201).json({ message: "Task created successfully", newTask });
-    } catch (error) {
-      console.error("Error creating task:", error);
-      res.status(500).json({ message: "Error creating task", error: error.message });
+  try {
+    const { title, description, status } = req.body;
+
+    // Check if required fields are provided
+    if (!title || !description) {
+      return res.status(400).json({ message: "Title and description are required" });
     }
-  };
-  
+
+    console.log("Creating task with:", req.body);
+
+    const newTask = new Task({
+      title,
+      description,
+      status: status || "pending" // Use provided status or default to "pending"
+    });
+    await newTask.save();
+
+    res.status(201).json({ message: "Task created successfully", newTask });
+  } catch (error) {
+    console.error("Error creating task:", error);
+    res.status(500).json({ message: "Error creating task", error: error.message });
+  }
+};
 
 // Update a task (Admin only)
 exports.updateTask = async (req, res) => {
   try {
     const { title, description, status } = req.body;
+    if (!title || !description || !status) {
+      return res.status(400).json({ message: "Title, description, and status are required" });
+    }
+
     const updatedTask = await Task.findByIdAndUpdate(
       req.params.id,
       { title, description, status },
-      { new: true }
+      { new: true, runValidators: true }
     );
 
     if (!updatedTask) {
@@ -62,7 +71,8 @@ exports.updateTask = async (req, res) => {
 
     res.status(200).json({ message: "Task updated successfully", updatedTask });
   } catch (error) {
-    res.status(500).json({ message: "Error updating task" });
+    console.error("Error updating task:", error);
+    res.status(500).json({ message: "Error updating task", error: error.message });
   }
 };
 
@@ -75,6 +85,7 @@ exports.deleteTask = async (req, res) => {
     }
     res.status(200).json({ message: "Task deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Error deleting task" });
+    console.error("Error deleting task:", error);
+    res.status(500).json({ message: "Error deleting task", error: error.message });
   }
 };

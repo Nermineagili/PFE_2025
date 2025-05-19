@@ -1,194 +1,397 @@
-/* SupervisorMessages.css */
+/* SupervisorMessages.css - Enhanced Version */
 .supervisor-messages-layout {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
-  
-  /* Main content area - adjusts based on sidebar state */
-  .supervisor-messages-content {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f5f7fa; /* Lighter background for better contrast */
+}
 
-    margin-top: 56px; /* Matches the height of your AdsupNavbar */
-    transition: margin-left 0.3s;
-    flex: 1;
-    background-color: #f8f9fa;
-    min-height: calc(100vh - 56px);
+/* Main content area */
+.supervisor-messages-content {
+  margin-top: 56px;
+  transition: margin-left 0.3s ease;
+  flex: 1;
+  min-height: calc(100vh - 56px);
+  padding: 1.5rem 0;
+}
+
+.supervisor-messages-content.sidebar-collapsed {
+  margin-left: 58px;
+}
+
+/* Card Styling */
+.messages-card {
+  border-radius: 16px;
+  box-shadow: 0 6px 24px rgba(21, 58, 100, 0.12);
+  border: none;
+  margin-bottom: 2rem;
+  overflow: hidden;
+}
+
+.messages-card-header {
+  background: linear-gradient(135deg, #153a64 0%, #0d2340 100%);
+  color: white;
+  border-bottom: 3px solid #c19048;
+  padding: 1.25rem 1.75rem;
+}
+
+.messages-title {
+  font-weight: 700;
+  font-size: 1.6rem;
+  letter-spacing: 0.5px;
+  color: white;
+  margin-bottom: 0;
+  position: relative;
+}
+
+.messages-title::after {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 3px;
+  background-color: #c19048;
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+}
+
+/* Alert Styling */
+.messages-alert {
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Message List Styling */
+.message-list {
+  border-radius: 8px;
+}
+
+.message-item {
+  padding: 1.5rem;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  border-bottom: 1px solid rgba(21, 58, 100, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.message-item:last-child {
+  border-bottom: none;
+}
+
+.message-item:hover {
+  background-color: rgba(193, 144, 72, 0.08);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(21, 58, 100, 0.08);
+}
+
+.message-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.message-name {
+  color: #153a64;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-right: 0.5rem;
+}
+
+.message-email {
+  color: #6c757d;
+  font-size: 0.95rem;
+}
+
+.message-date {
+  color: #6c757d;
+  margin-bottom: 0.75rem;
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+.message-content {
+  color: #343a40;
+  margin-bottom: 1.25rem;
+  white-space: pre-line;
+  line-height: 1.6;
+  background-color: rgba(21, 58, 100, 0.03);
+  padding: 1rem;
+  border-radius: 12px;
+  border-left: 4px solid #c19048;
+}
+
+.message-badge {
+  font-weight: 500;
+  padding: 0.4em 0.8em;
+  border-radius: 30px;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.message-badge.bg-warning {
+  background-color: #ffeeba !important;
+  color: #856404 !important;
+}
+
+.message-badge.bg-success {
+  background-color: #c8e6c9 !important;
+  color: #2e7d32 !important;
+}
+
+.message-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.reply-button {
+  background: linear-gradient(135deg, #153a64 0%, #0d2340 100%);
+  border: none;
+  border-radius: 30px;
+  padding: 0.5rem 1.25rem;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  box-shadow: 0 4px 8px rgba(21, 58, 100, 0.15);
+}
+
+.reply-button:hover {
+  background: linear-gradient(135deg, #0d2340 0%, #153a64 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(21, 58, 100, 0.25);
+}
+
+.delete-button {
+  background-color: #fff;
+  color: #dc3545;
+  border: 1px solid #dc3545;
+  border-radius: 30px;
+  padding: 0.5rem 1.25rem;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.delete-button:hover {
+  background-color: #dc3545;
+  color: #fff;
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(220, 53, 69, 0.25);
+}
+
+/* Refresh button styling */
+.messages-card-header .btn-outline-secondary {
+  color: white;
+  border-color: rgba(255, 255, 255, 0.5);
+  border-radius: 30px;
+  padding: 0.35rem 1rem;
+  transition: all 0.3s ease;
+}
+
+.messages-card-header .btn-outline-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-color: white;
+  transform: translateY(-2px);
+}
+
+/* Empty state styling */
+.text-center.p-4 {
+  padding: 3rem !important;
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* Modal Styling */
+.message-modal .modal-content,
+.delete-confirm-modal .modal-content {
+  border-radius: 16px;
+  border: none;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.message-modal-header,
+.delete-confirm-modal-header {
+  background: linear-gradient(135deg, #153a64 0%, #0d2340 100%);
+  color: white;
+  border-bottom: 3px solid #c19048;
+  padding: 1.25rem 1.75rem;
+}
+
+.message-modal-header .modal-title,
+.delete-confirm-modal-header .modal-title {
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.message-modal-header .btn-close,
+.delete-confirm-modal-header .btn-close {
+  filter: invert(1) brightness(200%);
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.message-modal-header .btn-close:hover,
+.delete-confirm-modal-header .btn-close:hover {
+  opacity: 1;
+}
+
+.message-modal-body,
+.delete-confirm-modal-body {
+  padding: 1.75rem;
+}
+
+.message-modal-footer,
+.delete-confirm-modal-footer {
+  border-top: 1px solid #e9ecef;
+  padding: 1.25rem 1.75rem;
+}
+
+/* Original Message Box */
+.original-message-content {
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  border-left: 4px solid #c19048;
+  padding: 1.25rem !important;
+  margin-bottom: 1.5rem !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.original-message-content small {
+  color: #6c757d;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+}
+
+.original-message-content p {
+  color: #495057;
+  line-height: 1.6;
+}
+
+/* Form Elements */
+.form-control {
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  border: 1px solid #ced4da;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  border-color: #153a64;
+  box-shadow: 0 0 0 0.25rem rgba(21, 58, 100, 0.15);
+}
+
+.form-label {
+  color: #153a64;
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Modal Buttons */
+.message-modal-footer .btn,
+.delete-confirm-modal-footer .btn {
+  border-radius: 30px;
+  padding: 0.5rem 1.5rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.message-modal-footer .btn-secondary,
+.delete-confirm-modal-footer .btn-secondary {
+  background-color: #f8f9fa;
+  color: #495057;
+  border-color: #ced4da;
+}
+
+.message-modal-footer .btn-secondary:hover,
+.delete-confirm-modal-footer .btn-secondary:hover {
+  background-color: #e9ecef;
+  transform: translateY(-2px);
+}
+
+.message-modal-footer .btn-success {
+  background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+  border: none;
+  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.2);
+}
+
+.message-modal-footer .btn-success:hover {
+  background: linear-gradient(135deg, #218838 0%, #28a745 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(40, 167, 69, 0.3);
+}
+
+.delete-confirm-modal-footer .btn-danger {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  border: none;
+  box-shadow: 0 4px 8px rgba(220, 53, 69, 0.2);
+}
+
+.delete-confirm-modal-footer .btn-danger:hover {
+  background: linear-gradient(135deg, #c82333 0%, #dc3545 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(220, 53, 69, 0.3);
+}
+
+/* Custom spinner styles */
+.spinner-border {
+  width: 1.2rem;
+  height: 1.2rem;
+  border-width: 0.2em;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 991.98px) {
+  .supervisor-messages-content {
+    margin-left: 0;
+    padding: 1rem;
   }
   
   .supervisor-messages-content.sidebar-collapsed {
-    margin-left: 58px; /* Matches the width of your collapsed AdminSidebar */
-  }
-  
-  /* Card Styling */
-  .messages-card {
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    border: none;
-    margin-bottom: 2rem;
-  }
-  
-  .messages-card-header {
-    background-color: #153a64;
-    color: white;
-    border-top-left-radius: 12px !important;
-    border-top-right-radius: 12px !important;
-    padding: 1rem 1.5rem;
-  }
-  
-  .messages-title {
-    font-weight: 600;
-    margin-bottom: 0;
-    font-size: 1.5rem;
-    color : white ;
-  }
-  
-  /* Alert Styling */
-  .messages-alert {
-    border-radius: 8px;
-    margin-bottom: 1.5rem;
-  }
-  
-  /* Message List Styling */
-  .message-list {
-    border-radius: 8px;
-  }
-  
-  .message-item {
-    padding: 1.25rem;
-    border-left: none;
-    border-right: none;
-    border-top: none;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    transition: background-color 0.2s;
-  }
-  
-  .message-item:last-child {
-    border-bottom: none;
-  }
-  
-  .message-item:hover {
-    background-color: rgba(193, 144, 72, 0.05);
+    margin-left: 0;
   }
   
   .message-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 0.5rem;
-  }
-  
-  .message-name {
-    color: #153a64;
-    font-size: 1.1rem;
-    margin-right: 0.5rem;
-  }
-  
-  .message-email {
-    color: #6c757d;
-    font-size: 0.95rem;
-  }
-  
-  .message-date {
-    color: #6c757d;
-    margin-bottom: 0.75rem;
-    font-size: 0.85rem;
-  }
-  
-  .message-content {
-    color: #343a40;
-    margin-bottom: 1rem;
-    white-space: pre-line;
+    flex-direction: column;
   }
   
   .message-badge {
-    font-weight: 500;
-    padding: 0.4em 0.6em;
-    border-radius: 6px;
+    margin-top: 0.5rem;
+    align-self: flex-start;
+  }
+  
+  .messages-title {
+    font-size: 1.4rem;
+  }
+  
+  .message-name {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .messages-card-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+  
+  .messages-card-header button {
+    margin-top: 1rem;
+    align-self: flex-end;
   }
   
   .message-actions {
-    display: flex;
-    justify-content: flex-end;
+    flex-direction: column;
   }
   
-  .reply-button {
-    background-color: #153a64;
-    border-color: #153a64;
-    transition: all 0.3s ease;
+  .message-actions .btn {
+    width: 100%;
+    margin-right: 0 !important;
+    margin-bottom: 0.5rem;
   }
-  
-  .reply-button:hover {
-    background-color: #0d2340;
-    transform: translateY(-2px);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  }
-  
-  /* Modal Styling */
-  .message-modal .modal-content {
-    border-radius: 12px;
-    border: none;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-  }
-  
-  .message-modal-header {
-    background-color: #153a64;
-    color: white;
-    border-bottom: 2px solid #c19048;
-    padding: 1rem 1.5rem;
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
-  }
-  
-  .message-modal-header .btn-close {
-    filter: invert(1);
-  }
-  
-  .message-modal-body {
-    padding: 1.5rem;
-  }
-  
-  .message-modal-footer {
-    border-top: 1px solid #e9ecef;
-    padding: 1rem 1.5rem;
-  }
-  
-  /* Original Message Box */
-  .original-message-content {
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    border-left: 3px solid #c19048;
-    font-style: italic;
-    color: #495057;
-  }
-  
-  /* Form Elements */
-  .form-control {
-    border-radius: 8px;
-    padding: 0.6rem 0.75rem;
-  }
-  
-  .form-control:focus {
-    border-color: #153a64;
-    box-shadow: 0 0 0 0.25rem rgba(21, 58, 100, 0.25);
-  }
-  
-  /* Responsive Adjustments */
-  @media (max-width: 991.98px) {
-    .supervisor-messages-content {
-      margin-left: 0;
-      padding-top: 20px;
-    }
-    
-    .supervisor-messages-content.sidebar-collapsed {
-      margin-left: 0;
-    }
-    
-    .message-header {
-      flex-direction: column;
-    }
-    
-    .message-badge {
-      margin-top: 0.5rem;
-      align-self: flex-start;
-    }
-  }
+}
