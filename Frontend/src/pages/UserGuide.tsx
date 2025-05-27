@@ -72,7 +72,7 @@ const UserGuide: React.FC = () => {
             </Card>
           </Col>
 
-          <Col md={6} lg={4} className="mb-4">
+          {/* <Col md={6} lg={4} className="mb-4">
             <Card className="yomi-guide-card">
               <div className="yomi-card-icon-container">
                 <MdPayment className="yomi-card-icon" />
@@ -96,13 +96,13 @@ const UserGuide: React.FC = () => {
                 </Link>
               </Card.Body>
             </Card>
-          </Col>
+          </Col> */}
 
           <Col md={6} lg={4} className="mb-4">
             <Card className="yomi-guide-card">
               <div className="yomi-card-icon-container">
                 <MdDashboard className="yomi-card-icon" />
-                <span className="yomi-step-number">4</span>
+                <span className="yomi-step-number">3</span>
               </div>
               <Card.Body>
                 <Card.Title>Suivre mes déclarations</Card.Title>
@@ -128,7 +128,7 @@ const UserGuide: React.FC = () => {
             <Card className="yomi-guide-card">
               <div className="yomi-card-icon-container">
                 <MdHelpOutline className="yomi-card-icon" />
-                <span className="yomi-step-number">5</span>
+                <span className="yomi-step-number">4</span>
               </div>
               <Card.Body>
                 <Card.Title>Obtenir de l'aide</Card.Title>

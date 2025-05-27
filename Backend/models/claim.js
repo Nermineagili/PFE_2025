@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const ClaimSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    contractId: { type: mongoose.Schema.Types.ObjectId, ref: 'Contract', required: true }, // Already added
+    // Removed contractId field
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     birthDate: {
@@ -23,11 +23,18 @@ const ClaimSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now },
     supportingFiles: [
         {
-            publicId: { type: String, required: true }, // Cloudinary public ID
-            url: { type: String, required: true }, // Cloudinary URL
-            fileName: { type: String, required: true }, // Original file name
-            fileType: { type: String, required: true }, // e.g., 'image/jpeg', 'application/pdf'
+            publicId: { type: String, required: true },
+            url: { type: String, required: true },
+            fileName: { type: String, required: true },
+            fileType: { type: String, required: true },
             uploadedAt: { type: Date, default: Date.now }
+        }
+    ],
+    comments: [
+        {
+            comment: { type: String, required: true }, // The comment text
+            supervisorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Supervisor who added the comment
+            createdAt: { type: Date, default: Date.now } // Timestamp of the comment
         }
     ]
 });

@@ -174,12 +174,66 @@
   .modal-footer {
     border-top: 1px solid #e5e7eb;
     padding: 15px 25px;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
   }
   
   .close-button {
     padding: 8px 20px;
     border-radius: 8px;
     font-weight: 500;
+  }
+  
+  /* Modal Action Buttons - Fixed visibility issue */
+  .modal-action-btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 500;
+    display: inline-flex !important;
+    align-items: center;
+    gap: 8px;
+    opacity: 1 !important;
+    visibility: visible !important;
+    position: relative !important;
+    z-index: 1 !important;
+  }
+  
+  .approve-modal-btn {
+    background-color: #28a745 !important;
+    border-color: #28a745 !important;
+    color: white !important;
+  }
+  
+  .approve-modal-btn:hover {
+    background-color: #218838 !important;
+    border-color: #1e7e34 !important;
+    color: white !important;
+  }
+  
+  .reject-modal-btn {
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+    color: white !important;
+  }
+  
+  .reject-modal-btn:hover {
+    background-color: #c82333 !important;
+    border-color: #bd2130 !important;
+    color: white !important;
+  }
+  
+  /* File links styling */
+  .file-link {
+    display: block;
+    margin: 5px 0;
+    color: #153a64;
+    text-decoration: none;
+  }
+  
+  .file-link:hover {
+    text-decoration: underline;
+    color: #c19048;
   }
   
   /* Responsive Adjustments */
@@ -208,5 +262,15 @@
     
     .detail-label {
       min-width: auto;
+    }
+    
+    .modal-footer {
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .modal-action-btn {
+      width: 100%;
+      justify-content: center;
     }
   }

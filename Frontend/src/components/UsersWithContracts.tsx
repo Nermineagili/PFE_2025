@@ -30,6 +30,12 @@ interface PolicyCount {
   count: number;
 }
 
+interface ApiResponse {
+  success: boolean;
+  message: string;
+  data: User[];
+}
+
 const UsersWithContracts: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -66,19 +72,23 @@ const UsersWithContracts: React.FC = () => {
           ? `http://localhost:5000/api/supervisor/users-with-contracts-only?policyType=${encodeURIComponent(selectedPolicyType)}`
           : 'http://localhost:5000/api/supervisor/users-with-contracts-only';
 
-        const response = await axios.get<User[]>(url, {
+        const response = await axios.get<ApiResponse>(url, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
 
-        setUsers(response.data);
+        if (!response.data.success || !Array.isArray(response.data.data)) {
+          throw new Error("Invalid API response format");
+        }
+
+        setUsers(response.data.data);
         
         // Calculate policy type counts
         const counts: PolicyCount[] = [];
         policyTypes.forEach(policyType => {
           if (policyType.value) { // Skip "All types" option
-            const count = response.data.filter(user => 
+            const count = response.data.data.filter(user => 
               user.contracts.some(contract => contract.policyType === policyType.value)
             ).length;
             counts.push({ type: policyType.label, count });
@@ -90,7 +100,7 @@ const UsersWithContracts: React.FC = () => {
       } catch (err) {
         console.error('Error fetching users with contracts:', err);
         const errorMessage = axios.isAxiosError(err) 
-          ? err.response?.data?.error || 'Failed to fetch users' 
+          ? err.response?.data?.message || 'Failed to fetch users' 
           : 'An unknown error occurred';
         setError(errorMessage);
         setLoading(false);
@@ -151,7 +161,7 @@ const UsersWithContracts: React.FC = () => {
         <div className="uwc-error-message">
           <p>{error}</p>
           <button 
-            onClick={() => navigate('/login')}
+            onClick={() => navigate('/signin')}
             className="uwc-action-button"
           >
             Retour à la page de connexion

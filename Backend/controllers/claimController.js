@@ -8,7 +8,6 @@ const submitClaim = async (req, res) => {
     try {
         const {
             userId,
-            contractId,
             birthDate,
             sexe,
             phone,
@@ -21,52 +20,57 @@ const submitClaim = async (req, res) => {
             incidentDescription
         } = req.body;
 
-        // Validate required fields
         if (!userId) {
             return res.status(400).json({ success: false, message: "userId is required" });
         }
-        if (!contractId) {
-            return res.status(400).json({ success: false, message: "contractId is required" });
-        }
 
-        // 1️⃣ Validate if user exists
         const user = await User.findById(userId).populate('contracts');
         if (!user) {
             return res.status(404).json({ success: false, message: "User not found" });
         }
 
-        // 2️⃣ Validate the contract
-        const contract = await Contract.findOne({ _id: contractId, userId });
-        if (!contract) {
-            return res.status(403).json({ success: false, message: "Contract not found or does not belong to this user." });
+        if (!user.contracts || user.contracts.length === 0) {
+            return res.status(403).json({ 
+                success: false, 
+                message: "You must have at least one contract to submit a claim." 
+            });
         }
 
         const now = new Date();
-        if (new Date(contract.startDate) > now || new Date(contract.endDate) < now || contract.status !== 'active') {
-            return res.status(403).json({ success: false, message: "The selected contract is not active or valid." });
+        const activeContracts = user.contracts.filter(contract => {
+            return contract.status === 'active' && 
+                   new Date(contract.startDate) <= now && 
+                   new Date(contract.endDate) >= now;
+        });
+
+        console.log('Active contracts found:', activeContracts.length);
+
+        if (activeContracts.length === 0) {
+            return res.status(403).json({ 
+                success: false, 
+                message: "You must have at least one active contract to submit a claim. Please check your contract status or contact support." 
+            });
         }
 
-        // 3️⃣ Handle uploaded files with Multer
         const files = req.files || [];
-        console.log('Number of files received:', files.length); // Debug log
+        console.log('Number of files received:', files.length);
         const supportingFiles = files.length > 0
             ? await Promise.all(
                 files.map(async (file) => {
                     try {
-                        console.log('Uploading file:', file.originalname, 'Size:', file.size); // Debug log
+                        console.log('Uploading file:', file.originalname, 'Size:', file.size);
                         const result = await cloudinary.uploader.upload(file.path, {
                             folder: 'insurance_app/claims',
                             resource_type: 'auto',
-                            timeout: 120000 // 120-second timeout
+                            timeout: 120000
                         });
 
-                        console.log('Cloudinary Upload Result:', result); // Debug log
+                        console.log('Cloudinary Upload Result:', result);
 
                         if (!result || !result.public_id || !result.secure_url) {
                             throw new Error('Cloudinary upload did not return expected result');
                         }
 
-                        // Delete the temporary file
                         fs.unlink(file.path, (err) => {
                             if (err) console.error('Failed to delete temp file:', err);
                         });
@@ -85,10 +89,8 @@ const submitClaim = async (req, res) => {
             )
             : [];
 
-        // 4️⃣ Create the claim with supporting files
         const newClaim = new Claim({
             userId,
-            contractId,
             firstName: user.name,
             lastName: user.lastname,
             birthDate,
@@ -104,15 +106,19 @@ const submitClaim = async (req, res) => {
             supportingFiles
         });
 
-        // 5️⃣ Save the claim and update the contract
         await newClaim.save();
-        contract.claims.push(newClaim._id);
-        await contract.save();
 
         res.status(201).json({
             success: true,
             message: "Claim submitted successfully",
-            data: newClaim
+            data: newClaim,
+            activeContracts: activeContracts.map(contract => ({
+                _id: contract._id,
+                policyType: contract.policyType,
+                startDate: contract.startDate,
+                endDate: contract.endDate,
+                status: contract.status
+            }))
         });
 
     } catch (error) {
@@ -121,36 +127,55 @@ const submitClaim = async (req, res) => {
     }
 };
 
-// Get all claims of a specific user
 const getUserClaims = async (req, res) => {
     try {
         const userId = req.params.userId;
 
-        const claims = await Claim.find({ userId }).sort({ createdAt: -1 });
+        const claims = await Claim.find({ userId })
+            .populate("userId", "name email phone")
+            .populate({
+                path: "comments",
+                populate: { path: "supervisorId", select: "name email" } // Populate supervisor details
+            })
+            .sort({ createdAt: -1 });
 
-        return res.status(200).json(claims); 
+        return res.status(200).json({
+            success: true,
+            message: "Claims retrieved successfully",
+            data: claims
+        });
     } catch (err) {
-        res.status(500).json({ error: "Failed to fetch user claims" });
+        console.error("Error fetching user claims:", err);
+        res.status(500).json({ success: false, message: "Failed to fetch user claims" });
     }
 };
 
-// Get a specific claim of a user
 const getUserClaimById = async (req, res) => {
     try {
         const { userId, claimId } = req.params;
 
-        const claim = await Claim.findOne({ _id: claimId, userId });
+        const claim = await Claim.findOne({ _id: claimId, userId })
+            .populate("userId", "name email phone")
+            .populate({
+                path: "comments",
+                populate: { path: "supervisorId", select: "name email" } // Populate supervisor details
+            });
 
         if (!claim) {
-            return res.status(404).json({ error: "Claim not found or does not belong to this user" });
+            return res.status(404).json({ success: false, message: "Claim not found or does not belong to this user" });
         }
 
-        res.json(claim);
+        res.status(200).json({
+            success: true,
+            message: "Claim retrieved successfully",
+            data: claim
+        });
     } catch (err) {
-        res.status(500).json({ error: "Failed to fetch claim" });
+        console.error("Error fetching claim:", err);
+        res.status(500).json({ success: false, message: "Failed to fetch claim" });
     }
 };
-// Download a supporting file
+
 const downloadClaimFile = async (req, res) => {
     try {
         const { claimId, fileId } = req.params;

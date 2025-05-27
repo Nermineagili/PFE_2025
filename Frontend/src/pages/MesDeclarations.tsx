@@ -5,7 +5,7 @@ import axios from "axios";
 import { Badge, Table, Spinner, Container, Card, Button, Modal } from "react-bootstrap";
 import { IoMdCheckmarkCircleOutline, IoMdDocument, IoMdCalendar, IoMdPerson } from "react-icons/io";
 import { FiX, FiAlertCircle, FiCheckCircle, FiClock } from "react-icons/fi";
-import { motion } from "framer-motion"; // Add framer-motion for animations
+import { motion } from "framer-motion";
 import "./MesDeclarations.css";
 
 interface Claim {
@@ -25,12 +25,26 @@ interface Claim {
   status: "pending" | "approved" | "rejected";
   createdAt: string;
   updatedAt: string;
+  comments?: {
+    comment: string;
+    supervisorId: { name: string; email: string };
+    createdAt: string;
+  }[];
+}
+
+interface Contract {
+  _id: string;
+  policyType: string;
+  startDate: string;
+  endDate: string;
+  status: string;
 }
 
 const MesDeclarations = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [claims, setClaims] = useState<Claim[]>([]);
+  const [activeContracts, setActiveContracts] = useState<Contract[]>([]);
   const [loading, setLoading] = useState(true);
   const [showToast, setShowToast] = useState(false);
   const [updatedClaims, setUpdatedClaims] = useState<Claim[]>([]);
@@ -42,9 +56,9 @@ const MesDeclarations = () => {
       if (user) {
         try {
           const response = await axios.get(`http://localhost:5000/api/claims/user/${user._id}`);
-          const fetchedClaims = response.data;
+          const fetchedClaims = response.data.data;
+          setClaims(fetchedClaims);
 
-          // Gestion des mises à jour
           const lastVisit = localStorage.getItem(`lastVisit_${user._id}`);
           if (lastVisit) {
             const newUpdates = fetchedClaims.filter(
@@ -55,13 +69,10 @@ const MesDeclarations = () => {
             if (newUpdates.length > 0) {
               setUpdatedClaims(newUpdates);
               setShowToast(true);
-              setTimeout(() => setShowToast(false), 7000); // Extended visibility
+              setTimeout(() => setShowToast(false), 7000);
             }
           }
-
-          setClaims(fetchedClaims); // même si vide, c'est correct
         } catch (error: any) {
-          // Si le backend renvoie une 404, on considère simplement qu'il n'y a pas encore de déclarations
           if (axios.isAxiosError(error) && error.response?.status === 404) {
             setClaims([]);
           } else {
@@ -75,9 +86,29 @@ const MesDeclarations = () => {
       }
     };
 
-    fetchClaims();
+    const fetchActiveContracts = async () => {
+      if (user) {
+        try {
+          const response = await axios.get(`http://localhost:5000/api/user/${user._id}`, {
+            headers: { Authorization: `Bearer ${localStorage.getItem('authToken')}` },
+          });
+          const userData = response.data.data;
+          const now = new Date();
+          const activeContracts = userData.contracts.filter((contract: Contract) => {
+            return contract.status === 'active' &&
+                   new Date(contract.startDate) <= now &&
+                   new Date(contract.endDate) >= now;
+          });
+          setActiveContracts(activeContracts);
+        } catch (error) {
+          console.error("Erreur lors de la récupération des contrats", error);
+        }
+      }
+    };
 
-    // Set current visit time
+    fetchClaims();
+    fetchActiveContracts();
+
     if (user) {
       localStorage.setItem(`lastVisit_${user._id}`, new Date().toISOString());
     }
@@ -85,47 +116,33 @@ const MesDeclarations = () => {
 
   const getStatusBadgeColor = (status: string) => {
     switch (status) {
-      case "approved":
-        return "success";
-      case "rejected":
-        return "danger";
-      default:
-        return "warning";
+      case "approved": return "success";
+      case "rejected": return "danger";
+      default: return "warning";
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case "approved":
-        return <FiCheckCircle className="me-1" />;
-      case "rejected":
-        return <FiAlertCircle className="me-1" />;
-      default:
-        return <FiClock className="me-1" />;
+      case "approved": return <FiCheckCircle className="me-1" />;
+      case "rejected": return <FiAlertCircle className="me-1" />;
+      default: return <FiClock className="me-1" />;
     }
   };
 
   const formatDateFr = (dateString: string) => {
-    const options: Intl.DateTimeFormatOptions = { 
-      day: '2-digit', 
-      month: '2-digit', 
-      year: 'numeric' 
-    };
+    const options: Intl.DateTimeFormatOptions = { day: '2-digit', month: '2-digit', year: 'numeric' };
     return new Date(dateString).toLocaleDateString("fr-FR", options);
   };
 
-  const dismissToast = () => {
-    setShowToast(false);
-  };
+  const dismissToast = () => setShowToast(false);
 
-  const isClaimUpdated = (claimId: string) => {
-    return updatedClaims.some((c) => c._id === claimId);
-  };
+  const isClaimUpdated = (claimId: string) => updatedClaims.some((c) => c._id === claimId);
 
   const handleShowDetails = async (claimId: string) => {
     try {
       const response = await axios.get(`http://localhost:5000/api/claims/user/${user?._id}/${claimId}`);
-      setSelectedClaim(response.data);
+      setSelectedClaim(response.data.data);
       setShowModal(true);
     } catch (error) {
       console.error("Erreur lors de la récupération des détails de la déclaration", error);
@@ -137,24 +154,14 @@ const MesDeclarations = () => {
     setSelectedClaim(null);
   };
 
-  // Animation variants for elements
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1,
-      transition: { 
-        staggerChildren: 0.1 
-      }
-    }
+    visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
   };
 
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
-    visible: { 
-      y: 0, 
-      opacity: 1,
-      transition: { type: "spring", stiffness: 100 }
-    }
+    visible: { y: 0, opacity: 1, transition: { type: "spring", stiffness: 100 } }
   };
 
   return (
@@ -164,7 +171,6 @@ const MesDeclarations = () => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
     >
-      {/* Modern Toast Notification */}
       {showToast && (
         <div className="update-toast visible">
           <IoMdCheckmarkCircleOutline className="toast-icon" />
@@ -179,11 +185,7 @@ const MesDeclarations = () => {
       )}
 
       <Container className="declarations-container">
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-        >
+        <motion.div variants={containerVariants} initial="hidden" animate="visible">
           <motion.div variants={itemVariants}>
             <Card className="declarations-card">
               <Card.Body>
@@ -203,11 +205,7 @@ const MesDeclarations = () => {
                     >
                       <IoMdDocument size={60} color="#153a64" />
                       <p>Vous n'avez pas encore fait de déclaration</p>
-                      <Button 
-                        variant="outline-primary" 
-                        onClick={() => navigate("/clienthome")}
-                        className="mt-2"
-                      >
+                      <Button variant="outline-primary" onClick={() => navigate("/clienthome")} className="mt-2">
                         Faire une déclaration
                       </Button>
                     </motion.div>
@@ -272,10 +270,44 @@ const MesDeclarations = () => {
               </Card.Body>
             </Card>
           </motion.div>
+
+          {/* Display Active Contracts */}
+          {activeContracts.length > 0 && (
+            <motion.div variants={itemVariants} className="mt-4">
+              <Card className="declarations-card">
+                <Card.Body>
+                  <h3 className="declarations-title">Mes Contrats Actifs</h3>
+                  <Table hover className="declarations-table">
+                    <thead>
+                      <tr>
+                        <th>Type</th>
+                        <th>Date de début</th>
+                        <th>Date de fin</th>
+                        <th>Statut</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {activeContracts.map((contract) => (
+                        <tr key={contract._id}>
+                          <td>{contract.policyType}</td>
+                          <td>{formatDateFr(contract.startDate)}</td>
+                          <td>{formatDateFr(contract.endDate)}</td>
+                          <td>
+                            <Badge pill bg={contract.status === "active" ? "success" : "warning"} className="status-badge">
+                              {contract.status === "active" ? "Actif" : "Inactif"}
+                            </Badge>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                </Card.Body>
+              </Card>
+            </motion.div>
+          )}
         </motion.div>
       </Container>
 
-      {/* Enhanced Modal for Claim Details */}
       <Modal 
         show={showModal} 
         onHide={handleCloseModal} 
@@ -296,7 +328,7 @@ const MesDeclarations = () => {
                 <div className="col-md-6">
                   <p><strong>Référence:</strong> #{selectedClaim._id.slice(-6).toUpperCase()}</p>
                   <p>
-                    <strong>Status:</strong> 
+                    <strong>Statut:</strong> 
                     <Badge pill bg={getStatusBadgeColor(selectedClaim.status)} className="status-badge ms-2">
                       {getStatusIcon(selectedClaim.status)}
                       {selectedClaim.status === "pending"
@@ -353,6 +385,25 @@ const MesDeclarations = () => {
                   <p><strong>Province/État:</strong> {selectedClaim.stateProvince}</p>
                 </div>
               </div>
+
+              {/* Display Comments */}
+              {selectedClaim.comments && selectedClaim.comments.length > 0 && (
+                <div className="row mt-4">
+                  <div className="col-12">
+                    <div className="d-flex align-items-center mb-2">
+                      <IoMdPerson size={20} className="me-2" color="#153a64" />
+                      <strong>Commentaires du Superviseur</strong>
+                    </div>
+                    {selectedClaim.comments.map((comment, index) => (
+                      <div key={index} className="p-3 mb-2 bg-light rounded">
+                        <p><strong>Commentaire:</strong> {comment.comment}</p>
+                        <p><strong>Superviseur:</strong> {comment.supervisorId.name} ({comment.supervisorId.email})</p>
+                        <p><strong>Date:</strong> {formatDateFr(comment.createdAt)}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <div className="spinner-container">

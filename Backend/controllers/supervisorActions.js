@@ -1,115 +1,150 @@
 const Claim = require("../models/claim");
 const User = require("../models/user");
 const Contract = require('../models/Contract');
-
 const ContactMessage = require("../models/ContactMessage.js");
-
 const bcrypt = require('bcrypt');
 
-// Get all claims (Superviseur only)
 const getAllClaims = async (req, res) => {
     try {
-        const claims = await Claim.find().populate("userId", "name email");
-        res.json(claims);
+        const claims = await Claim.find()
+            .populate("userId", "name email phone")
+            // Removed .populate("contractId", "startDate endDate status policyType") since contractId no longer exists
+            .sort({ createdAt: -1 });
+
+        res.status(200).json({
+            success: true,
+            message: "All claims retrieved successfully",
+            data: claims
+        });
     } catch (err) {
-        res.status(500).json({ error: "Failed to fetch claims" });
+        console.error("Error fetching claims:", err);
+        res.status(500).json({ success: false, message: "Failed to fetch claims" });
     }
 };
 
-// Get claim by ID (Superviseur only)
 const getClaimById = async (req, res) => {
     try {
-        const claim = await Claim.findById(req.params.id).populate("userId", "name email");
-        if (!claim) return res.status(404).json({ error: "Claim not found" });
-        res.json(claim);
+        const claim = await Claim.findById(req.params.id)
+            .populate("userId", "name email phone");
+            // Removed .populate("contractId", "startDate endDate status policyType") since contractId no longer exists
+
+        if (!claim) return res.status(404).json({ success: false, message: "Claim not found" });
+        res.status(200).json({
+            success: true,
+            message: "Claim retrieved successfully",
+            data: claim
+        });
     } catch (err) {
-        res.status(500).json({ error: "Failed to fetch claim" });
+        console.error("Error fetching claim:", err);
+        res.status(500).json({ success: false, message: "Failed to fetch claim" });
     }
 };
 
-// Update claim status (Superviseur only)
 const updateClaimStatus = async (req, res) => {
     try {
-        const { status } = req.body;
+        const { status, comment } = req.body;
         if (!["pending", "approved", "rejected"].includes(status)) {
-            return res.status(400).json({ error: "Invalid status value" });
+            return res.status(400).json({ success: false, message: "Invalid status value" });
+        }
+
+        const supervisorId = req.user?._id; // Assuming authenticateToken sets req.user
+        if (!supervisorId) {
+            return res.status(401).json({ success: false, message: "Supervisor ID not found in token" });
+        }
+
+        const updateData = { status };
+        if (comment && status === "rejected") {
+            updateData.$push = { comments: { comment, supervisorId } };
         }
 
         const updatedClaim = await Claim.findByIdAndUpdate(
             req.params.id,
-            { status },
-            { new: true }
-        );
+            updateData,
+            { new: true, runValidators: true }
+        )
+        .populate("userId", "name email phone");
+        // Removed .populate("contractId", "startDate endDate status policyType") since contractId no longer exists
 
-        if (!updatedClaim) return res.status(404).json({ error: "Claim not found" });
+        if (!updatedClaim) return res.status(404).json({ success: false, message: "Claim not found" });
 
-        res.json({ message: "Claim status updated successfully", claim: updatedClaim });
+        res.status(200).json({
+            success: true,
+            message: "Claim status updated successfully",
+            data: updatedClaim
+        });
     } catch (err) {
-        res.status(500).json({ error: "Failed to update claim status" });
+        console.error("Error updating claim status:", err);
+        res.status(500).json({ success: false, message: "Failed to update claim status" });
     }
 };
 
-// Delete a claim (Superviseur only)
 const deleteClaim = async (req, res) => {
     try {
         const deletedClaim = await Claim.findByIdAndDelete(req.params.id);
-        if (!deletedClaim) return res.status(404).json({ error: "Claim not found" });
+        if (!deletedClaim) return res.status(404).json({ success: false, message: "Claim not found" });
 
-        res.json({ message: "Claim deleted successfully" });
+        res.status(200).json({
+            success: true,
+            message: "Claim deleted successfully"
+        });
     } catch (err) {
-        res.status(500).json({ error: "Failed to delete claim" });
+        console.error("Error deleting claim:", err);
+        res.status(500).json({ success: false, message: "Failed to delete claim" });
     }
 };
+
 const getUsersWithContractsOnly = async (req, res) => {
-  try {
-    const { policyType } = req.query; // e.g., /api/supervisor/users-with-contracts?policyType=santé
+    try {
+        const { policyType } = req.query;
 
-    // First, find contracts that match the given policyType
-    const contractFilter = policyType
-      ? { policyType }
-      : {}; // if no filter, match all types
+        const contractFilter = policyType
+            ? { policyType }
+            : {};
 
-    const matchingContracts = await Contract.find(contractFilter).select('_id');
+        const matchingContracts = await Contract.find(contractFilter).select('_id');
+        const matchingContractIds = matchingContracts.map(c => c._id);
 
-    // Extract contract IDs
-    const matchingContractIds = matchingContracts.map(c => c._id);
+        const users = await User.find({
+            role: { $ne: 'admin' },
+            contracts: { $in: matchingContractIds }
+        })
+            .select('name email phone contracts')
+            .populate({
+                path: 'contracts',
+                match: contractFilter,
+                select: 'policyType startDate endDate premiumAmount',
+                options: { sort: { startDate: -1 } }
+            })
+            .sort({ name: 1 });
 
-    // Find users who have at least one of the matching contracts
-    const users = await User.find({
-      role: { $ne: 'admin' },
-      contracts: { $in: matchingContractIds }
-    })
-      .select('name email phone contracts')
-      .populate({
-        path: 'contracts',
-        match: contractFilter, // Only populate matching contracts
-        select: 'policyType startDate endDate premiumAmount',
-        options: { sort: { startDate: -1 } }
-      })
-      .sort({ name: 1 });
-
-    res.status(200).json(users);
-  } catch (err) {
-    console.error('Error fetching users with contracts:', err);
-    res.status(500).json({ error: 'Failed to fetch users with contracts' });
-  }
+        res.status(200).json({
+            success: true,
+            message: "Users with contracts retrieved successfully",
+            data: users
+        });
+    } catch (err) {
+        console.error('Error fetching users with contracts:', err);
+        res.status(500).json({ success: false, message: 'Failed to fetch users with contracts' });
+    }
 };
 
-
-// Get all messages (Superviseur only)
 const getAllMessages = async (req, res) => {
-  try {
-    if (req.user.role !== 'superviseur') {
-      return res.status(403).json({ error: 'Access denied: Supervisor role required' });
+    try {
+        if (req.user.role !== 'superviseur') {
+            return res.status(403).json({ success: false, message: 'Access denied: Supervisor role required' });
+        }
+        const messages = await ContactMessage.find()
+            .sort({ createdAt: -1 })
+            .populate('userId', 'name email');
+        res.status(200).json({
+            success: true,
+            message: "Messages retrieved successfully",
+            data: messages
+        });
+    } catch (error) {
+        console.error('Error fetching messages:', error.message);
+        res.status(500).json({ success: false, message: "Failed to fetch messages", details: error.message });
     }
-    const messages = await ContactMessage.find()
-      .sort({ createdAt: -1 })
-      .populate('userId', 'name email');
-    res.status(200).json(messages);
-  } catch (error) {
-    console.error('Error fetching messages:', error.message);
-    res.status(500).json({ error: "Failed to fetch messages", details: error.message });
-  }
 };
 
 module.exports = {
