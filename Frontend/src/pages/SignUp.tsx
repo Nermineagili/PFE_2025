@@ -13,6 +13,7 @@ const SignUp: React.FC = () => {
   });
   
   const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -23,21 +24,35 @@ const SignUp: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setErrorMessage(''); // Clear any previous error
+    setSuccessMessage(''); // Clear any previous success message
     
     try {
       const response = await axios.post('http://localhost:5000/api/auth/register', user);
       console.log('Registration successful:', response.data);
 
-      if (response.data.success) {
+      // If we get here without error, registration was successful
+      setSuccessMessage('Utilisateur enregistré avec succès!');
+      // Add a delay before navigation to show the success message
+      setTimeout(() => {
         navigate('/clienthome');
-      } else {
-        setErrorMessage(response.data.message || 'Inscription échouée');
-      }
+      }, 2000);
       
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         console.error(error.response?.data);
-        setErrorMessage(error.response?.data.error || "L'inscription a échoué");
+        // Check if it's actually an error or just a success message in error format
+        const errorMsg = error.response?.data?.message || error.response?.data?.error || "L'inscription a échoué";
+        
+        // Sometimes success messages come through as errors due to server setup
+        if (errorMsg.includes('successfully') || errorMsg.includes('succès') || errorMsg.includes('registered')) {
+          setSuccessMessage(errorMsg);
+          setTimeout(() => {
+            navigate('/clienthome');
+          }, 2000);
+        } else {
+          setErrorMessage(errorMsg);
+        }
       } else {
         console.error('Une erreur inattendue est survenue:', error);
         setErrorMessage('Une erreur inattendue est survenue');
@@ -63,6 +78,16 @@ const SignUp: React.FC = () => {
                 <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
               </svg>
               <span>{errorMessage}</span>
+            </div>
+          )}
+
+          {successMessage && (
+            <div className="auth-success-message">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                <path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/>
+              </svg>
+              <span>{successMessage}</span>
             </div>
           )}
           

@@ -1,10 +1,14 @@
 const Claim = require('../models/claim');
 const User = require('../models/user');
+const Contract = require('../models/Contract');
+const cloudinary = require('../cloudinary'); // Assuming cloudinary config is in a separate file
+const fs = require('fs');
 
 const submitClaim = async (req, res) => {
     try {
         const {
             userId,
+            contractId,
             birthDate,
             sexe,
             phone,
@@ -17,30 +21,74 @@ const submitClaim = async (req, res) => {
             incidentDescription
         } = req.body;
 
+        // Validate required fields
+        if (!userId) {
+            return res.status(400).json({ success: false, message: "userId is required" });
+        }
+        if (!contractId) {
+            return res.status(400).json({ success: false, message: "contractId is required" });
+        }
+
         // 1️⃣ Validate if user exists
         const user = await User.findById(userId).populate('contracts');
         if (!user) {
             return res.status(404).json({ success: false, message: "User not found" });
         }
 
-        // 2️⃣ Check if user has at least one contract
-        if (!user.contracts || user.contracts.length === 0) {
-            return res.status(403).json({ success: false, message: "You need a valid contract to submit a claim." });
+        // 2️⃣ Validate the contract
+        const contract = await Contract.findOne({ _id: contractId, userId });
+        if (!contract) {
+            return res.status(403).json({ success: false, message: "Contract not found or does not belong to this user." });
         }
 
-        // Optional: Check if any contract is still active
         const now = new Date();
-        const hasActiveContract = user.contracts.some(contract =>
-            new Date(contract.startDate) <= now && new Date(contract.endDate) >= now
-        );
-
-        if (!hasActiveContract) {
-            return res.status(403).json({ success: false, message: "You do not have any active contracts." });
+        if (new Date(contract.startDate) > now || new Date(contract.endDate) < now || contract.status !== 'active') {
+            return res.status(403).json({ success: false, message: "The selected contract is not active or valid." });
         }
 
-        // 3️⃣ Create the claim
+        // 3️⃣ Handle uploaded files with Multer
+        const files = req.files || [];
+        console.log('Number of files received:', files.length); // Debug log
+        const supportingFiles = files.length > 0
+            ? await Promise.all(
+                files.map(async (file) => {
+                    try {
+                        console.log('Uploading file:', file.originalname, 'Size:', file.size); // Debug log
+                        const result = await cloudinary.uploader.upload(file.path, {
+                            folder: 'insurance_app/claims',
+                            resource_type: 'auto',
+                            timeout: 120000 // 120-second timeout
+                        });
+
+                        console.log('Cloudinary Upload Result:', result); // Debug log
+
+                        if (!result || !result.public_id || !result.secure_url) {
+                            throw new Error('Cloudinary upload did not return expected result');
+                        }
+
+                        // Delete the temporary file
+                        fs.unlink(file.path, (err) => {
+                            if (err) console.error('Failed to delete temp file:', err);
+                        });
+
+                        return {
+                            publicId: result.public_id,
+                            url: result.secure_url,
+                            fileName: file.originalname,
+                            fileType: file.mimetype
+                        };
+                    } catch (uploadError) {
+                        console.error('File upload failed:', uploadError.message);
+                        throw new Error('Failed to upload file to Cloudinary');
+                    }
+                })
+            )
+            : [];
+
+        // 4️⃣ Create the claim with supporting files
         const newClaim = new Claim({
             userId,
+            contractId,
             firstName: user.name,
             lastName: user.lastname,
             birthDate,
@@ -52,10 +100,14 @@ const submitClaim = async (req, res) => {
             postalCode,
             email,
             stateProvince,
-            incidentDescription
+            incidentDescription,
+            supportingFiles
         });
 
+        // 5️⃣ Save the claim and update the contract
         await newClaim.save();
+        contract.claims.push(newClaim._id);
+        await contract.save();
 
         res.status(201).json({
             success: true,
@@ -98,9 +150,31 @@ const getUserClaimById = async (req, res) => {
         res.status(500).json({ error: "Failed to fetch claim" });
     }
 };
+// Download a supporting file
+const downloadClaimFile = async (req, res) => {
+    try {
+        const { claimId, fileId } = req.params;
+
+        const claim = await Claim.findById(claimId);
+        if (!claim) {
+            return res.status(404).json({ success: false, message: "Claim not found" });
+        }
+
+        const file = claim.supportingFiles.id(fileId);
+        if (!file) {
+            return res.status(404).json({ success: false, message: "File not found" });
+        }
+
+        res.redirect(file.url);
+    } catch (error) {
+        console.error("Error downloading claim file:", error);
+        res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};
 
 module.exports = {
     submitClaim,
     getUserClaims,
     getUserClaimById,
+    downloadClaimFile
 };

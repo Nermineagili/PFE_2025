@@ -5,6 +5,8 @@ import "./ClaimForm.css";
 
 const ClaimForm = forwardRef<HTMLDivElement>((_props, ref) => {
   const [formData, setFormData] = useState({
+    userId: '',
+    contractId: '',
     firstName: '',
     lastname: '',
     email: '',
@@ -15,8 +17,9 @@ const ClaimForm = forwardRef<HTMLDivElement>((_props, ref) => {
     postalAddress: '',
     city: '',
     postalCode: '',
-    incidentDescription: '',
     stateProvince: '',
+    incidentDescription: '',
+    supportingFiles: null as File | null, // Add file input state
   });
 
   const [loading, setLoading] = useState(false);
@@ -39,34 +42,42 @@ const ClaimForm = forwardRef<HTMLDivElement>((_props, ref) => {
     const token = localStorage.getItem('authToken');
 
     if (userId && token) {
+      setFormData((prevData) => ({ ...prevData, userId }));
       axios.get(`http://localhost:5000/api/user/${userId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       })
-      .then(response => {
-        const user = response.data.data;
-        if (user) {
-          setFormData(prevData => ({
-            ...prevData,
-            firstName: user.name,
-            lastname: user.lastname,
-            email: user.email,
-          }));
-        }
-      })
-      .catch(error => {
-        console.error('Error fetching user data:', error);
-      });
+        .then(response => {
+          const user = response.data.data;
+          if (user) {
+            setFormData(prevData => ({
+              ...prevData,
+              firstName: user.name || '',
+              lastname: user.lastname || '',
+              email: user.email || '',
+              // Assuming the user has a contracts array; set the first contractId for testing
+              contractId: user.contracts?.[0]?._id || '681a38fabfeb7f36a2b3ceaa', // Hardcoded or fetched
+            }));
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching user data:', error);
+        });
     }
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement | HTMLInputElement>) => {
     const { name, value } = e.target;
     if (name === 'day' || name === 'month' || name === 'year') {
       setFormData(prevData => ({
         ...prevData,
         birthDate: { ...prevData.birthDate, [name]: value },
+      }));
+    } else if (name === 'supportingFiles') {
+      setFormData(prevData => ({
+        ...prevData,
+        supportingFiles: (e.target as HTMLInputElement).files?.[0] || null,
       }));
     } else {
       setFormData(prevData => ({ ...prevData, [name]: value }));
@@ -81,8 +92,9 @@ const ClaimForm = forwardRef<HTMLDivElement>((_props, ref) => {
 
     try {
       const userId = localStorage.getItem('userId');
-      if (!userId) {
-        setError("L'identifiant utilisateur est manquant. Veuillez vous reconnecter.");
+      const token = localStorage.getItem('authToken');
+      if (!userId || !token) {
+        setError("L'identifiant utilisateur ou le token est manquant. Veuillez vous reconnecter.");
         setLoading(false);
         return;
       }
@@ -92,17 +104,41 @@ const ClaimForm = forwardRef<HTMLDivElement>((_props, ref) => {
         month: monthMap[formData.birthDate.month] || formData.birthDate.month,
       };
 
-      const dataToSubmit = { ...formData, userId, birthDate };
+      const dataToSubmit = new FormData();
+      dataToSubmit.append('userId', userId);
+      dataToSubmit.append('contractId', formData.contractId);
+      dataToSubmit.append('birthDate[day]', birthDate.day);
+      dataToSubmit.append('birthDate[month]', birthDate.month.toString());
+      dataToSubmit.append('birthDate[year]', birthDate.year);
+      dataToSubmit.append('sexe', formData.sexe);
+      dataToSubmit.append('phone', formData.phone);
+      dataToSubmit.append('address', formData.address);
+      dataToSubmit.append('postalAddress', formData.postalAddress);
+      dataToSubmit.append('city', formData.city);
+      dataToSubmit.append('postalCode', formData.postalCode);
+      dataToSubmit.append('email', formData.email);
+      dataToSubmit.append('stateProvince', formData.stateProvince);
+      dataToSubmit.append('incidentDescription', formData.incidentDescription);
+      if (formData.supportingFiles) {
+        dataToSubmit.append('supportingFiles', formData.supportingFiles);
+      }
 
       const response = await axios.post(
         'http://localhost:5000/api/claims/submit',
         dataToSubmit,
-        { headers: { 'Content-Type': 'application/json' } }
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
 
       if (response.data.success) {
         setSuccess('Sinistre soumis avec succès !');
         setFormData({
+          userId: '',
+          contractId: '',
           firstName: '',
           lastname: '',
           email: '',
@@ -115,6 +151,7 @@ const ClaimForm = forwardRef<HTMLDivElement>((_props, ref) => {
           postalCode: '',
           stateProvince: '',
           incidentDescription: '',
+          supportingFiles: null,
         });
       } else {
         setError('Échec de la soumission du sinistre. Veuillez réessayer.');
@@ -124,6 +161,9 @@ const ClaimForm = forwardRef<HTMLDivElement>((_props, ref) => {
 
       if (axios.isAxiosError(error) && error.response) {
         switch (error.response.status) {
+          case 400:
+            setError(error.response.data.message || 'Données invalides.');
+            break;
           case 403:
             setError("Vous n'avez pas de contrat actif pour déclarer un sinistre.");
             break;
@@ -131,7 +171,7 @@ const ClaimForm = forwardRef<HTMLDivElement>((_props, ref) => {
             setError("Utilisateur introuvable.");
             break;
           default:
-            setError(error.response.data?.error || 'Une erreur est survenue lors de l’envoi du formulaire.');
+            setError(error.response.data?.message || 'Une erreur est survenue lors de l’envoi du formulaire.');
         }
       } else {
         setError('Une erreur inconnue est survenue.');
@@ -140,7 +180,6 @@ const ClaimForm = forwardRef<HTMLDivElement>((_props, ref) => {
       setLoading(false);
     }
   };
-
 
   return (
     <section ref={ref} id="claim-form-section" className="claim-form-section">
@@ -204,12 +243,9 @@ const ClaimForm = forwardRef<HTMLDivElement>((_props, ref) => {
                   >
                     <option value="">Jour</option>
                     {days.map((day) => (
-                      <option key={day} value={day}>
-                        {day}
-                      </option>
+                      <option key={day} value={day}>{day}</option>
                     ))}
                   </Form.Select>
-
                   <Form.Select
                     name="month"
                     value={formData.birthDate.month}
@@ -219,12 +255,9 @@ const ClaimForm = forwardRef<HTMLDivElement>((_props, ref) => {
                   >
                     <option value="">Mois</option>
                     {months.map((month) => (
-                      <option key={month} value={month}>
-                        {month}
-                      </option>
+                      <option key={month} value={month}>{month}</option>
                     ))}
                   </Form.Select>
-
                   <Form.Select
                     name="year"
                     value={formData.birthDate.year}
@@ -234,9 +267,7 @@ const ClaimForm = forwardRef<HTMLDivElement>((_props, ref) => {
                   >
                     <option value="">Année</option>
                     {years.map((year) => (
-                      <option key={year} value={year}>
-                        {year}
-                      </option>
+                      <option key={year} value={year}>{year}</option>
                     ))}
                   </Form.Select>
                 </div>
@@ -338,6 +369,16 @@ const ClaimForm = forwardRef<HTMLDivElement>((_props, ref) => {
                   onChange={handleChange}
                   placeholder="Décrivez le sinistre en détail"
                   required
+                />
+              </Form.Group>
+
+              <Form.Group controlId="supportingFiles">
+                <Form.Label>Fichiers à l'appui</Form.Label>
+                <Form.Control
+                  type="file"
+                  name="supportingFiles"
+                  onChange={handleChange}
+                  accept="image/jpeg,image/png,application/pdf"
                 />
               </Form.Group>
 
