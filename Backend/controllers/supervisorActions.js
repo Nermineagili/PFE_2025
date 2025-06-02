@@ -6,9 +6,17 @@ const bcrypt = require('bcrypt');
 
 const getAllClaims = async (req, res) => {
     try {
+        if (req.user.role !== 'superviseur') {
+            return res.status(403).json({ success: false, message: "Access denied: Supervisor role required" });
+        }
+
         const claims = await Claim.find()
             .populate("userId", "name email phone")
-            // Removed .populate("contractId", "startDate endDate status policyType") since contractId no longer exists
+            .populate("contractId", "policyType startDate endDate status")
+            .populate({
+                path: "comments",
+                populate: { path: "supervisorId", select: "name email" }
+            })
             .sort({ createdAt: -1 });
 
         res.status(200).json({
@@ -24,9 +32,17 @@ const getAllClaims = async (req, res) => {
 
 const getClaimById = async (req, res) => {
     try {
+        if (req.user.role !== 'superviseur') {
+            return res.status(403).json({ success: false, message: "Access denied: Supervisor role required" });
+        }
+
         const claim = await Claim.findById(req.params.id)
-            .populate("userId", "name email phone");
-            // Removed .populate("contractId", "startDate endDate status policyType") since contractId no longer exists
+            .populate("userId", "name email phone")
+            .populate("contractId", "policyType startDate endDate status")
+            .populate({
+                path: "comments",
+                populate: { path: "supervisorId", select: "name email" }
+            });
 
         if (!claim) return res.status(404).json({ success: false, message: "Claim not found" });
         res.status(200).json({
@@ -42,19 +58,23 @@ const getClaimById = async (req, res) => {
 
 const updateClaimStatus = async (req, res) => {
     try {
+        if (req.user.role !== 'superviseur') {
+            return res.status(403).json({ success: false, message: "Access denied: Supervisor role required" });
+        }
+
         const { status, comment } = req.body;
         if (!["pending", "approved", "rejected"].includes(status)) {
             return res.status(400).json({ success: false, message: "Invalid status value" });
         }
 
-        const supervisorId = req.user?._id; // Assuming authenticateToken sets req.user
+        const supervisorId = req.user._id;
         if (!supervisorId) {
             return res.status(401).json({ success: false, message: "Supervisor ID not found in token" });
         }
 
         const updateData = { status };
-        if (comment && status === "rejected") {
-            updateData.$push = { comments: { comment, supervisorId } };
+        if (comment && status !== "pending") {
+            updateData.$push = { comments: { comment, supervisorId, createdAt: new Date() } };
         }
 
         const updatedClaim = await Claim.findByIdAndUpdate(
@@ -62,8 +82,12 @@ const updateClaimStatus = async (req, res) => {
             updateData,
             { new: true, runValidators: true }
         )
-        .populate("userId", "name email phone");
-        // Removed .populate("contractId", "startDate endDate status policyType") since contractId no longer exists
+        .populate("userId", "name email phone")
+        .populate("contractId", "policyType startDate endDate status")
+        .populate({
+            path: "comments",
+            populate: { path: "supervisorId", select: "name email" }
+        });
 
         if (!updatedClaim) return res.status(404).json({ success: false, message: "Claim not found" });
 
@@ -80,6 +104,18 @@ const updateClaimStatus = async (req, res) => {
 
 const deleteClaim = async (req, res) => {
     try {
+        if (req.user.role !== 'superviseur') {
+            return res.status(403).json({ success: false, message: "Access denied: Supervisor role required" });
+        }
+
+        const claim = await Claim.findById(req.params.id);
+        if (!claim) return res.status(404).json({ success: false, message: "Claim not found" });
+
+        // Remove the claim reference from the associated contract
+        await Contract.findByIdAndUpdate(claim.contractId, {
+            $pull: { claims: claim._id }
+        });
+
         const deletedClaim = await Claim.findByIdAndDelete(req.params.id);
         if (!deletedClaim) return res.status(404).json({ success: false, message: "Claim not found" });
 
@@ -95,6 +131,10 @@ const deleteClaim = async (req, res) => {
 
 const getUsersWithContractsOnly = async (req, res) => {
     try {
+        if (req.user.role !== 'superviseur') {
+            return res.status(403).json({ success: false, message: "Access denied: Supervisor role required" });
+        }
+
         const { policyType } = req.query;
 
         const contractFilter = policyType

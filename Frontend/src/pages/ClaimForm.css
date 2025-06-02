@@ -62,4 +62,16 @@
     flex-direction: column;
     gap: 10px;
   }
+
+  .claim-card {
+    padding: 20px;
+  }
+
+  .claim-title {
+    font-size: 24px;
+  }
+
+  .claim-subtitle {
+    font-size: 14px;
+  }
 }

@@ -1,27 +1,33 @@
 const Claim = require('../models/claim');
 const User = require('../models/user');
 const Contract = require('../models/Contract');
-const cloudinary = require('../cloudinary'); // Assuming cloudinary config is in a separate file
+const cloudinary = require('../cloudinary');
 const fs = require('fs');
 
 const submitClaim = async (req, res) => {
     try {
         const {
             userId,
+            contractId,
+            firstName,
+            lastName,
             birthDate,
-            sexe,
+            profession,
             phone,
-            address,
-            postalAddress,
-            city,
-            postalCode,
             email,
-            stateProvince,
-            incidentDescription
+            postalAddress,
+            incidentType,
+            incidentDate,
+            incidentTime,
+            incidentLocation,
+            incidentDescription,
+            damages,
+            thirdPartyInvolved,
+            thirdPartyDetails
         } = req.body;
 
-        if (!userId) {
-            return res.status(400).json({ success: false, message: "userId is required" });
+        if (!userId || !contractId) {
+            return res.status(400).json({ success: false, message: "userId and contractId are required" });
         }
 
         const user = await User.findById(userId).populate('contracts');
@@ -49,6 +55,14 @@ const submitClaim = async (req, res) => {
             return res.status(403).json({ 
                 success: false, 
                 message: "You must have at least one active contract to submit a claim. Please check your contract status or contact support." 
+            });
+        }
+
+        const selectedContract = activeContracts.find(c => c._id.toString() === contractId);
+        if (!selectedContract) {
+            return res.status(403).json({ 
+                success: false, 
+                message: "Selected contract is not active or does not belong to you." 
             });
         }
 
@@ -91,22 +105,28 @@ const submitClaim = async (req, res) => {
 
         const newClaim = new Claim({
             userId,
-            firstName: user.name,
-            lastName: user.lastname,
+            contractId,
+            firstName,
+            lastName,
             birthDate,
-            sexe,
+            profession,
             phone,
-            address,
-            postalAddress,
-            city,
-            postalCode,
             email,
-            stateProvince,
+            postalAddress,
+            incidentType,
+            incidentDate,
+            incidentTime,
+            incidentLocation,
             incidentDescription,
+            damages,
+            thirdPartyInvolved,
+            thirdPartyDetails: thirdPartyInvolved ? thirdPartyDetails : undefined,
             supportingFiles
         });
 
         await newClaim.save();
+        selectedContract.claims.push(newClaim._id);
+        await selectedContract.save();
 
         res.status(201).json({
             success: true,
@@ -133,9 +153,10 @@ const getUserClaims = async (req, res) => {
 
         const claims = await Claim.find({ userId })
             .populate("userId", "name email phone")
+            .populate("contractId", "policyType startDate endDate status")
             .populate({
                 path: "comments",
-                populate: { path: "supervisorId", select: "name email" } // Populate supervisor details
+                populate: { path: "supervisorId", select: "name email" }
             })
             .sort({ createdAt: -1 });
 
@@ -156,9 +177,10 @@ const getUserClaimById = async (req, res) => {
 
         const claim = await Claim.findOne({ _id: claimId, userId })
             .populate("userId", "name email phone")
+            .populate("contractId", "policyType startDate endDate status")
             .populate({
                 path: "comments",
-                populate: { path: "supervisorId", select: "name email" } // Populate supervisor details
+                populate: { path: "supervisorId", select: "name email" }
             });
 
         if (!claim) {

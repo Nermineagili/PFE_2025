@@ -1,14 +1,15 @@
 /* Main Container */
 .manage-claims-container {
     padding: 2rem 0;
-  }
-  
-  .manage-claims-card {
+}
+
+.manage-claims-card {
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     border: none;
-  }
-  .manage-claims-container.light-theme {
+}
+
+.manage-claims-container.light-theme {
     --primary-color: #153a64;
     --secondary-color: #c19048;
     --bg-color: #ffffff;
@@ -20,9 +21,9 @@
     --danger-color: #dc3545;
     --warning-color: #ffc107;
     --info-color: #17a2b8;
-  }
-  
-  .manage-claims-container.dark-theme {
+}
+
+.manage-claims-container.dark-theme {
     --primary-color: #6ea8fe;
     --secondary-color: #d4a76a;
     --bg-color: #1a1a1a;
@@ -34,159 +35,160 @@
     --danger-color: #e5534b;
     --warning-color: #f1c40f;
     --info-color: #5bc0de;
-  }
-  .manage-claims-title {
+}
+
+.manage-claims-title {
     color: #153a64;
     font-weight: 600;
     margin-bottom: 1.5rem;
-  }
-  
-  /* Table Styles */
-  .manage-claims-table {
+}
+
+/* Table Styles */
+.manage-claims-table {
     margin-top: 1rem;
-  }
-  
-  .manage-claims-table thead th {
+}
+
+.manage-claims-table thead th {
     background-color: #153a64;
     color: white;
     border-bottom: 2px solid #c19048;
-  }
-  
-  .manage-claims-table tbody tr:hover {
+}
+
+.manage-claims-table tbody tr:hover {
     background-color: rgba(193, 144, 72, 0.05);
-  }
-  
-  .description-cell {
+}
+
+.description-cell {
     max-width: 300px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-  }
-  
-  .actions-cell {
+}
+
+.actions-cell {
     white-space: nowrap;
-  }
-  
-  .action-btn {
+}
+
+.action-btn {
     border: none;
     background: transparent;
     padding: 0.4rem;
     margin: 0 0.2rem;
     border-radius: 50%;
     transition: all 0.2s;
-  }
-  
-  .action-btn:hover {
+}
+
+.action-btn:hover {
     transform: scale(1.1);
-  }
-  
-  .analyze-btn {
+}
+
+.see-more-btn {
     color: #153a64;
-  }
-  
-  .analyze-btn:hover {
+}
+
+.see-more-btn:hover {
     background-color: rgba(21, 58, 100, 0.1);
-  }
-  
-  .approve-btn {
+}
+
+.approve-btn {
     color: #28a745;
-  }
-  
-  .approve-btn:hover {
+}
+
+.approve-btn:hover {
     background-color: rgba(40, 167, 69, 0.1);
-  }
-  
-  .reject-btn {
+}
+
+.reject-btn {
     color: #dc3545;
-  }
-  
-  .reject-btn:hover {
+}
+
+.reject-btn:hover {
     background-color: rgba(220, 53, 69, 0.1);
-  }
-  
-  .delete-btn {
+}
+
+.delete-btn {
     color: #6c757d;
-  }
-  
-  .delete-btn:hover {
+}
+
+.delete-btn:hover {
     background-color: rgba(108, 117, 125, 0.1);
-  }
-  
-  /* Status Badges */
-  .badge {
+}
+
+/* Status Badges */
+.badge {
     padding: 0.5em 0.75em;
     font-weight: 500;
     border-radius: 8px;
-  }
-  
-  /* Claim Modal Styles */
-  .claim-modal {
+}
+
+/* Claim Modal Styles */
+.claim-modal {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  }
-  
-  .modal-header {
+}
+
+.modal-header {
     background-color: #153a64;
     color: white;
     border-bottom: 2px solid #c19048;
-  }
-  
-  .modal-header .btn-close {
+}
+
+.modal-header .btn-close {
     filter: invert(1);
-  }
-  
-  .modal-body {
+}
+
+.modal-body {
     padding: 25px;
-  }
-  
-  .claim-details {
+}
+
+.claim-details {
     display: flex;
     flex-direction: column;
     gap: 15px;
-  }
-  
-  .detail-row {
+}
+
+.detail-row {
     display: flex;
     align-items: flex-start;
-  }
-  
-  .detail-row.full-width {
+}
+
+.detail-row.full-width {
     flex-direction: column;
-  }
-  
-  .detail-label {
+}
+
+.detail-label {
     font-weight: 600;
     color: #153a64;
-    min-width: 120px;
-  }
-  
-  .detail-value {
+    min-width: 150px; /* Adjusted for longer labels */
+}
+
+.detail-value {
     flex: 1;
-  }
-  
-  .incident-description {
+}
+
+.incident-description {
     background-color: #f8f9fa;
     padding: 15px;
     border-radius: 8px;
     margin-top: 8px;
     white-space: pre-wrap;
-  }
-  
-  .modal-footer {
+}
+
+.modal-footer {
     border-top: 1px solid #e5e7eb;
     padding: 15px 25px;
     display: flex;
     gap: 10px;
     justify-content: flex-end;
-  }
-  
-  .close-button {
+}
+
+.close-button {
     padding: 8px 20px;
     border-radius: 8px;
     font-weight: 500;
-  }
-  
-  /* Modal Action Buttons - Fixed visibility issue */
-  .modal-action-btn {
+}
+
+/* Modal Action Buttons */
+.modal-action-btn {
     padding: 8px 16px;
     border-radius: 8px;
     font-weight: 500;
@@ -197,80 +199,80 @@
     visibility: visible !important;
     position: relative !important;
     z-index: 1 !important;
-  }
-  
-  .approve-modal-btn {
+}
+
+.approve-modal-btn {
     background-color: #28a745 !important;
     border-color: #28a745 !important;
     color: white !important;
-  }
-  
-  .approve-modal-btn:hover {
+}
+
+.approve-modal-btn:hover {
     background-color: #218838 !important;
     border-color: #1e7e34 !important;
     color: white !important;
-  }
-  
-  .reject-modal-btn {
+}
+
+.reject-modal-btn {
     background-color: #dc3545 !important;
     border-color: #dc3545 !important;
     color: white !important;
-  }
-  
-  .reject-modal-btn:hover {
+}
+
+.reject-modal-btn:hover {
     background-color: #c82333 !important;
     border-color: #bd2130 !important;
     color: white !important;
-  }
-  
-  /* File links styling */
-  .file-link {
+}
+
+/* File links styling */
+.file-link {
     display: block;
     margin: 5px 0;
     color: #153a64;
     text-decoration: none;
-  }
-  
-  .file-link:hover {
+}
+
+.file-link:hover {
     text-decoration: underline;
     color: #c19048;
-  }
-  
-  /* Responsive Adjustments */
-  @media (max-width: 768px) {
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
     .manage-claims-container {
-      padding: 1rem;
+        padding: 1rem;
     }
     
     .manage-claims-table {
-      font-size: 0.9rem;
+        font-size: 0.9rem;
     }
     
     .action-btn {
-      padding: 0.3rem;
-      margin: 0 0.1rem;
+        padding: 0.3rem;
+        margin: 0 0.1rem;
     }
     
     .modal-body {
-      padding: 20px;
+        padding: 20px;
     }
     
     .detail-row {
-      flex-direction: column;
-      gap: 5px;
+        flex-direction: column;
+        gap: 5px;
     }
     
     .detail-label {
-      min-width: auto;
+        min-width: auto;
     }
     
     .modal-footer {
-      flex-direction: column;
-      gap: 10px;
+        flex-direction: column;
+        gap: 10px;
     }
     
     .modal-action-btn {
-      width: 100%;
-      justify-content: center;
+        width: 100%;
+        justify-content: center;
     }
-  }
+}

@@ -1,9 +1,8 @@
-
 /* Main section styling with gradient background */
 .declarations-section {
-  padding: 120px 0 0; /* Increased padding-top to clear fixed navbar */
+  padding: 120px 0 0;
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  min-height: calc(100vh - 80px); /* Adjust based on footer height */
+  min-height: calc(100vh - 80px);
   position: relative;
 }
 
@@ -301,6 +300,15 @@
   font-weight: 600;
 }
 
+.modal-body a {
+  color: #153a64;
+  text-decoration: none;
+}
+
+.modal-body a:hover {
+  text-decoration: underline;
+}
+
 .modal-footer {
   border-top: none;
   padding: 15px 25px 25px;
@@ -334,7 +342,7 @@
 
 @media (max-width: 768px) {
   .declarations-section {
-    padding: 100px 0 0; /* Adjusted for smaller screens */
+    padding: 100px 0 0;
   }
   
   .declarations-card {
@@ -369,7 +377,7 @@
 
 @media (max-width: 576px) {
   .declarations-section {
-    padding: 80px 0 0; /* Further adjusted for mobile */
+    padding: 80px 0 0;
   }
   
   .declarations-title {

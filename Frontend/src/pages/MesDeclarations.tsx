@@ -10,26 +10,33 @@ import "./MesDeclarations.css";
 
 interface Claim {
   _id: string;
-  firstName?: string;
-  lastName?: string;
-  birthDate?: { day: number; month: number; year: number };
-  sexe?: string;
-  phone?: string;
-  address?: string;
-  postalAddress?: string;
-  city?: string;
-  postalCode?: string;
-  email?: string;
-  stateProvince?: string;
+  userId: { name: string; email: string; phone: string } | string | null;
+  contractId: { policyType: string; startDate: string; endDate: string; status: string } | string | null;
+  firstName: string;
+  lastName: string;
+  birthDate: { day: number; month: number; year: number };
+  profession: string;
+  phone: string;
+  email: string;
+  postalAddress: string;
+  incidentType: string;
+  incidentDate: string;
+  incidentTime: string;
+  incidentLocation: string;
   incidentDescription: string;
+  damages: string;
+  thirdPartyInvolved: boolean;
+  thirdPartyDetails?: {
+    name: string;
+    contactInfo: string;
+    registrationId: string;
+    insurerContact: string;
+  };
   status: "pending" | "approved" | "rejected";
   createdAt: string;
   updatedAt: string;
-  comments?: {
-    comment: string;
-    supervisorId: { name: string; email: string };
-    createdAt: string;
-  }[];
+  supportingFiles: { publicId: string; url: string; fileName: string; fileType: string; uploadedAt: string }[];
+  comments: { comment: string; supervisorId: { name: string; email: string }; createdAt: string }[];
 }
 
 interface Contract {
@@ -55,7 +62,9 @@ const MesDeclarations = () => {
     const fetchClaims = async () => {
       if (user) {
         try {
-          const response = await axios.get(`http://localhost:5000/api/claims/user/${user._id}`);
+          const response = await axios.get(`http://localhost:5000/api/claims/user/${user._id}`, {
+            headers: { Authorization: `Bearer ${localStorage.getItem('authToken')}` },
+          });
           const fetchedClaims = response.data.data;
           setClaims(fetchedClaims);
 
@@ -141,7 +150,9 @@ const MesDeclarations = () => {
 
   const handleShowDetails = async (claimId: string) => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/claims/user/${user?._id}/${claimId}`);
+      const response = await axios.get(`http://localhost:5000/api/claims/user/${user?._id}/${claimId}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('authToken')}` },
+      });
       setSelectedClaim(response.data.data);
       setShowModal(true);
     } catch (error) {
@@ -216,6 +227,7 @@ const MesDeclarations = () => {
                       <thead>
                         <tr>
                           <th>Référence</th>
+                          <th>Type de Sinistre</th>
                           <th>Description</th>
                           <th>Statut</th>
                           <th>Date</th>
@@ -231,6 +243,7 @@ const MesDeclarations = () => {
                             whileHover={{ scale: 1.01 }}
                           >
                             <td><strong>#{claim._id.slice(-6).toUpperCase()}</strong></td>
+                            <td>{claim.incidentType || "N/A"}</td>
                             <td className="description-cell">
                               {claim.incidentDescription.length > 50
                                 ? `${claim.incidentDescription.substring(0, 50)}...`
@@ -339,6 +352,9 @@ const MesDeclarations = () => {
                     </Badge>
                   </p>
                   <p><strong>Date de création:</strong> {formatDateFr(selectedClaim.createdAt)}</p>
+                  <p><strong>Type de sinistre:</strong> {selectedClaim.incidentType || "N/A"}</p>
+                  <p><strong>Date et heure:</strong> {formatDateFr(selectedClaim.incidentDate)} à {selectedClaim.incidentTime}</p>
+                  <p><strong>Lieu:</strong> {selectedClaim.incidentLocation || "N/A"}</p>
                 </div>
                 <div className="col-md-6">
                   <div className="d-flex align-items-center mb-2">
@@ -349,7 +365,7 @@ const MesDeclarations = () => {
                   <p><strong>Date de naissance:</strong> {selectedClaim.birthDate
                     ? `${selectedClaim.birthDate.day}/${selectedClaim.birthDate.month}/${selectedClaim.birthDate.year}`
                     : "N/A"}</p>
-                  <p><strong>Sexe:</strong> {selectedClaim.sexe === "homme" ? "Homme" : "Femme"}</p>
+                  <p><strong>Profession:</strong> {selectedClaim.profession || "N/A"}</p>
                 </div>
               </div>
 
@@ -357,7 +373,7 @@ const MesDeclarations = () => {
                 <div className="col-12">
                   <div className="d-flex align-items-center mb-2">
                     <IoMdDocument size={20} className="me-2" color="#153a64" />
-                    <strong>Description de l'incident</strong>
+                    <strong>Circonstances de l'incident</strong>
                   </div>
                   <div className="p-3 bg-light rounded">
                     {selectedClaim.incidentDescription}
@@ -365,7 +381,19 @@ const MesDeclarations = () => {
                 </div>
               </div>
 
-              <div className="row">
+              <div className="row mb-4">
+                <div className="col-12">
+                  <div className="d-flex align-items-center mb-2">
+                    <IoMdDocument size={20} className="me-2" color="#153a64" />
+                    <strong>Dommages subis</strong>
+                  </div>
+                  <div className="p-3 bg-light rounded">
+                    {selectedClaim.damages}
+                  </div>
+                </div>
+              </div>
+
+              <div className="row mb-4">
                 <div className="col-md-6">
                   <div className="d-flex align-items-center mb-2">
                     <IoMdPerson size={20} className="me-2" color="#153a64" />
@@ -373,20 +401,61 @@ const MesDeclarations = () => {
                   </div>
                   <p><strong>Téléphone:</strong> {selectedClaim.phone}</p>
                   <p><strong>Email:</strong> {selectedClaim.email}</p>
+                  <p><strong>Adresse postale:</strong> {selectedClaim.postalAddress}</p>
                 </div>
                 <div className="col-md-6">
                   <div className="d-flex align-items-center mb-2">
-                    <IoMdPerson size={20} className="me-2" color="#153a64" />
-                    <strong>Adresse</strong>
+                    <IoMdDocument size={20} className="me-2" color="#153a64" />
+                    <strong>Contrat Associé</strong>
                   </div>
-                  <p><strong>Adresse:</strong> {selectedClaim.address}</p>
-                  <p><strong>Ville:</strong> {selectedClaim.city}</p>
-                  <p><strong>Code postal:</strong> {selectedClaim.postalCode}</p>
-                  <p><strong>Province/État:</strong> {selectedClaim.stateProvince}</p>
+                  {selectedClaim.contractId && typeof selectedClaim.contractId !== "string" ? (
+                    <>
+                      <p><strong>Type:</strong> {selectedClaim.contractId.policyType}</p>
+                      <p><strong>Date de début:</strong> {formatDateFr(selectedClaim.contractId.startDate)}</p>
+                      <p><strong>Date de fin:</strong> {formatDateFr(selectedClaim.contractId.endDate)}</p>
+                    </>
+                  ) : (
+                    <p>Contrat non disponible</p>
+                  )}
                 </div>
               </div>
 
-              {/* Display Comments */}
+              <div className="row mb-4">
+                <div className="col-12">
+                  <div className="d-flex align-items-center mb-2">
+                    <IoMdDocument size={20} className="me-2" color="#153a64" />
+                    <strong>Tiers impliqué</strong>
+                  </div>
+                  <p><strong>Tiers impliqué:</strong> {selectedClaim.thirdPartyInvolved ? "Oui" : "Non"}</p>
+                  {selectedClaim.thirdPartyInvolved && selectedClaim.thirdPartyDetails && (
+                    <>
+                      <p><strong>Nom:</strong> {selectedClaim.thirdPartyDetails.name || "N/A"}</p>
+                      <p><strong>Coordonnées:</strong> {selectedClaim.thirdPartyDetails.contactInfo || "N/A"}</p>
+                      <p><strong>N° d'immatriculation:</strong> {selectedClaim.thirdPartyDetails.registrationId || "N/A"}</p>
+                      <p><strong>Assureur:</strong> {selectedClaim.thirdPartyDetails.insurerContact || "N/A"}</p>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {selectedClaim.supportingFiles && selectedClaim.supportingFiles.length > 0 && (
+                <div className="row mb-4">
+                  <div className="col-12">
+                    <div className="d-flex align-items-center mb-2">
+                      <IoMdDocument size={20} className="me-2" color="#153a64" />
+                      <strong>Fichiers à l'appui</strong>
+                    </div>
+                    {selectedClaim.supportingFiles.map((file, index) => (
+                      <p key={index}>
+                        <a href={file.url} target="_blank" rel="noopener noreferrer">
+                          {file.fileName} ({file.fileType})
+                        </a>
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {selectedClaim.comments && selectedClaim.comments.length > 0 && (
                 <div className="row mt-4">
                   <div className="col-12">
