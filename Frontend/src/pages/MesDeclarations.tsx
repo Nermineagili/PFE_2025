@@ -285,7 +285,7 @@ const MesDeclarations = () => {
           </motion.div>
 
           {/* Display Active Contracts */}
-          {activeContracts.length > 0 && (
+          {/* {activeContracts.length > 0 && (
             <motion.div variants={itemVariants} className="mt-4">
               <Card className="declarations-card">
                 <Card.Body>
@@ -317,7 +317,7 @@ const MesDeclarations = () => {
                 </Card.Body>
               </Card>
             </motion.div>
-          )}
+          )} */}
         </motion.div>
       </Container>
 

@@ -9,13 +9,14 @@ const {
   getRenewableContracts,
   prepareRenewal,
   executeRenewal,
-  fixContractStatuses
+  fixContractStatuses,
+  downloadContract
 } = require('../controllers/ContratController');
 const { authenticateToken, validateObjectId } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 const stripeWebhookMiddleware = express.raw({type: 'application/json'});
-// Middleware to validate contract IDs
+
 const validateContractId = (req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.contractId)) {
     return res.status(400).json({ 
@@ -26,7 +27,6 @@ const validateContractId = (req, res, next) => {
   next();
 };
 
-// POST route to subscribe to a new contract (payment initiation)
 router.post(
   '/subscribe',
   [
@@ -37,15 +37,14 @@ router.post(
     body('startDate').isISO8601().withMessage('Valid start date is required'),
     body('endDate').isISO8601().withMessage('Valid end date is required'),
     body('premiumAmount').isNumeric().withMessage('Premium amount must be a number'),
-    body('coverageDetails').notEmpty().withMessage('Coverage details are required')
+    body('coverageDetails').notEmpty().withMessage('Coverage details are required'),
+    body('signature').optional().isString().withMessage('Signature must be a string')
   ],
   createContract
 );
 
-// Route to finalize a payment
 router.post('/finalize-payment', finalizePayment);
 
-// GET route to fetch all contracts for a user
 router.get(
   '/:userId',
   authenticateToken,
@@ -53,19 +52,17 @@ router.get(
   getUserContracts
 );
 
-// Add this route - no auth needed as it's called by Stripe
 router.post('/webhook', stripeWebhookMiddleware, handleStripeWebhook);
-// Get contracts eligible for renewal
+
 router.get(
   '/renewable/:userId',
   authenticateToken,
   validateObjectId,
   getRenewableContracts
 );
+
 router.post('/fix-statuses', fixContractStatuses);
 
-
-// Prepare contract renewal
 router.post(
   '/prepare-renewal/:contractId',
   authenticateToken,
@@ -73,12 +70,18 @@ router.post(
   prepareRenewal
 );
 
-// Execute contract renewal
 router.post(
   '/execute-renewal/:contractId',
   authenticateToken,
   validateContractId,
   executeRenewal
+);
+
+router.get(
+  '/download/:contractId',
+  authenticateToken,
+  validateContractId,
+  downloadContract
 );
 
 module.exports = router;

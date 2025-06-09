@@ -157,6 +157,47 @@
   transform: none;
 }
 
+/* Enhanced signature buttons styling */
+.signature-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.signature-buttons button {
+  flex: 1;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: #153a64;
+  color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.signature-buttons button:first-child {
+  background-color: #dc3545;
+}
+
+.signature-buttons button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.signature-buttons button:first-child:hover {
+  background-color: #c82333;
+}
+
+.signature-buttons button:disabled {
+  background-color: #d1d5db;
+  cursor: not-allowed;
+  transform: none;
+  opacity: 0.6;
+}
+
 .error {
   color: #dc3545;
   font-size: 0.85rem;
@@ -197,6 +238,7 @@
   max-width: 300px;
   padding: 1rem;
 }
+
 .payment-processing {
   display: flex;
   flex-direction: column;
@@ -234,5 +276,3 @@
   border-radius: 5px;
   margin: 10px 0;
 }
-
-

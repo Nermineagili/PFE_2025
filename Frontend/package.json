@@ -14,7 +14,7 @@
     "@fortawesome/free-regular-svg-icons": "^6.7.2",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
-    "@stripe/react-stripe-js": "^3.6.0",
+    "@stripe/react-stripe-js": "^3.7.0",
     "@stripe/stripe-js": "^7.2.0",
     "@themesberg/react-bootstrap": "^1.4.1",
     "@types/recharts": "^1.8.29",
@@ -31,7 +31,9 @@
     "react-dropzone": "^14.3.8",
     "react-icons": "^5.5.0",
     "react-router-dom": "^7.2.0",
+    "react-signature-canvas": "^1.1.0-alpha.2",
     "recharts": "^2.15.3",
+    "signature_pad": "^5.0.9",
     "simplebar-react": "^3.3.0"
   },
   "devDependencies": {

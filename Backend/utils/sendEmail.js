@@ -3,7 +3,9 @@ require('dotenv').config();
 
 const sendEmail = async (to, subject, html) => {
   const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: process.env.SMTP_HOST,
+    port: parseInt(process.env.SMTP_PORT),
+    secure: false, // Use TLS for port 587; set to true for 465
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
@@ -11,7 +13,7 @@ const sendEmail = async (to, subject, html) => {
   });
 
   const mailOptions = {
-    from: `"Insurance Platform" <${process.env.SMTP_USER}>`,
+    from: process.env.SMTP_FROM,
     to,
     subject,
     html,
