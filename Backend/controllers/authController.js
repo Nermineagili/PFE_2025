@@ -95,34 +95,44 @@ const register = async (req, res) => {
 
 // User Login
 const login = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email });
-    
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
+    console.log(`login - Request received at ${new Date().toISOString()} with body:`, req.body);
+    try {
+        const { email, password } = req.body;
+        if (!email || !password) {
+            console.log(`login - Missing email or password at ${new Date().toISOString()}`);
+            return res.status(400).json({ error: "Email and password are required" });
+        }
+
+        console.log(`login - Finding user ${email} at ${new Date().toISOString()}`);
+        const user = await User.findOne({ email }).lean(); // Use lean() for performance
+        if (!user) {
+            console.log(`login - User ${email} not found at ${new Date().toISOString()}`);
+            return res.status(401).json({ error: "Invalid credentials" });
+        }
+
+        console.log(`login - Comparing passwords for ${email} at ${new Date().toISOString()}`);
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            console.log(`login - Password mismatch for ${email} at ${new Date().toISOString()}`);
+            return res.status(401).json({ error: "Invalid credentials" });
+        }
+
+        console.log(`login - Generating token for ${user._id} at ${new Date().toISOString()}`);
+        const payload = {
+            _id: user._id,
+            email: user.email,
+            fullname: `${user.name} ${user.lastname}`,
+            role: user.role,
+            profilePic: user.profilePic,
+        };
+        const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
+
+        console.log(`login - Login successful, token generated at ${new Date().toISOString()}:`, token);
+        res.status(200).json({ success: true, user: payload, token });
+    } catch (error) {
+        console.error(`login - Error: ${error.message} at ${new Date().toISOString()}`, error.stack);
+        res.status(500).json({ error: "Login failed", details: error.message });
     }
-    
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      return res.status(401).json({ error: "Invalid password" });
-    }
-    
-    const payload = {
-      _id: user._id,
-      email: user.email,
-      fullname: `${user.name} ${user.lastname}`,
-      role: user.role,
-      profilePic: user.profilePic,
-    };
-    
-    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
-    res.status(200).json({ user: payload, token });
-    
-  } catch (error) {
-    console.error('[Auth] Login error:', error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
 };
 
 // Forgot Password

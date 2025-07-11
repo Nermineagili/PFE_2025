@@ -48,7 +48,9 @@ const ClaimSchema = new mongoose.Schema({
             supervisorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
             createdAt: { type: Date, default: Date.now }
         }
-    ]
+    ],
+    prediction: { type: String }, // Add field for prediction result
+    probability_suspicieux: { type: Number } // Add field for probability
 });
 
 module.exports = mongoose.model('Claim', ClaimSchema);

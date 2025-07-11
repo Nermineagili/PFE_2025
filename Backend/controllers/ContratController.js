@@ -349,15 +349,22 @@ exports.finalizePayment = async (req, res) => {
 };
 
 exports.getUserContracts = async (req, res) => {
-  try {
-    const { userId } = req.params;
-    const user = await User.findById(userId).populate('contracts');
-    if (!user) return res.status(404).json({ message: 'User not found' });
-    res.status(200).json(user.contracts || []);
-  } catch (error) {
-    console.error('Contracts fetch error:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
-  }
+    try {
+        console.log('getUserContracts called with req.user:', req.user);
+        console.log('getUserContracts called with req.params.userId:', req.params.userId);
+        const { userId } = req.params;
+        const user = await User.findById(userId).populate('contracts');
+        if (!user) {
+            console.log('User not found for userId:', userId);
+            return res.status(404).json({ message: 'User not found' });
+        }
+        console.log('Raw user data:', user);
+        console.log('User fetched with contracts:', user.contracts);
+        res.status(200).json(user.contracts || []);
+    } catch (error) {
+        console.error('Contracts fetch error:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
 };
 
 exports.prepareRenewal = async (req, res) => {

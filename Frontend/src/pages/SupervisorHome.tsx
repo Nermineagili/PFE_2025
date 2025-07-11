@@ -4,10 +4,10 @@ import AdminSidebar from "../components/AdminSidebar";
 import Dashboard from "./Dashboard";
 import ManageClaims from "../components/ManageClaims";
 import Settings from "../components/Settings";
-import Postlogin from "../components/ChatBot/Postlogin";
 import AdsupNavbar from "../components/AdsupNavbar";
-import "./SupervisorHome.css"; // Make sure to create this CSS file
+import "./SupervisorHome.css";
 import UsersWithContracts from "../components/UsersWithContracts";
+import TaskManager from "../components/TaskManager"; 
 
 const SupervisorHome: React.FC = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -15,6 +15,7 @@ const SupervisorHome: React.FC = () => {
   const manageClaimsRef = useRef<HTMLDivElement>(null);
   const manageSettingsRef = useRef<HTMLDivElement>(null);
   const manageContractsRef = useRef<HTMLDivElement>(null);
+  const manageTasksRef = useRef<HTMLDivElement>(null); 
 
   const scrollToDashboard = () => {
     manageDashboardRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -32,6 +33,10 @@ const SupervisorHome: React.FC = () => {
     manageContractsRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const scrollToTasks = () => {
+    manageTasksRef.current?.scrollIntoView({ behavior: "smooth" }); 
+  };
+
   // Handle sidebar collapse state change
   const handleSidebarToggle = (collapsed: boolean) => {
     setSidebarCollapsed(collapsed);
@@ -46,10 +51,11 @@ const SupervisorHome: React.FC = () => {
       <AdminSidebar
         role="supervisor"
         onManageDashboardClick={scrollToDashboard}
-        onManageClaimsClick={scrollToClaims}
+        onManageClaimsClick={scrollToClaims} 
         onManageSettingsClick={scrollToSettings}
         onSidebarToggle={handleSidebarToggle}
         onManageContractsClick={scrollToContracts}
+        onManageTasksClick={scrollToTasks} 
       />
 
       {/* Main Content Area - This adjusts based on sidebar state */}
@@ -58,21 +64,21 @@ const SupervisorHome: React.FC = () => {
           <div ref={manageDashboardRef}>
             <Dashboard />
           </div>
+          <div ref={manageTasksRef}>
+            <TaskManager /> 
+          </div>
           <div ref={manageContractsRef}>
-            <UsersWithContracts/>
+            <UsersWithContracts />
           </div>
           <div ref={manageClaimsRef}>
             <ManageClaims />
           </div>
-          
           <div ref={manageSettingsRef}>
             <Settings />
           </div>
+
         </Container>
       </div>
-
-      {/* Chatbot component */}
-      <Postlogin userType="client" />
     </div>
   );
 };

@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const ContractSchema = new mongoose.Schema(
-  {
+  {   
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     policyType: {
       type: String,
@@ -30,10 +30,12 @@ const ContractSchema = new mongoose.Schema(
       renewalCoverage: String,
       renewalPolicyDetails: mongoose.Schema.Types.Mixed
     },
-    previousContract: { type: mongoose.Schema.Types.ObjectId, ref: "Contract" }, // For tracking renewals
-    signature: { type: String } // Added field for base64-encoded signature
+    previousContract: { type: mongoose.Schema.Types.ObjectId, ref: "Contract" },
+    signature: { type: String }
   },
   { timestamps: true }
 );
+
+ContractSchema.index({ claims: 1 }); // Ensure this index exists
 
 module.exports = mongoose.model("Contract", ContractSchema);

@@ -3,6 +3,9 @@ const User = require('../models/user');
 const Contract = require('../models/Contract');
 const cloudinary = require('../cloudinary');
 const fs = require('fs');
+const { execSync } = require('child_process');
+const path = require('path');
+const axios = require('axios');
 
 const submitClaim = async (req, res) => {
     try {
@@ -149,6 +152,7 @@ const submitClaim = async (req, res) => {
 
 const getUserClaims = async (req, res) => {
     try {
+        console.log('getUserClaims called with req.user:', req.user); // New log
         const userId = req.params.userId;
 
         const claims = await Claim.find({ userId })
@@ -170,7 +174,6 @@ const getUserClaims = async (req, res) => {
         res.status(500).json({ success: false, message: "Failed to fetch user claims" });
     }
 };
-
 const getUserClaimById = async (req, res) => {
     try {
         const { userId, claimId } = req.params;
@@ -219,9 +222,34 @@ const downloadClaimFile = async (req, res) => {
     }
 };
 
+// Analyze claim using Flask API
+// const analyzeClaim = async (req, res) => {
+//   try {
+//     const { claimId } = req.params;
+//     const { prediction, probability_suspicieux } = req.body;
+//     const claim = await Claim.findById(claimId);
+//     if (!claim) {
+//       return res.status(404).json({ success: false, message: 'Claim not found' });
+//     }
+
+//     claim.prediction = prediction;
+//     claim.probability_suspicieux = probability_suspicieux;
+//     await claim.save();
+
+//     res.status(200).json({ success: true, claim });
+//   } catch (error) {
+//     console.error('Error updating claim:', error);
+//     res.status(500).json({
+//       success: false,
+//       message: 'Internal server error',
+//       details: error.message,
+//     });
+//   }
+// };
 module.exports = {
     submitClaim,
     getUserClaims,
     getUserClaimById,
-    downloadClaimFile
+    downloadClaimFile,
+   
 };

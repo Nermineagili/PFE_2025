@@ -103,32 +103,41 @@ const updateClaimStatus = async (req, res) => {
 };
 
 const deleteClaim = async (req, res) => {
+    console.log(`deleteClaim - Starting for ${req.params.id} at ${new Date().toISOString()}`);
     try {
-        if (req.user.role !== 'superviseur') {
-            return res.status(403).json({ success: false, message: "Access denied: Supervisor role required" });
-        }
-
+        console.log(`deleteClaim - Finding claim ${req.params.id} at ${new Date().toISOString()}`);
         const claim = await Claim.findById(req.params.id);
-        if (!claim) return res.status(404).json({ success: false, message: "Claim not found" });
+        if (!claim) {
+            console.log(`deleteClaim - Claim not found at ${new Date().toISOString()}`);
+            return res.status(404).json({ success: false, message: "Claim not found" });
+        }
+        console.log(`deleteClaim - Found claim, contractId: ${claim.contractId} at ${new Date().toISOString()}`);
 
-        // Remove the claim reference from the associated contract
-        await Contract.findByIdAndUpdate(claim.contractId, {
-            $pull: { claims: claim._id }
-        });
+        console.log(`deleteClaim - Finding contract ${claim.contractId} at ${new Date().toISOString()}`);
+        const startUpdate = Date.now();
+        const contract = await Contract.findById(claim.contractId);
+        if (!contract) {
+            console.log(`deleteClaim - Contract not found for ${claim.contractId} at ${new Date().toISOString()}`);
+            throw new Error(`Contract not found for ID: ${claim.contractId}`);
+        }
+        await Contract.findByIdAndUpdate(claim.contractId, { $pull: { claims: claim._id } });
+        console.log(`deleteClaim - Contract updated in ${Date.now() - startUpdate}ms at ${new Date().toISOString()}`);
 
+        console.log(`deleteClaim - Deleting claim ${req.params.id} at ${new Date().toISOString()}`);
+        const startDelete = Date.now();
         const deletedClaim = await Claim.findByIdAndDelete(req.params.id);
-        if (!deletedClaim) return res.status(404).json({ success: false, message: "Claim not found" });
+        if (!deletedClaim) {
+            console.log(`deleteClaim - Delete failed for ${req.params.id} at ${new Date().toISOString()}`);
+            throw new Error("Claim deletion failed");
+        }
+        console.log(`deleteClaim - Claim deleted in ${Date.now() - startDelete}ms at ${new Date().toISOString()}`);
 
-        res.status(200).json({
-            success: true,
-            message: "Claim deleted successfully"
-        });
+        res.status(200).json({ success: true, message: "Claim deleted successfully" });
     } catch (err) {
-        console.error("Error deleting claim:", err);
-        res.status(500).json({ success: false, message: "Failed to delete claim" });
+        console.error(`deleteClaim - Error: ${err.message} at ${new Date().toISOString()}`);
+        res.status(500).json({ success: false, message: "Failed to delete claim", details: err.message });
     }
 };
-
 const getUsersWithContractsOnly = async (req, res) => {
     try {
         if (req.user.role !== 'superviseur') {
@@ -187,11 +196,41 @@ const getAllMessages = async (req, res) => {
     }
 };
 
+// Analyze claim with AI prediction
+const analyzeClaim = async (req, res) => {
+    try {
+        if (req.user.role !== 'superviseur') {
+            return res.status(403).json({ success: false, message: "Access denied: Supervisor role required" });
+        }
+
+        const { claimId } = req.params;
+        const { prediction, probability_suspicieux } = req.body;
+        const claim = await Claim.findById(claimId);
+        if (!claim) {
+            return res.status(404).json({ success: false, message: 'Claim not found' });
+        }
+
+        claim.prediction = prediction;
+        claim.probability_suspicieux = probability_suspicieux;
+        await claim.save();
+
+        res.status(200).json({ success: true, claim });
+    } catch (error) {
+        console.error('Error updating claim:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+            details: error.message,
+        });
+    }
+};
+
 module.exports = {
     getAllClaims,
     getClaimById,
     updateClaimStatus,
     deleteClaim,
     getUsersWithContractsOnly,
-    getAllMessages
+    getAllMessages,
+    analyzeClaim
 };

@@ -5,7 +5,6 @@ import Dashboard from "./Dashboard";
 import ManageUsers from "../components/ManageUsers";
 import Settings from "../components/Settings";
 import ManageClaims from "../components/ManageClaims";
-import Postlogin from "../components/ChatBot/Postlogin";
 import AdsupNavbar from "../components/AdsupNavbar";
 import ResetPasswordApproval from "./ResetPasswordApproval";
 import { useLocation } from "react-router-dom";
@@ -148,7 +147,6 @@ const AdminHome: React.FC = () => {
       </div>
       
       {/* Chatbot component */}
-      <Postlogin userType={"client"} />
     </div>
   );
 };

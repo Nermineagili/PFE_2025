@@ -8,12 +8,50 @@ const SignIn: React.FC = () => {
   const [credentials, setCredentials] = useState({ email: "", password: "" });
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const navigate = useNavigate();
   const { login } = useAuth();
+
+  const validateField = (name: string, value: string) => {
+    const newErrors = { ...errors };
+    switch (name) {
+      case "email":
+        if (!value.trim()) newErrors[name] = "Email requis.";
+        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) newErrors[name] = "Email invalide.";
+        else delete newErrors[name];
+        break;
+      case "password":
+        if (!value.trim()) newErrors[name] = "Mot de passe requis.";
+        else if (value.length < 8) newErrors[name] = "Mot de passe doit contenir au moins 8 caractères.";
+        else if (!/(?=.*[A-Z])(?=.*[0-9])/.test(value)) newErrors[name] = "Mot de passe doit inclure une majuscule et un chiffre.";
+        else delete newErrors[name];
+        break;
+      default:
+        delete newErrors[name];
+    }
+    setErrors(newErrors);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setCredentials((prev) => ({ ...prev, [name]: value }));
+    validateField(name, value);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setErrorMessage(""); // Clear previous server error on new submit
+
+    // Final validation before submission
+    validateField("email", credentials.email);
+    validateField("password", credentials.password);
+    if (Object.keys(errors).length > 0) {
+      setErrorMessage("Veuillez corriger les erreurs dans le formulaire.");
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const response = await axios.post("http://localhost:5000/api/auth/login", credentials);
       login(response.data.token, response.data.user);
@@ -61,11 +99,14 @@ const SignIn: React.FC = () => {
               <input
                 id="email"
                 type="email"
+                name="email" // Added name for handleChange
                 placeholder="Votre adresse email"
-                onChange={(e) => setCredentials({ ...credentials, email: e.target.value })}
+                onChange={handleChange}
                 value={credentials.email}
                 required
+                className={errors.email ? "input-error" : ""}
               />
+              {errors.email && <span className="error-text">{errors.email}</span>}
             </div>
 
             <div className="form-group">
@@ -73,11 +114,14 @@ const SignIn: React.FC = () => {
               <input
                 id="password"
                 type="password"
+                name="password" // Added name for handleChange
                 placeholder="Votre mot de passe"
-                onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
+                onChange={handleChange}
                 value={credentials.password}
                 required
+                className={errors.password ? "input-error" : ""}
               />
+              {errors.password && <span className="error-text">{errors.password}</span>}
             </div>
 
             <div className="forgot-password">
@@ -87,7 +131,7 @@ const SignIn: React.FC = () => {
             <button 
               type="submit" 
               className="auth-submit-btn"
-              disabled={isLoading}
+              disabled={isLoading || Object.keys(errors).length > 0}
             >
               {isLoading ? (
                 <span className="loading-spinner"></span>

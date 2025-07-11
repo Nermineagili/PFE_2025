@@ -1,13 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const { submitClaim, getUserClaimById, getUserClaims, downloadClaimFile } = require('../controllers/claimController');
-const { authenticateToken, validateObjectId } = require('../middleware/authMiddleware');
+const { submitClaim, getUserClaims, getUserClaimById, downloadClaimFile, analyzeClaim } = require('../controllers/claimController');
+const { authenticateToken, validateObjectId, checkSupervisor } = require('../middleware/authMiddleware');
 const multer = require('multer');
 const fs = require('fs');
+
 const upload = multer({
     storage: multer.diskStorage({
         destination: (req, file, cb) => {
-            const dir = 'uploads/';
+            const dir = 'Uploads/';
             if (!fs.existsSync(dir)) fs.mkdirSync(dir);
             cb(null, dir);
         },
@@ -27,14 +28,14 @@ const upload = multer({
     }
 });
 
-// Debug middleware to log the request
+// Debug middleware
 router.use((req, res, next) => {
     console.log('Incoming Request Headers:', req.headers);
     console.log('Incoming Request Body (before multer):', req.body);
     next();
 });
 
-// Error handling middleware for multer
+// Multer error handling
 router.use((err, req, res, next) => {
     if (err instanceof multer.MulterError) {
         console.error('Multer Error:', err);
@@ -46,12 +47,12 @@ router.use((err, req, res, next) => {
     next();
 });
 
-// Conditional multer middleware
+// Submit claim
 router.post('/submit', authenticateToken, (req, res, next) => {
     if (req.headers['content-type'] && req.headers['content-type'].startsWith('multipart/form-data')) {
         upload.array('supportingFiles', 5)(req, res, next);
     } else {
-        next(); // Skip multer for non-multipart requests
+        next();
     }
 }, (req, res, next) => {
     console.log('Files after multer:', req.files);
@@ -67,5 +68,8 @@ router.get("/user/:userId/:claimId",  getUserClaimById);
 
 // Download a specific supporting file
 router.get("/download/:claimId/:fileId", downloadClaimFile);
+
+// Analyze claim
+// router.post('/analyze/:claimId', validateObjectId('claimId'), analyzeClaim);
 
 module.exports = router;

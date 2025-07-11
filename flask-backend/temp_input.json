@@ -1,0 +1,12 @@
+{
+  "incidentDescription": "test",
+  "damages": "test",
+  "incidentType": "accident",
+  "profession": "Ingénieur",
+  "thirdPartyInvolved": true,
+  "supportingFilesCount": 2,
+  "incidentDate": "2025-06-12",
+  "policyType": "automobile",
+  "userId": "681a215cb423041bc1e4de81",
+  "incidentLocation": "Paris"
+}

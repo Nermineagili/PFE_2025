@@ -639,7 +639,7 @@ const MesContrats: React.FC = () => {
                   <MdFileDownload className="me-2" /> Télécharger
                 </Button>
                 
-                {selectedContract.status === 'active' && (
+                {/* {selectedContract.status === 'active' && (
                   <Button 
                     variant="outline-secondary" 
                     className="d-flex align-items-center rounded-pill"
@@ -647,7 +647,7 @@ const MesContrats: React.FC = () => {
                   >
                     <MdEdit className="me-2" /> Modifier
                   </Button>
-                )}
+                )} */}
                 
                 {selectedContract.status === 'expired' && (
                   <Button 

@@ -46,10 +46,10 @@ router.post(
 router.post('/finalize-payment', finalizePayment);
 
 router.get(
-  '/:userId',
-  authenticateToken,
-  validateObjectId,
-  getUserContracts
+    '/:userId',
+    authenticateToken,
+    validateObjectId('userId'),
+    getUserContracts
 );
 
 router.post('/webhook', stripeWebhookMiddleware, handleStripeWebhook);
