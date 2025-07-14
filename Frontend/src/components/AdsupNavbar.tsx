@@ -53,12 +53,10 @@ const AdsupNavbar: React.FC = () => {
   const handleNotificationsClick = () => {
     console.log('[AdsupNavbar] Notification clicked, user role:', user?.role);
     try {
-      if (user?.role === 'admin') {
-        navigate('/admin-reset-approval');
-      } else if (user?.role === 'superviseur') {
+      if (user?.role === 'superviseur') {
         navigate('/supervisor-messages');
       } else {
-        console.warn('[AdsupNavbar] Invalid role for notifications:', user?.role);
+        console.warn('[AdsupNavbar] Invalid role for notifications or admin role:', user?.role);
       }
     } catch (error) {
       console.error('[AdsupNavbar] Navigation error:', error);
@@ -102,7 +100,7 @@ const AdsupNavbar: React.FC = () => {
 
           <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
             <Nav>
-              {(user?.role === 'admin' || user?.role === 'superviseur') && (
+              {user?.role === 'superviseur' && (
                 <Nav.Link onClick={handleNotificationsClick} className="adsup-nav-link">
                   <FontAwesomeIcon icon={faBell} />
                   {unreadCount > 0 && (

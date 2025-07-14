@@ -140,9 +140,9 @@ const AdminHome: React.FC = () => {
             <ManageClaims />
           </div> */}
           
-          <div ref={manageSettingsRef}>
+          {/* <div ref={manageSettingsRef}>
             <Settings />
-          </div>
+          </div> */}
         </Container>
       </div>
       

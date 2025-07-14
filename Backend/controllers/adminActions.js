@@ -73,13 +73,19 @@ const getAllUsers = async (req, res) => {
 };
 
 const getUserById = async (req, res) => {
+    console.log(`[getUserById] Request received for ID: ${req.params.id}`);
     try {
         const userId = req.params.id;
+        console.log(`[getUserById] Querying database for ID: ${userId}`);
         const user = await User.findById(userId).select('-password');
-        if (!user) return res.status(404).json({ error: "User not found" });
-        
+        if (!user) {
+            console.log(`[getUserById] User not found for ID: ${userId}`);
+            return res.status(404).json({ error: "User not found" });
+        }
+        console.log(`[getUserById] User found: ${JSON.stringify(user)}`);
         res.json(user);
     } catch (err) {
+        console.error(`[getUserById] Error: ${err.message}`, err.stack);
         res.status(500).json({ error: "Failed to fetch user" });
     }
 };

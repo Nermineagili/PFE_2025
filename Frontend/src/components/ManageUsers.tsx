@@ -223,17 +223,6 @@ function ManageUsers() {
 
   return (
     <Container className="manage-users-container">
-      {/* <div className="d-flex justify-content-end mb-3">
-        <Button 
-          variant={showResetSection ? "outline-secondary" : "outline-primary"}
-          onClick={() => setShowResetSection(!showResetSection)}
-          className="toggle-reset-btn"
-        >
-          <FaKey className="me-2" />
-          {showResetSection ? "Masquer les demandes de réinitialisation" : "Afficher les demandes de réinitialisation"}
-        </Button>
-      </div> */}
-
       <Card className="manage-users-card">
         <Card.Body>
           <div className="manage-users-header">
@@ -248,42 +237,40 @@ function ManageUsers() {
           </div>
 
           <div className="manage-users-filter-container">
-  {/* Search Input - Now as a separate section */}
-          <div className="manage-users-search-wrapper">
-            <FaSearch className="manage-users-search-icon" />
-            <Form.Control
-              type="text"
-              placeholder="Rechercher par prénom, nom ou email"
-              value={searchQuery}
-              onChange={handleSearchChange}
-              className="manage-users-search-input"
-            />
-          </div>
-          
-          {/* Filter Toggle - Now as a separate section */}
-          <div className="manage-users-filter-section">
-            <div className="manage-users-filter-title">
-              <FaFilter className="manage-users-filter-icon" />
-              {filterContracts ? 'Affichage des utilisateurs avec contrats' : 'Affichage de tous les utilisateurs'}
-              {!loading && (
-                <span className="manage-users-filter-count">
-                  {filterContracts || searchQuery ? filteredCount : totalUsers}
-                </span>
-              )}
-            </div>
-            <div className="manage-users-filter-switch">
-              <Form.Check
-                type="switch"
-                id="filter-contracts-switch"
-                label="Afficher uniquement les utilisateurs avec contrats"
-                checked={filterContracts}
-                onChange={() => setFilterContracts(!filterContracts)}
-                className="manage-users-custom-switch"
-                disabled={!!searchQuery} // Désactiver le filtre si une recherche est active
+            <div className="manage-users-search-wrapper">
+              <FaSearch className="manage-users-search-icon" />
+              <Form.Control
+                type="text"
+                placeholder="Rechercher par prénom, nom ou email"
+                value={searchQuery}
+                onChange={handleSearchChange}
+                className="manage-users-search-input"
               />
             </div>
+            
+            <div className="manage-users-filter-section">
+              <div className="manage-users-filter-title">
+                <FaFilter className="manage-users-filter-icon" />
+                {filterContracts ? 'Affichage des utilisateurs avec contrats' : 'Affichage de tous les utilisateurs'}
+                {!loading && (
+                  <span className="manage-users-filter-count">
+                    {filterContracts || searchQuery ? filteredCount : totalUsers}
+                  </span>
+                )}
+              </div>
+              <div className="manage-users-filter-switch">
+                <Form.Check
+                  type="switch"
+                  id="filter-contracts-switch"
+                  label="Afficher uniquement les utilisateurs avec contrats"
+                  checked={filterContracts}
+                  onChange={() => setFilterContracts(!filterContracts)}
+                  className="manage-users-custom-switch"
+                  disabled={!!searchQuery}
+                />
+              </div>
+            </div>
           </div>
-        </div>
 
           {(loading || searchLoading) && (
             <div className="manage-users-loading-spinner text-center py-4">
@@ -305,7 +292,7 @@ function ManageUsers() {
           )}
 
           {!loading && !searchLoading && !error && users.length > 0 && (
-            <div className="manage-users-table Upserted by Grok: table-responsive">
+            <div className="manage-users-table table-responsive">
               <Table hover className="manage-users-table">
                 <thead>
                   <tr>

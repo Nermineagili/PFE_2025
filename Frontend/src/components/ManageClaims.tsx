@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Button, Table, Modal, Spinner, Alert, Container, Card, OverlayTrigger, Tooltip, Badge, Form } from "react-bootstrap";
 import { FaRegTrashAlt, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
+import { FaBrain } from 'react-icons/fa'; // AI-themed icon
+import { FaEye } from 'react-icons/fa'; // Icon for "Voir plus"
 import "./ManageClaims.css";
 import { useTheme } from "../context/ThemeContext";
 
@@ -303,7 +305,7 @@ const ManageClaims: React.FC = () => {
                               className="action-btn see-more-btn"
                               onClick={() => handleSeeMore(claim)}
                             >
-                              Voir plus
+                              <FaEye className="me-2" /> Voir plus
                             </Button>
                           </OverlayTrigger>
                           <OverlayTrigger overlay={<Tooltip id={`approve-tooltip-${claim._id}`}>Approuver</Tooltip>}>
@@ -329,7 +331,7 @@ const ManageClaims: React.FC = () => {
                               size="sm"
                               className="action-btn delete-btn"
                               onClick={() => deleteClaim(claim._id)}
-                              disabled={deleting === claim._id} // Disable only for the specific claim being deleted
+                              disabled={deleting === claim._id}
                             >
                               {deleting === claim._id ? <Spinner animation="border" size="sm" /> : <FaRegTrashAlt />}
                             </Button>
@@ -351,90 +353,90 @@ const ManageClaims: React.FC = () => {
             Analyse des Déclarations
           </Modal.Title>
         </Modal.Header>
-<Modal.Body className="modal-body">
-  {selectedClaim && (
-    <div className="claim-details">
-      <h4>Informations Utilisateur</h4>
-      <p><strong>Nom :</strong> {getUserIdDetails(selectedClaim.userId).name || "Inconnu"}</p>
-      <p><strong>Email :</strong> {getUserIdDetails(selectedClaim.userId).email || "Inconnu"}</p>
-      <p><strong>Téléphone :</strong> {getUserIdDetails(selectedClaim.userId).phone || "Inconnu"}</p>
-      <h4>Détails du Contrat</h4>
-      <p><strong>Type de Police :</strong> {getContractDetails(selectedClaim.contractId).policyType || "Inconnu"}</p>
-      <p><strong>Date de Début :</strong> {formatDateFr(getContractDetails(selectedClaim.contractId).startDate || "N/A")}</p>
-      <p><strong>Date de Fin :</strong> {formatDateFr(getContractDetails(selectedClaim.contractId).endDate || "N/A")}</p>
-      <p><strong>Statut :</strong> {getContractDetails(selectedClaim.contractId).status || "N/A"}</p>
-      <h4>Détails du Sinistre</h4>
-      <p><strong>Type de Sinistre :</strong> {selectedClaim.incidentType || "N/A"}</p>
-      <p><strong>Date de l'Incident :</strong> {formatDateFr(selectedClaim.incidentDate || "N/A")}</p>
-      <p><strong>Heure de l'Incident :</strong> {selectedClaim.incidentTime || "N/A"}</p>
-      <p><strong>Lieu de l'Incident :</strong> {selectedClaim.incidentLocation || "N/A"}</p>
-      <p><strong>Description :</strong> {selectedClaim.incidentDescription || "Aucune description"}</p>
-      <p><strong>Dommages :</strong> {selectedClaim.damages || "N/A"}</p>
-      <p><strong>Tiers Impliqué :</strong> {selectedClaim.thirdPartyInvolved ? "Oui" : "Non"}</p>
-      {selectedClaim.thirdPartyInvolved && selectedClaim.thirdPartyDetails && (
-        <div>
-          <p><strong>Nom du Tiers :</strong> {selectedClaim.thirdPartyDetails.name || "N/A"}</p>
-          <p><strong>Contact :</strong> {selectedClaim.thirdPartyDetails.contactInfo || "N/A"}</p>
-          <p><strong>Numéro d'Immatriculation :</strong> {selectedClaim.thirdPartyDetails.registrationId || "N/A"}</p>
-          <p><strong>Contact Assureur :</strong> {selectedClaim.thirdPartyDetails.insurerContact || "N/A"}</p>
-        </div>
-      )}
-      <p><strong>Statut :</strong> {getStatusBadge(selectedClaim.status).props.children}</p>
-      <p><strong>Date de Création :</strong> {formatDateFr(selectedClaim.createdAt)}</p>
+        <Modal.Body className="modal-body">
+          {selectedClaim && (
+            <div className="claim-details">
+              <h4>Informations Utilisateur</h4>
+              <p><strong>Nom :</strong> {getUserIdDetails(selectedClaim.userId).name || "Inconnu"}</p>
+              <p><strong>Email :</strong> {getUserIdDetails(selectedClaim.userId).email || "Inconnu"}</p>
+              <p><strong>Téléphone :</strong> {getUserIdDetails(selectedClaim.userId).phone || "Inconnu"}</p>
+              <h4>Détails du Contrat</h4>
+              <p><strong>Type de Police :</strong> {getContractDetails(selectedClaim.contractId).policyType || "Inconnu"}</p>
+              <p><strong>Date de Début :</strong> {formatDateFr(getContractDetails(selectedClaim.contractId).startDate || "N/A")}</p>
+              <p><strong>Date de Fin :</strong> {formatDateFr(getContractDetails(selectedClaim.contractId).endDate || "N/A")}</p>
+              <p><strong>Statut :</strong> {getContractDetails(selectedClaim.contractId).status || "N/A"}</p>
+              <h4>Détails du Sinistre</h4>
+              <p><strong>Type de Sinistre :</strong> {selectedClaim.incidentType || "N/A"}</p>
+              <p><strong>Date de l'Incident :</strong> {formatDateFr(selectedClaim.incidentDate || "N/A")}</p>
+              <p><strong>Heure de l'Incident :</strong> {selectedClaim.incidentTime || "N/A"}</p>
+              <p><strong>Lieu de l'Incident :</strong> {selectedClaim.incidentLocation || "N/A"}</p>
+              <p><strong>Description :</strong> {selectedClaim.incidentDescription || "Aucune description"}</p>
+              <p><strong>Dommages :</strong> {selectedClaim.damages || "N/A"}</p>
+              <p><strong>Tiers Impliqué :</strong> {selectedClaim.thirdPartyInvolved ? "Oui" : "Non"}</p>
+              {selectedClaim.thirdPartyInvolved && selectedClaim.thirdPartyDetails && (
+                <div>
+                  <p><strong>Nom du Tiers :</strong> {selectedClaim.thirdPartyDetails.name || "N/A"}</p>
+                  <p><strong>Contact :</strong> {selectedClaim.thirdPartyDetails.contactInfo || "N/A"}</p>
+                  <p><strong>Numéro d'Immatriculation :</strong> {selectedClaim.thirdPartyDetails.registrationId || "N/A"}</p>
+                  <p><strong>Contact Assureur :</strong> {selectedClaim.thirdPartyDetails.insurerContact || "N/A"}</p>
+                </div>
+              )}
+              <p><strong>Statut :</strong> {getStatusBadge(selectedClaim.status).props.children}</p>
+              <p><strong>Date de Création :</strong> {formatDateFr(selectedClaim.createdAt)}</p>
 
-      <h4>Documents Soutenants</h4>
-      {selectedClaim.supportingFiles && selectedClaim.supportingFiles.length > 0 ? (
-        <ul>
-          {selectedClaim.supportingFiles.map((file, index) => (
-            <li key={index}>
-              <a href={file.url} target="_blank" rel="noopener noreferrer">{file.fileName}</a> 
-              (Type: {file.fileType}, Uploaded: {formatDateFr(file.uploadedAt)})
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>Aucun document joint</p>
-      )}
+              <h4>Documents Soutenants</h4>
+              {selectedClaim.supportingFiles && selectedClaim.supportingFiles.length > 0 ? (
+                <ul>
+                  {selectedClaim.supportingFiles.map((file, index) => (
+                    <li key={index}>
+                      <a href={file.url} target="_blank" rel="noopener noreferrer">{file.fileName}</a> 
+                      (Type: {file.fileType}, Uploaded: {formatDateFr(file.uploadedAt)})
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>Aucun document joint</p>
+              )}
 
-      <h4>Commentaires</h4>
-      {selectedClaim.comments && selectedClaim.comments.length > 0 ? (
-        <ul>
-          {selectedClaim.comments.map((comment, index) => (
-            <li key={index}>
-              {comment.comment} (Par: {comment.supervisorId.name || "Inconnu"}, 
-              le {formatDateFr(comment.createdAt)})
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>Aucun commentaire</p>
-      )}
+              <h4>Commentaires</h4>
+              {selectedClaim.comments && selectedClaim.comments.length > 0 ? (
+                <ul>
+                  {selectedClaim.comments.map((comment, index) => (
+                    <li key={index}>
+                      {comment.comment} (Par: {comment.supervisorId.name || "Inconnu"}, 
+                      le {formatDateFr(comment.createdAt)})
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>Aucun commentaire</p>
+              )}
 
-      <h4>Analyse (si disponible)</h4>
-      {analysisResult ? (
-        <div>
-          <p><strong>Prédiction :</strong> {analysisResult.prediction}</p>
-          <p><strong>Probabilité Suspicieux :</strong> {(analysisResult.probability_suspicieux * 100).toFixed(2)}%</p>
-          <p><strong>Probabilité Valide :</strong> {(analysisResult.probability_valide * 100).toFixed(2)}%</p>
-        </div>
-      ) : (
-        <p>Aucune analyse effectuée</p>
-      )}
+              <h4>Analyse (si disponible)</h4>
+              {analysisResult ? (
+                <div>
+                  <p><strong>Prédiction :</strong> {analysisResult.prediction}</p>
+                  <p><strong>Probabilité Suspicieux :</strong> {(analysisResult.probability_suspicieux * 100).toFixed(2)}%</p>
+                  <p><strong>Probabilité Valide :</strong> {(analysisResult.probability_valide * 100).toFixed(2)}%</p>
+                </div>
+              ) : (
+                <p>Aucune analyse effectuée</p>
+              )}
 
-      {error && <Alert variant="danger">{error}</Alert>}
-      <Form.Group controlId="commentForm">
-        <Form.Label>Commentaire</Form.Label>
-        <Form.Control
-          as="textarea"
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          placeholder="Entrez votre commentaire ici..."
-          rows={3}
-        />
-      </Form.Group>
-    </div>
-  )}
-</Modal.Body>
+              {error && <Alert variant="danger">{error}</Alert>}
+              <Form.Group controlId="commentForm">
+                <Form.Label>Commentaire</Form.Label>
+                <Form.Control
+                  as="textarea"
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder="Entrez votre commentaire ici..."
+                  rows={3}
+                />
+              </Form.Group>
+            </div>
+          )}
+        </Modal.Body>
         <Modal.Footer className="modal-footer">
           <Button
             variant="secondary"
@@ -460,12 +462,21 @@ const ManageClaims: React.FC = () => {
                 <FaTimesCircle /> Rejeter
               </Button>
               <Button
-                variant="info"
+                variant="primary"
                 onClick={() => handleAnalyze(selectedClaim)}
                 disabled={analyzing}
-                className="modal-action-btn analyze-modal-btn"
+                className="modal-action-btn analyze-ai-btn"
               >
-                {analyzing ? <Spinner animation="border" size="sm" /> : "Analyser"}
+                {analyzing ? (
+                  <>
+                    <Spinner animation="border" size="sm" className="me-2" />
+                    Analysant avec IA...
+                  </>
+                ) : (
+                  <>
+                    <FaBrain className="me-2" /> Analyser avec IA
+                  </>
+                )}
               </Button>
             </>
           )}

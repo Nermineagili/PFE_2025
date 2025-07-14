@@ -95,44 +95,44 @@ const register = async (req, res) => {
 
 // User Login
 const login = async (req, res) => {
-    console.log(`login - Request received at ${new Date().toISOString()} with body:`, req.body);
-    try {
-        const { email, password } = req.body;
-        if (!email || !password) {
-            console.log(`login - Missing email or password at ${new Date().toISOString()}`);
-            return res.status(400).json({ error: "Email and password are required" });
-        }
+  console.log(`login - Request received at ${new Date().toISOString()} with body:`, req.body);
+  try {
+      const { email, password } = req.body;
+      if (!email || !password) {
+          console.log(`login - Missing email or password at ${new Date().toISOString()}`);
+          return res.status(400).json({ error: "Email and password are required" });
+      }
 
-        console.log(`login - Finding user ${email} at ${new Date().toISOString()}`);
-        const user = await User.findOne({ email }).lean(); // Use lean() for performance
-        if (!user) {
-            console.log(`login - User ${email} not found at ${new Date().toISOString()}`);
-            return res.status(401).json({ error: "Invalid credentials" });
-        }
+      console.log(`login - Finding user ${email} at ${new Date().toISOString()}`);
+      const user = await User.findOne({ email }).lean(); // Use lean() for performance
+      if (!user) {
+          console.log(`login - User ${email} not found at ${new Date().toISOString()}`);
+          return res.status(401).json({ error: "Invalid credentials" });
+      }
 
-        console.log(`login - Comparing passwords for ${email} at ${new Date().toISOString()}`);
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-        if (!isPasswordValid) {
-            console.log(`login - Password mismatch for ${email} at ${new Date().toISOString()}`);
-            return res.status(401).json({ error: "Invalid credentials" });
-        }
+      console.log(`login - Comparing passwords for ${email} at ${new Date().toISOString()}`);
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+          console.log(`login - Password mismatch for ${email} at ${new Date().toISOString()}`);
+          return res.status(401).json({ error: "Invalid credentials" });
+      }
 
-        console.log(`login - Generating token for ${user._id} at ${new Date().toISOString()}`);
-        const payload = {
-            _id: user._id,
-            email: user.email,
-            fullname: `${user.name} ${user.lastname}`,
-            role: user.role,
-            profilePic: user.profilePic,
-        };
-        const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
+      console.log(`login - Generating token for ${user._id} at ${new Date().toISOString()}`);
+      const payload = {
+          _id: user._id,
+          email: user.email,
+          fullname: `${user.name} ${user.lastname}`,
+          role: user.role,
+          profilePic: user.profilePic,
+      };
+      const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
 
-        console.log(`login - Login successful, token generated at ${new Date().toISOString()}:`, token);
-        res.status(200).json({ success: true, user: payload, token });
-    } catch (error) {
-        console.error(`login - Error: ${error.message} at ${new Date().toISOString()}`, error.stack);
-        res.status(500).json({ error: "Login failed", details: error.message });
-    }
+      console.log(`login - Login successful, token generated at ${new Date().toISOString()}:`, token);
+      res.status(200).json({ success: true, user: payload, token });
+  } catch (error) {
+      console.error(`login - Error: ${error.message} at ${new Date().toISOString()}`, error.stack);
+      res.status(500).json({ error: "Login failed", details: error.message });
+  }
 };
 
 // Forgot Password
@@ -145,139 +145,30 @@ const forgotPassword = async (req, res) => {
       console.log('[Auth] User not found:', email);
       return res.status(404).json({ error: 'User not found' });
     }
+
+    // Generate reset token
     const resetToken = crypto.randomBytes(32).toString('hex');
     user.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-    user.originalResetToken = resetToken;
     user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
     await user.save();
     console.log('[Auth] Reset token saved for user:', user._id);
-    
-    const resetApprovalUrl = `${process.env.FRONTEND_URL}/adminhome/reset-approval/${resetToken}/${user._id}`;
-    const adminMessage = `Password reset request from ${user.name} ${user.lastname} (${user.email}). Approve here: ${resetApprovalUrl}`;
-    let adminNotified = false;
-    let emailSent = false;
-    try {
-      const admins = await User.find({ role: 'admin' }).select('email _id');
-      console.log('[Auth] Found admins:', admins.length, admins.map(a => ({ email: a.email, id: a._id })));
-      if (admins.length) {
-        // Send email to admins
-        emailSent = await sendEmail(
-          admins.map(admin => admin.email),
-          'Password Reset Approval Needed',
-          adminMessage
-        );
-        console.log('[Auth] Admin email sent:', emailSent);
-        
-        // Create notifications for all admins
-        try {
-          await createNotificationForRole(
-            'admin',
-            'password_reset_request',
-            `Password reset request from ${user.name} ${user.lastname} (${user.email})`,
-            user._id
-          );
-          adminNotified = true;
-        } catch (notifError) {
-          console.error('[Auth] Failed to create notifications:', notifError.message);
-        }
-      } else {
-        console.log('[Auth] No admins found to notify');
-      }
-    } catch (queryError) {
-      console.error('[Auth] Error querying admins or sending email:', queryError.message);
-    }
-    
-    const userMessage = `Hello ${user.name},\n\nYour password reset request has been submitted and is pending admin approval. You'll receive a reset link upon approval.`;
-    const userNotified = await sendEmail(email, 'Password Reset Request Submitted', userMessage);
-    console.log('[Auth] User notified:', userNotified);
-    
+
+    // Send reset email directly to user
+    const resetLink = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+    const emailContent = `
+      <p>Cliquez sur le lien suivant pour réinitialiser votre mot de passe : <a href="${resetLink}">${resetLink}</a></p>
+      <p>Ce lien expire dans 1 heure.</p>
+    `;
+    const emailSent = await sendEmail(user.email, 'Réinitialisation de votre mot de passe', emailContent);
+    console.log('[Auth] Reset email sent:', emailSent);
+
     res.status(200).json({
-      message: 'Password reset request submitted for admin approval',
-      adminNotified,
-      userNotified,
+      message: 'Email de réinitialisation envoyé.',
       emailSent
     });
   } catch (error) {
     console.error('[Auth] Error processing password reset request:', error.message);
     res.status(500).json({ error: 'Failed to process request', details: error.message });
-  }
-};
-
-// Approve Reset Request
-const approveResetRequest = async (req, res) => {
-  try {
-    const { token, userId } = req.params;
-    const user = await User.findById(userId);
-
-    if (!user) return res.status(404).json({ error: "User not found" });
-
-    if (!user.resetPasswordToken || user.resetPasswordExpires < Date.now() || token !== user.originalResetToken) {
-      return res.status(400).json({ error: "Invalid or expired token" });
-    }
-
-    const userResetToken = crypto.randomBytes(32).toString('hex');
-    user.userResetToken = await bcrypt.hash(userResetToken, 10);
-    user.userResetExpires = Date.now() + 3600000;
-    user.markModified('userResetToken');
-    user.markModified('userResetExpires');
-    
-    await user.save();
-
-    const updatedUser = await User.findById(userId);
-    if (!updatedUser.userResetToken) {
-      throw new Error("Failed to save userResetToken");
-    }
-
-    const resetLink = `${process.env.FRONTEND_URL}/reset-password/${userResetToken}`;
-    await sendEmail(
-      user.email,
-      'Password Reset Instructions',
-      `Your reset link: ${resetLink}`
-    );
-
-    return res.status(200).json({ 
-      message: "Password reset approved",
-      resetLink,
-      userResetToken
-    });
-  } catch (error) {
-    console.error('[Auth] Approve reset error:', error);
-    return res.status(500).json({ error: "Internal Server Error", details: error.message });
-  }
-};
-
-// Validate Reset Token
-const validateResetToken = async (req, res) => {
-  try {
-    const { token } = req.params;
-    console.log('[Auth] Validating token:', token);
-
-    const users = await User.find({
-      userResetToken: { $exists: true },
-      userResetExpires: { $gt: Date.now() }
-    });
-
-    console.log('[Auth] Found users with active tokens:', users.length);
-    for (const user of users) {
-      console.log('[Auth] Comparing with user:', user.email);
-      const isMatch = await bcrypt.compare(token, user.userResetToken);
-      if (isMatch) {
-        console.log('[Auth] Token matched for user:', user.email);
-        return res.status(200).json({ 
-          message: "Token is valid", 
-          userId: user._id 
-        });
-      }
-    }
-
-    console.log('[Auth] No matching token found');
-    return res.status(400).json({ 
-      error: "Password reset token is invalid or has expired",
-      details: "No matching active token found"
-    });
-  } catch (error) {
-    console.error('[Auth] Token validation error:', error);
-    return res.status(500).json({ error: "Internal Server Error", details: error.message });
   }
 };
 
@@ -290,42 +181,28 @@ const resetPassword = async (req, res) => {
       return res.status(400).json({ error: "Passwords do not match" });
     }
 
-    const users = await User.find({
-      userResetToken: { $exists: true },
-      userResetExpires: { $gt: Date.now() }
+    const user = await User.findOne({
+      resetPasswordToken: crypto.createHash('sha256').update(token).digest('hex'),
+      resetPasswordExpires: { $gt: Date.now() }
     });
 
-    let validUser = null;
-    for (const user of users) {
-      const isMatch = await bcrypt.compare(token, user.userResetToken);
-      if (isMatch) {
-        validUser = user;
-        break;
-      }
-    }
-
-    if (!validUser) {
+    if (!user) {
       return res.status(400).json({ error: "Password reset token is invalid or has expired" });
     }
 
     const salt = await bcrypt.genSalt(10);
-    validUser.password = await bcrypt.hash(password, salt);
-    validUser.resetPasswordToken = undefined;
-    validUser.originalResetToken = undefined;
-    validUser.resetPasswordExpires = undefined;
-    validUser.userResetToken = undefined;
-    validUser.userResetExpires = undefined;
-    
-    await validUser.save();
-    
+    user.password = await bcrypt.hash(password, salt);
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
     const emailContent = `
       <h2>Password Reset Successful</h2>
-      <p>Hello ${validUser.name},</p>
+      <p>Hello ${user.name},</p>
       <p>Your password has been successfully reset.</p>
     `;
-    
-    await sendEmail(validUser.email, 'Password Reset Complete', emailContent);
-    
+    await sendEmail(user.email, 'Password Reset Complete', emailContent);
+
     res.status(200).json({ message: "Password reset successful" });
   } catch (error) {
     console.error('[Auth] Reset password error:', error);
@@ -333,34 +210,12 @@ const resetPassword = async (req, res) => {
   }
 };
 
-// Get Pending Reset Requests
-const getPendingResetRequests = async (req, res) => {
-  try {
-    const users = await User.find({
-      resetPasswordToken: { $exists: true },
-      resetPasswordExpires: { $gt: Date.now() }
-    }).select('name email originalResetToken resetPasswordExpires createdAt');
-
-    res.json(users.map(user => ({
-      _id: user._id,
-      userId: user._id,
-      name: user.name,
-      email: user.email,
-      token: user.originalResetToken,
-      requestedAt: user.resetPasswordExpires - 3600000
-    })));
-  } catch (error) {
-    console.error('[Auth] Error fetching reset requests:', error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-};
+// Remove unused functions
+// const approveResetRequest, validateResetToken, and getPendingResetRequests are no longer needed
 
 module.exports = { 
   register, 
   login, 
   forgotPassword, 
-  approveResetRequest, 
-  validateResetToken, 
-  resetPassword,
-  getPendingResetRequests
+  resetPassword
 };

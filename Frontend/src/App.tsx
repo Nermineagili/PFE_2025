@@ -94,10 +94,10 @@ function AppContent() {
         path="/adminhome"
         element={isLoggedIn && user?.role === 'admin' ? <AdminHome /> : <Navigate to="/" replace />}
       />
-      <Route
+      {/* <Route
         path="/admin/approve-reset/:token/:userId"
         element={isLoggedIn && user?.role === 'admin' ? <ManageUsers /> : <Navigate to="/" replace />}
-      />
+      /> */}
       <Route
         path="/supervisorhome"
         element={isLoggedIn && user?.role === 'superviseur' ? <SupervisorHome /> : <Navigate to="/" replace />}

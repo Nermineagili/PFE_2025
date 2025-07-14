@@ -3,7 +3,7 @@ import { Form, Button, Card, Alert, Spinner } from "react-bootstrap";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { FaLock } from "react-icons/fa";
-import "./ResetPassword.css"; // Create a matching CSS file
+import "./ResetPassword.css"; // Ensure this CSS file exists
 
 const ResetPassword: React.FC = () => {
   const { token } = useParams<{ token: string }>();
@@ -12,43 +12,9 @@ const ResetPassword: React.FC = () => {
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-  const [validating, setValidating] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
-  const [userEmail, setUserEmail] = useState<string>("");
   const [passwordStrength, setPasswordStrength] = useState<string>("weak");
-
-  // Validate token on page load
-  useEffect(() => {
-    const validateToken = async () => {
-      if (!token) {
-        setError("Lien de réinitialisation invalide. Veuillez demander un nouveau lien.");
-        setValidating(false);
-        return;
-      }
-
-      try {
-        const response = await axios.get(
-          `http://localhost:5000/api/auth/reset-password/${token}`
-        );
-        
-        setUserEmail(response.data.email);
-        setValidating(false);
-      } catch (err) {
-        console.error("Échec de la validation du token:", err);
-        setError(
-          axios.isAxiosError(err)
-            ? err.response?.data?.error || "Lien de réinitialisation invalide ou expiré"
-            : err instanceof Error
-              ? err.message
-              : "Une erreur inattendue s'est produite"
-        );
-        setValidating(false);
-      }
-    };
-
-    validateToken();
-  }, [token]);
 
   // Check password strength
   useEffect(() => {
@@ -64,7 +30,7 @@ const ResetPassword: React.FC = () => {
     const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
     const isLongEnough = password.length >= 8;
 
-    const strength = 
+    const strength =
       (hasUpperCase ? 1 : 0) +
       (hasLowerCase ? 1 : 0) +
       (hasNumbers ? 1 : 0) +
@@ -97,11 +63,12 @@ const ResetPassword: React.FC = () => {
     }
 
     try {
-      await axios.post(
-        "http://localhost:5000/api/auth/reset-password",
-        { token, password, confirmPassword }
-      );
-      
+      await axios.post("http://localhost:5000/api/auth/reset-password", {
+        token,
+        password,
+        confirmPassword,
+      });
+
       setSuccess(true);
       // Redirect to login after 3 seconds
       setTimeout(() => {
@@ -121,24 +88,11 @@ const ResetPassword: React.FC = () => {
     }
   };
 
-  if (validating) {
-    return (
-      <div className="reset-password-container">
-        <Card className="reset-password-card">
-          <Card.Body className="text-center py-5">
-            <Spinner animation="border" variant="primary" />
-            <p className="mt-3">Validation du lien de réinitialisation en cours...</p>
-          </Card.Body>
-        </Card>
-      </div>
-    );
-  }
-
   return (
     <div className="reset-password-container">
       <Card className="reset-password-card">
         <Card.Header as="h5">
-        <FaLock className="me-2" /> Réinitialiser le mot de passe
+          <FaLock className="me-2" /> Réinitialiser le mot de passe
         </Card.Header>
         <Card.Body>
           {error && (
@@ -161,12 +115,10 @@ const ResetPassword: React.FC = () => {
             </Alert>
           ) : (
             <>
-              {userEmail && (
-                <Alert variant="info" className="mb-4">
-                  Réinitialisation du mot de passe pour : <strong>{userEmail}</strong>
-                </Alert>
-              )}
-              
+              <Alert variant="info" className="mb-4">
+                Réinitialisation du mot de passe pour un compte associé à ce lien.
+              </Alert>
+
               <Form onSubmit={handleSubmit}>
                 <Form.Group className="mb-3">
                   <Form.Label>Nouveau mot de passe</Form.Label>
@@ -191,13 +143,20 @@ const ResetPassword: React.FC = () => {
                         <div
                           className={`progress-bar bg-${getStrengthColor()}`}
                           role="progressbar"
-                          style={{ 
-                            width: passwordStrength === "faible" ? "33%" : 
-                                   passwordStrength === "moyen" ? "66%" : "100%" 
+                          style={{
+                            width:
+                              passwordStrength === "faible"
+                                ? "33%"
+                                : passwordStrength === "moyen"
+                                ? "66%"
+                                : "100%",
                           }}
                           aria-valuenow={
-                            passwordStrength === "faible" ? 33 : 
-                            passwordStrength === "moyen" ? 66 : 100
+                            passwordStrength === "faible"
+                              ? 33
+                              : passwordStrength === "moyen"
+                              ? 66
+                              : 100
                           }
                           aria-valuemin={0}
                           aria-valuemax={100}
@@ -227,8 +186,8 @@ const ResetPassword: React.FC = () => {
                 </Form.Group>
 
                 <div className="d-grid gap-2">
-                  <Button 
-                    variant="primary" 
+                  <Button
+                    variant="primary"
                     type="submit"
                     disabled={loading || password !== confirmPassword || password.length < 8}
                   >

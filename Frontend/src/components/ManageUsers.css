@@ -1,12 +1,15 @@
 /* Main Container */
 .manage-users-container {
   padding: 2rem 0;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 .manage-users-card {
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   border: none;
+  overflow: hidden;
 }
 
 .manage-users-header {
@@ -14,22 +17,27 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .manage-users-title {
   color: #153a64;
   font-weight: 600;
   margin-bottom: 0;
+  font-size: 1.5rem;
 }
 
 .manage-users-add-btn {
   background-color: #153a64;
   border-color: #153a64;
   border-radius: 8px;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 1.5rem;
   display: flex;
   align-items: center;
   transition: all 0.3s ease;
+  font-weight: 500;
 }
 
 .manage-users-add-btn:hover {
@@ -38,14 +46,15 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Search and Filter Container - Updated */
+/* Search and Filter Container */
 .manage-users-filter-container {
   margin-bottom: 1.5rem;
+  padding: 0 1.5rem;
 }
 
-/* Search Input Styles - Updated */
+/* Search Input Styles */
 .manage-users-search-wrapper {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   position: relative;
 }
 
@@ -56,6 +65,8 @@
   border: 1px solid #e0e0e0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
+  width: 100%;
+  max-width: 400px;
 }
 
 .manage-users-search-input:focus {
@@ -72,16 +83,17 @@
   z-index: 10;
 }
 
-/* Filter Section Styles - Updated */
+/* Filter Section Styles */
 .manage-users-filter-section {
   background-color: #f8f9fa;
   border-radius: 12px;
-  padding: 1rem 1.5rem;
+  padding: 1.5rem;
   border-left: 4px solid #153a64;
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .manage-users-filter-title {
@@ -113,7 +125,6 @@
 .manage-users-filter-switch {
   display: flex;
   align-items: center;
-  margin-left: auto;
 }
 
 .manage-users-custom-switch .form-check-input {
@@ -147,13 +158,19 @@
 
 .manage-users-table {
   margin-top: 1rem;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
 .manage-users-table thead th {
   background-color: #153a64;
   color: white;
   border-bottom: 2px solid #c19048;
-  padding: 0.75rem 1rem;
+  padding: 1rem;
+  text-align: left;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 .manage-users-table tbody tr:hover {
@@ -167,8 +184,8 @@
 .manage-users-action-btn {
   border: none;
   background: transparent;
-  padding: 0.4rem;
-  margin: 0 0.2rem;
+  padding: 0.5rem;
+  margin: 0 0.25rem;
   border-radius: 50%;
   transition: all 0.2s;
 }
@@ -193,12 +210,37 @@
   background-color: rgba(220, 53, 69, 0.1);
 }
 
+/* Load More Button */
+.manage-users-load-more-btn {
+  background-color: #c19048;
+  border-color: #c19048;
+  border-radius: 8px;
+  padding: 0.5rem 1.5rem;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.manage-users-load-more-btn:hover {
+  background-color: #a47838;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.manage-users-load-more-btn:disabled {
+  background-color: #e0e0e0;
+  border-color: #e0e0e0;
+  cursor: not-allowed;
+}
+
 /* Loading and Error States */
 .manage-users-loading-spinner {
   padding: 2rem 0;
 }
 
-.manage-users-error, .manage-users-no-users {
+.manage-users-error,
+.manage-users-no-users {
   margin: 2rem 0;
   padding: 1.5rem;
   text-align: center;
@@ -229,7 +271,8 @@
   color: white;
 }
 
-.role-supervisor, .role-superviseur {
+.role-supervisor,
+.role-superviseur {
   background-color: #c19048;
   color: white;
 }
@@ -241,7 +284,7 @@
 
 /* User Modal Styles */
 .manage-users-modal {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .add-user-modal .modal-dialog {
@@ -252,7 +295,7 @@
   background-color: #153a64;
   color: white;
   border-bottom: 2px solid #c19048;
-  padding: 1rem 1.5rem;
+  padding: 1.5rem;
 }
 
 .manage-users-modal-title {
@@ -282,14 +325,16 @@
 }
 
 /* Form Styles */
-.form-control, .form-select {
+.form-control,
+.form-select {
   border-radius: 8px;
   border: 1px solid #ced4da;
   padding: 0.6rem 0.75rem;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
-.form-control:focus, .form-select:focus {
+.form-control:focus,
+.form-select:focus {
   border-color: #153a64;
   box-shadow: 0 0 0 0.25rem rgba(21, 58, 100, 0.25);
 }
@@ -300,52 +345,39 @@
   margin-bottom: 0.5rem;
 }
 
-/* Toggle Reset Button */
-.toggle-reset-btn {
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  transition: all 0.2s ease;
-}
-
-.toggle-reset-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
 /* Responsive Adjustments */
 @media (max-width: 768px) {
   .manage-users-container {
     padding: 1rem;
   }
-  
+
   .manage-users-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
   }
-  
+
   .manage-users-filter-section {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
   }
-  
+
   .manage-users-filter-switch {
     margin-left: 0;
     margin-top: 0.5rem;
     width: 100%;
   }
-  
+
   .manage-users-table {
     font-size: 0.9rem;
   }
-  
+
   .manage-users-action-btn {
     padding: 0.3rem;
     margin: 0 0.1rem;
   }
-  
+
   .manage-users-modal-body {
     padding: 1.25rem;
   }

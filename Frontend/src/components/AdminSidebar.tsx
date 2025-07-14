@@ -171,10 +171,10 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
         )}
 
         {/* Common: Settings */}
-        <a href="#!" className="admin-nav-item" onClick={handleSettingsClick}>
+        {/* <a href="#!" className="admin-nav-item" onClick={handleSettingsClick}>
           <FontAwesomeIcon icon={faCog} className="admin-nav-icon" />
           <span>Paramètres</span>
-        </a>
+        </a> */}
 
         {/* Logout */}
         <NavLink

@@ -73,9 +73,9 @@ const SupervisorHome: React.FC = () => {
           <div ref={manageClaimsRef}>
             <ManageClaims />
           </div>
-          <div ref={manageSettingsRef}>
+          {/* <div ref={manageSettingsRef}>
             <Settings />
-          </div>
+          </div> */}
 
         </Container>
       </div>

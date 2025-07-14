@@ -3,7 +3,7 @@ import { Form, Button, Card, Alert, Spinner } from "react-bootstrap";
 import axios from "axios";
 import { FaEnvelope } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import "./ForgotPassword.css"; // Create a matching CSS file
+import "./ForgotPassword.css"; // Ensure this CSS file exists
 
 const ForgotPassword: React.FC = () => {
   const [email, setEmail] = useState<string>("");
@@ -16,17 +16,17 @@ const ForgotPassword: React.FC = () => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    
+
     try {
       const response = await axios.post("http://localhost:5000/api/auth/forgot-password", {
-        email
+        email,
       });
-      
+
       setSuccess(true);
       setMessage(`
-        Votre demande de réinitialisation de mot de passe a été soumise.
-        Un administrateur examinera votre demande sous peu.
-        Une fois approuvée, vous recevrez un email à l'adresse ${email} avec les instructions de réinitialisation.
+        Un email de réinitialisation a été envoyé à ${email}.
+        Suivez les instructions dans l'email pour réinitialiser votre mot de passe.
+        Ce lien expire dans 1 heure.
       `);
     } catch (err: any) {
       console.error("Échec de la demande de réinitialisation:", err);
@@ -79,8 +79,8 @@ const ForgotPassword: React.FC = () => {
               </Form.Group>
 
               <div className="d-grid gap-2">
-                <Button 
-                  variant="primary" 
+                <Button
+                  variant="primary"
                   type="submit"
                   disabled={loading || !email}
                 >
