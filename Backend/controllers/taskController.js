@@ -25,7 +25,7 @@ exports.getTaskById = async (req, res) => {
   }
 };
 
-// Create a new task (Admin only)
+// Create a new task 
 exports.createTask = async (req, res) => {
   try {
     const { title, description, status } = req.body;
@@ -51,7 +51,7 @@ exports.createTask = async (req, res) => {
   }
 };
 
-// Update a task (Admin only)
+// Update a task
 exports.updateTask = async (req, res) => {
   try {
     const { title, description, status } = req.body;
@@ -76,7 +76,7 @@ exports.updateTask = async (req, res) => {
   }
 };
 
-// Delete a task (Admin only)
+// Delete a task 
 exports.deleteTask = async (req, res) => {
   try {
     const deletedTask = await Task.findByIdAndDelete(req.params.id);

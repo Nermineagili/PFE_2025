@@ -24,10 +24,10 @@ router.post('/upload-profile-pic', authenticateToken, (req, res, next) => {
 }, upload.single('image'), uploadProfilePic);
 
 // Define the route to get user by ID
-router.get('/:id', authenticateToken, validateObjectId, getUserById); // Protect this route with authentication and validate ObjectId
+router.get('/:id', authenticateToken,  getUserById); // Protect this route with authentication and validate ObjectId
 
 // ✅ Update User Profile (Authenticated)
-router.put('/:id', authenticateToken, validateObjectId, updateUser);
+router.put('/:id', authenticateToken,  updateUser);
 
 router.put('/change-password/:userId', authenticateToken, changePassword);
 

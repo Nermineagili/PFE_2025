@@ -3,7 +3,7 @@ const User = require('../models/user');
 const mongoose = require('mongoose');
 
 // Verify JWT token
-exports.authenticateToken = (req, res, next) => {
+const authenticateToken = (req, res, next) => {
     const authHeader = req.header('Authorization');
     console.log('authenticateToken - Authorization Header:', authHeader);
 
@@ -24,10 +24,10 @@ exports.authenticateToken = (req, res, next) => {
     }
 };
 
-// ... (rest of the file remains the same)
+
 
 // Check if the user is an admin
-exports.checkAdmin = async (req, res, next) => {
+const checkAdmin = async (req, res, next) => {
     try {
         const user = await User.findById(req.user._id);
         if (!user) return res.status(404).json({ error: "User not found" });
@@ -47,7 +47,7 @@ exports.checkAdmin = async (req, res, next) => {
 // In authMiddleware.js
 const timeout = require('timers/promises').setTimeout;
 
-exports.checkSupervisor = async (req, res, next) => {
+const checkSupervisor = async (req, res, next) => {
     try {
         console.log(`checkSupervisor - Verifying user ${req.user._id} at ${new Date().toISOString()}`);
         const user = await Promise.race([
@@ -69,7 +69,7 @@ exports.checkSupervisor = async (req, res, next) => {
     }
 };
 
-exports.validateObjectId = (...paramNames) => {
+const validateObjectId = (...paramNames) => {
     return (req, res, next) => {
         console.log(`validateObjectId - Validating params ${paramNames} for ${req.path} at ${new Date().toISOString()}`);
         if (req.params) {
@@ -86,7 +86,7 @@ exports.validateObjectId = (...paramNames) => {
 };
 
 // Check if user is admin or supervisor
-exports.checkAdminOrSupervisor = async (req, res, next) => {
+const checkAdminOrSupervisor = async (req, res, next) => {
     try {
         const user = await User.findById(req.user._id);
         if (!user) {
@@ -101,4 +101,12 @@ exports.checkAdminOrSupervisor = async (req, res, next) => {
         console.error('Authorization Error:', err);
         res.status(500).json({ error: 'Server error during authorization' });
     }
+};
+
+module.exports = {
+  authenticateToken,
+  checkAdmin,
+  checkSupervisor,
+  validateObjectId,
+  checkAdminOrSupervisor
 };

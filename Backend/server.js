@@ -19,7 +19,7 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const cron = require('node-cron');
 
-const settingsRoutes = require('./routes/settings');
+// const settingsRoutes = require('./routes/settings');
 const userRoutes = require('./routes/user');
 const authRoutes = require('./routes/auth');
 const claimRoutes = require('./routes/claim');
@@ -83,7 +83,7 @@ app.use('/api/contracts', contratRoutes);
 app.use('/api/supervisor', supervisorRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use('/api', chatRoutes);
-app.use('/api/settings', settingsRoutes);
+// app.use('/api/settings', settingsRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/notifications', notificationRoutes);
 
