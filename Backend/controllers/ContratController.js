@@ -160,7 +160,6 @@ exports.createContract = async (req, res) => {
   }
 };
 
-
 exports.downloadContract = async (req, res) => {
   try {
     const { contractId } = req.params;
@@ -270,9 +269,32 @@ exports.downloadContract = async (req, res) => {
       doc.text('Signature: Non disponible', { align: 'right' });
     }
 
-    // YOMI stamp (simulated as text for simplicity)
-    doc.moveDown(2);
-    doc.fontSize(12).text('YOMI Insurance', { align: 'center', color: '#2196F3', opacity: 0.1, rotate: 45 });
+    // Add YOMI Assurance stamp at bottom center, higher up
+    const stampPath = path.join(__dirname, '../assets/stamp.png'); // Path to your stamp image
+    try {
+      await fsPromises.access(stampPath);
+      doc.save(); // Save the current state to restore later
+      const pageWidth = 595; // A4 width in points
+      const stampX = (pageWidth - 150) / 2; // Center the 150-width stamp
+      doc.translate(stampX, 650); // Higher bottom center position (adjust y as needed)
+      doc.rotate(45, { origin: [0, 0] }); // Rotate for stamp effect
+      doc.image(stampPath, 0, 0, { width: 150, opacity: 0.2 }); // Lighter stamp
+      doc.restore(); // Restore the state
+    } catch (stampError) {
+      // Fallback to text-based stamp if image is unavailable
+      doc.save();
+      const pageWidth = 595; // A4 width in points
+      const textX = (pageWidth - 150) / 2; // Center the text
+      doc.fontSize(30).text('YOMI Assurance', {
+        align: 'center',
+        color: '#2196F3',
+        opacity: 0.1,
+        rotate: 45,
+        x: textX,
+        y: 650
+      });
+      doc.restore();
+    }
 
     // Finalize PDF
     doc.end();
