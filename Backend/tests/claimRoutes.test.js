@@ -90,7 +90,6 @@ it('should submit a claim successfully', async () => {
   expect(response.body.message).toBe('Claim submitted successfully');
 });
 
-
   it('should return all claims for a user', async () => {
     const mockClaims = [{ _id: 'claim1' }, { _id: 'claim2' }];
     Claim.find = jest.fn().mockReturnValue({

@@ -1,5 +1,5 @@
 // server.js
-require('dotenv').config();
+require('dotenv').config({ path: '../.env' }); // Update to load .env from project root
 
 if (process.env.NODE_ENV !== 'test') {
   console.log('\n=== Environment variables ===');

@@ -69,7 +69,4 @@ router.get("/user/:userId/:claimId",  getUserClaimById);
 // Download a specific supporting file
 router.get("/download/:claimId/:fileId", downloadClaimFile);
 
-// Analyze claim
-// router.post('/analyze/:claimId', validateObjectId('claimId'), analyzeClaim);
-
 module.exports = router;

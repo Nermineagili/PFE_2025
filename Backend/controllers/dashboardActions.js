@@ -24,7 +24,7 @@ const getUserById = async (req, res) => {
     }
 };
 
-// Get all users with contracts (including empty contract arrays)
+// Get all users with contracts 
 const getAllUsersWithContracts = async (req, res) => {
     try {
         const users = await User.find({ role: { $ne: 'admin' } })

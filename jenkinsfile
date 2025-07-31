@@ -1,0 +1,57 @@
+pipeline {
+    agent any
+    
+    stages {
+        stage('Checkout GitHub') {
+            steps {
+                git url: 'https://github.com/Nermineagili/PFE_2025.git', branch: 'main'
+                
+            }
+        }
+
+        stage('Build Docker Images') {
+            steps {
+                // Build backend image
+                dir('backend') {
+                    bat 'docker build -t app_assurance_backend .'
+                }
+                // Build Flask backend image
+                dir('flask-backend') {
+                    bat 'docker build -t app_assurance_flask-backend .'
+                }
+                // Build frontend image
+                dir('frontend') {
+                    bat 'docker build -t app_assurance_frontend .'
+                }
+            }
+        }
+
+        stage('Start Services with Docker Compose') {
+            steps {
+                bat 'docker-compose up -d'
+                // Ensure docker-compose.yml defines services
+            }
+        }
+
+stage('Run Tests') {
+            steps {
+                // Run backend tests (using Jest)
+                dir('backend') {
+                    bat 'docker exec app_assurance_backend npm install && docker exec app_assurance_backend npx jest /app/tests -v'
+                }
+            }
+            post {
+                always {
+                    junit 'backend/tests/*.xml'
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo 'App deployed'
+                // Add deployment steps (e.g., push to Docker Hub) as needed
+            }
+        }
+    }
+}

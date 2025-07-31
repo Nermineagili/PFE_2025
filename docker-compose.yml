@@ -1,0 +1,73 @@
+version: '3.8'
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"  # Map host port 5000 to container port 5000
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - PORT=${PORT}
+      - MONGO_URI=${MONGO_URI}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      - JWT_SECRET=${JWT_SECRET}
+      - FRONTEND_URL=${FRONTEND_URL}
+      - ADMIN_URL=${ADMIN_URL}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - CHATGPT_API_KEY=${CHATGPT_API_KEY}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./backend/uploads:/app/uploads  # Persist uploaded files
+    networks:
+      - app-network
+
+  flask-backend:
+    build:
+      context: ./flask-backend
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"  # Map host port 5001 to container port 5001
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"  # Map host port 80 to container port 80
+    depends_on:
+      - backend
+      - flask-backend
+    environment:
+      - REACT_APP_API_URL=${REACT_APP_API_URL}
+      - REACT_APP_FLASK_API_URL=${REACT_APP_FLASK_API_URL}
+    networks:
+      - app-network
+
+  mongodb:
+    image: mongo:6.0
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
+      - MONGO_INITDB_DATABASE=${MONGO_DB}
+    ports:
+      - "27017:27017"  # Map host port 27017 to container port 27017
+    volumes:
+      - mongo-data:/data/db  # Persist MongoDB data
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
+  uploads:
