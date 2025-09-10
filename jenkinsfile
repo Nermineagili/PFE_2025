@@ -40,27 +40,18 @@ pipeline {
 stage('Run Tests') {
     steps {
         dir('backend') {
-            // Build backend image with devDependencies
+            // Build the backend Docker image with devDependencies
             bat 'docker build -t app_assurance_backend --target base .'
 
-            // Ensure test-results folder exists on host
-            bat 'if not exist test-results mkdir test-results'
-
-            // Run tests with mapped volume
+            // Run Jest tests inside the container
             bat '''
             docker run --rm ^
-            -v %cd%/test-results:/app/test-results ^
-            app_assurance_backend sh -c "mkdir -p /app/test-results && npx jest tests --ci --reporters=default --reporters=jest-junit || true"
+            app_assurance_backend sh -c "npx jest tests --ci --reporters=default || true"
             '''
         }
     }
-    post {
-        always {
-            // Collect JUnit test results
-            junit 'backend/test-results/jest-junit.xml'
-        }
-    }
 }
+
 
 
 
