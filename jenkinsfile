@@ -36,17 +36,21 @@ pipeline {
 stage('Run Tests') {
     steps {
         dir('backend') {
-            bat '''
-                docker run --rm app_assurance_backend sh -c "npm install && npx jest tests --ci --reporters=default --reporters=jest-junit"
-            '''
+            // Build the backend Docker image using the base stage (with devDependencies)
+            bat 'docker build -t app_assurance_backend --target base .'
+
+            // Run Jest tests inside the container
+            bat 'docker run --rm app_assurance_backend sh -c "npx jest tests --ci --reporters=default --reporters=jest-junit"'
         }
     }
     post {
         always {
+            // Collect JUnit test results for Jenkins
             junit 'backend/test-results/jest-junit.xml'
         }
     }
 }
+
 
 
 
