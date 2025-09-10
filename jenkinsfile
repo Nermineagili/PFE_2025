@@ -43,11 +43,15 @@ stage('Run Tests') {
             // Build backend image with devDependencies
             bat 'docker build -t app_assurance_backend --target base .'
 
-            // Ensure test-results folder exists
-            bat 'mkdir test-results'
+            // Ensure test-results folder exists on host
+            bat 'if not exist test-results mkdir test-results'
 
-            // Run tests with mounted volume for JUnit report
-            bat 'docker run --rm -v %cd%/test-results:/app/test-results app_assurance_backend sh -c "npx jest tests --ci --reporters=default --reporters=jest-junit || true"'
+            // Run tests with mapped volume
+            bat '''
+            docker run --rm ^
+            -v %cd%/test-results:/app/test-results ^
+            app_assurance_backend sh -c "mkdir -p /app/test-results && npx jest tests --ci --reporters=default --reporters=jest-junit || true"
+            '''
         }
     }
     post {
@@ -57,6 +61,7 @@ stage('Run Tests') {
         }
     }
 }
+
 
 
 
