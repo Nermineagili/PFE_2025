@@ -1,15 +1,14 @@
-# Use Python 3.11 Slim (Debian-based) instead of Alpine
+# Use Python 3.11 Slim (Debian-based)
 FROM python:3.11-slim
 
 # Set working directory
 WORKDIR /app
 
-# Install build tools and dependencies
+# Install build tools and dependencies (without libatlas-base-dev)
 RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
     gfortran \
-    libatlas-base-dev \
     libopenblas-dev \
     liblapack-dev \
     && rm -rf /var/lib/apt/lists/*
